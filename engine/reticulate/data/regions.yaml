@@ -1,0 +1,548 @@
+# Brain structures shown in the atlas.
+#
+# Cortex: the 34 gyral regions of the Desikan–Killiany atlas (Desikan et al., 2006) as
+# annotated on fsaverage. Deep structures, cerebellum, brainstem and corpus callosum:
+# FreeSurfer's automated segmentation of fsaverage (aseg; Fischl et al., 2002).
+#
+# `functions` are textbook-level summaries with review references. They describe what
+# a region is known to contribute to, not what it "does" in isolation: almost every
+# function depends on distributed networks.
+#
+# `atlas_labels` maps a structure to the atlas: annotation names for cortex, aseg label
+# numbers [left, right] or [bilateral] for deep structures.
+
+version: 0.2.0
+
+groups:
+  - {id: frontal, name: Frontal lobe}
+  - {id: parietal, name: Parietal lobe}
+  - {id: temporal, name: Temporal lobe}
+  - {id: occipital, name: Occipital lobe}
+  - {id: cingulate, name: Cingulate cortex}
+  - {id: insula, name: Insula}
+  - {id: subcortical, name: Subcortical nuclei}
+  - {id: hindbrain, name: Cerebellum and brainstem}
+  - {id: white_matter, name: White matter}
+  - {id: other, name: Other}
+
+regions:
+  # ---- frontal lobe -------------------------------------------------------------------
+  - id: superiorfrontal
+    name: Superior frontal gyrus
+    alias: incl. supplementary motor area, pre-SMA and dorsomedial prefrontal cortex
+    group: frontal
+    kind: cortex
+    atlas_labels: [superiorfrontal]
+    functions:
+      - Initiating self-generated movements and sequences (supplementary motor area)
+      - Switching between action plans and withholding responses (pre-SMA)
+      - Self-referential and social thought (dorsomedial prefrontal cortex)
+    refs: [nachev2008, buckner2008]
+
+  - id: rostralmiddlefrontal
+    name: Rostral middle frontal gyrus
+    alias: dorsolateral prefrontal cortex (dlPFC)
+    group: frontal
+    kind: cortex
+    atlas_labels: [rostralmiddlefrontal]
+    functions:
+      - Keeping goals and rules active in working memory
+      - Top-down control that biases processing toward current goals
+      - Self-control in value-based choice, e.g. favouring delayed over immediate rewards
+    refs: [miller2001, hare2009, figner2010]
+
+  - id: caudalmiddlefrontal
+    name: Caudal middle frontal gyrus
+    alias: incl. frontal eye field and dorsal premotor cortex
+    group: frontal
+    kind: cortex
+    atlas_labels: [caudalmiddlefrontal]
+    functions:
+      - Voluntary eye movements and spatial attention (frontal eye field)
+      - Goal-directed attention as part of the dorsal attention network
+      - Preparing movements according to rules (dorsal premotor cortex)
+    refs: [corbetta2002, vernet2014]
+
+  - id: parsopercularis
+    name: Pars opercularis
+    alias: inferior frontal gyrus, posterior Broca's area (BA 44)
+    group: frontal
+    kind: cortex
+    atlas_labels: [parsopercularis]
+    functions:
+      - Speech production and syntactic processing (left hemisphere)
+      - Stopping actions and inhibitory control (right hemisphere)
+    refs: [friederici2011, aron2014]
+
+  - id: parstriangularis
+    name: Pars triangularis
+    alias: inferior frontal gyrus, anterior Broca's area (BA 45)
+    group: frontal
+    kind: cortex
+    atlas_labels: [parstriangularis]
+    functions:
+      - Controlled retrieval and selection of word meanings (left hemisphere)
+      - Inhibitory control (right hemisphere)
+    refs: [badre2007, aron2014]
+
+  - id: parsorbitalis
+    name: Pars orbitalis
+    alias: inferior frontal gyrus (BA 47)
+    group: frontal
+    kind: cortex
+    atlas_labels: [parsorbitalis]
+    functions:
+      - Controlled semantic retrieval and integration of meaning
+      - Processing structure that unfolds over time in language and music
+    refs: [badre2007, levitin2003]
+
+  - id: lateralorbitofrontal
+    name: Lateral orbitofrontal cortex
+    group: frontal
+    kind: cortex
+    atlas_labels: [lateralorbitofrontal]
+    functions:
+      - Representing the value of expected outcomes, including punishments
+      - Learning which choice caused which outcome (credit assignment)
+      - Adjusting behaviour after negative outcomes
+    refs: [kringelbach2005, rushworth2011]
+
+  - id: medialorbitofrontal
+    name: Medial orbitofrontal cortex
+    alias: ventromedial prefrontal cortex (vmPFC)
+    group: frontal
+    kind: cortex
+    atlas_labels: [medialorbitofrontal]
+    functions:
+      - Encoding the subjective value of options across reward types
+      - Comparing options during value-based choice
+      - Hedonic experience of rewards
+    refs: [bartra2013, kringelbach2005]
+
+  - id: frontalpole
+    name: Frontal pole
+    alias: rostral prefrontal cortex (BA 10)
+    group: frontal
+    kind: cortex
+    atlas_labels: [frontalpole]
+    functions:
+      - Keeping an alternative course of action in mind while pursuing the current one
+      - Exploratory choices that gather information
+    refs: [koechlin2007, daw2006]
+
+  - id: precentral
+    name: Precentral gyrus
+    alias: primary motor cortex (M1)
+    group: frontal
+    kind: cortex
+    atlas_labels: [precentral]
+    functions:
+      - Executing voluntary movements
+      - Somatotopic map of the body (motor homunculus)
+    refs: [penfield1937, witt2008]
+
+  - id: paracentral
+    name: Paracentral lobule
+    group: frontal
+    kind: cortex
+    atlas_labels: [paracentral]
+    functions:
+      - Motor and sensory representation of the leg and foot
+    refs: [penfield1937]
+
+  # ---- parietal lobe ------------------------------------------------------------------
+  - id: postcentral
+    name: Postcentral gyrus
+    alias: primary somatosensory cortex (S1)
+    group: parietal
+    kind: cortex
+    atlas_labels: [postcentral]
+    functions:
+      - Touch, pressure, vibration and body position
+      - Somatotopic map of the body (sensory homunculus)
+    refs: [penfield1937]
+
+  - id: superiorparietal
+    name: Superior parietal lobule
+    alias: incl. intraparietal sulcus
+    group: parietal
+    kind: cortex
+    atlas_labels: [superiorparietal]
+    functions:
+      - Goal-directed spatial attention (dorsal attention network)
+      - Coordinating vision with reaching and grasping
+      - Manipulating spatial information in working memory
+    refs: [corbetta2002]
+
+  - id: supramarginal
+    name: Supramarginal gyrus
+    alias: anterior temporoparietal junction
+    group: parietal
+    kind: cortex
+    atlas_labels: [supramarginal]
+    functions:
+      - Phonological working memory (left hemisphere)
+      - Reorienting attention to unexpected events (right hemisphere, ventral attention network)
+      - Separating one's own emotional state from another's (right hemisphere)
+    refs: [corbetta2002, silani2013]
+
+  - id: inferiorparietal
+    name: Inferior parietal lobule
+    alias: angular gyrus, posterior temporoparietal junction
+    group: parietal
+    kind: cortex
+    atlas_labels: [inferiorparietal]
+    functions:
+      - Semantic integration and combining concepts
+      - Reasoning about other people's beliefs (right temporoparietal junction)
+      - Retrieving episodic memories (default mode network)
+    refs: [seghier2013, saxe2003]
+
+  - id: precuneus
+    name: Precuneus
+    group: parietal
+    kind: cortex
+    atlas_labels: [precuneus]
+    functions:
+      - Visuospatial imagery
+      - Retrieving episodic memories
+      - Self-referential processing and taking another's perspective
+    refs: [cavanna2006]
+
+  # ---- temporal lobe ------------------------------------------------------------------
+  - id: superiortemporal
+    name: Superior temporal gyrus
+    group: temporal
+    kind: cortex
+    atlas_labels: [superiortemporal]
+    functions:
+      - Auditory processing beyond primary auditory cortex
+      - Speech perception (left posterior part, classical Wernicke's area)
+      - Recognising voices
+    refs: [friederici2011, belin2000]
+
+  - id: transversetemporal
+    name: Transverse temporal gyrus
+    alias: Heschl's gyrus, primary auditory cortex
+    group: temporal
+    kind: cortex
+    atlas_labels: [transversetemporal]
+    functions:
+      - First cortical stage of hearing
+      - Tonotopic map of sound frequency
+    refs: [dacosta2011]
+
+  - id: bankssts
+    name: Banks of the superior temporal sulcus
+    group: temporal
+    kind: cortex
+    atlas_labels: [bankssts]
+    functions:
+      - Perceiving biological motion, gaze and facial movement
+      - Integrating what is heard with what is seen
+    refs: [allison2000, beauchamp2004]
+
+  - id: middletemporal
+    name: Middle temporal gyrus
+    group: temporal
+    kind: cortex
+    atlas_labels: [middletemporal]
+    functions:
+      - Semantic memory and word meaning
+      - Language comprehension
+      - Visual motion near its posterior end (area MT/V5)
+    refs: [binder2009, tootell1995]
+
+  - id: inferiortemporal
+    name: Inferior temporal gyrus
+    group: temporal
+    kind: cortex
+    atlas_labels: [inferiortemporal]
+    functions:
+      - High-level visual object recognition and categorisation
+      - Semantic memory
+    refs: [grillspector2014, binder2009]
+
+  - id: fusiform
+    name: Fusiform gyrus
+    group: temporal
+    kind: cortex
+    atlas_labels: [fusiform]
+    functions:
+      - Face recognition (fusiform face area)
+      - Recognising written words (visual word form area, left hemisphere)
+      - Object and colour processing
+    refs: [kanwisher1997, dehaene2011, grillspector2014]
+
+  - id: parahippocampal
+    name: Parahippocampal gyrus
+    group: temporal
+    kind: cortex
+    atlas_labels: [parahippocampal]
+    functions:
+      - Processing scenes and places (parahippocampal place area)
+      - Contextual associations
+      - Spatial memory and navigation
+    refs: [epstein1998, aminoff2013]
+
+  - id: entorhinal
+    name: Entorhinal cortex
+    group: temporal
+    kind: cortex
+    atlas_labels: [entorhinal]
+    functions:
+      - Main gateway between neocortex and hippocampus
+      - Grid-like spatial coding during navigation
+      - Forming new memories
+    refs: [eichenbaum2007, doeller2010]
+
+  - id: temporalpole
+    name: Temporal pole
+    group: temporal
+    kind: cortex
+    atlas_labels: [temporalpole]
+    functions:
+      - Semantic knowledge about people and social concepts
+      - Linking emotional meaning to perceptual and conceptual information
+    refs: [olson2007]
+
+  # ---- occipital lobe -----------------------------------------------------------------
+  - id: lateraloccipital
+    name: Lateral occipital cortex
+    group: occipital
+    kind: cortex
+    atlas_labels: [lateraloccipital]
+    functions:
+      - Object shape processing (lateral occipital complex)
+      - Visual motion at its anterior border (area MT/V5)
+      - Visual field maps beyond V1
+    refs: [grillspector2014, tootell1995, wandell2007]
+
+  - id: lingual
+    name: Lingual gyrus
+    group: occipital
+    kind: cortex
+    atlas_labels: [lingual]
+    functions:
+      - Early visual processing of the upper visual field
+      - Colour processing in ventral occipital cortex
+    refs: [wandell2007]
+
+  - id: pericalcarine
+    name: Pericalcarine cortex
+    alias: primary visual cortex (V1)
+    group: occipital
+    kind: cortex
+    atlas_labels: [pericalcarine]
+    functions:
+      - First cortical stage of vision
+      - Retinotopic map of the opposite visual field
+    refs: [wandell2007]
+
+  - id: cuneus
+    name: Cuneus
+    group: occipital
+    kind: cortex
+    atlas_labels: [cuneus]
+    functions:
+      - Early visual processing of the lower visual field
+      - Visual field maps V2 and V3
+    refs: [wandell2007]
+
+  # ---- cingulate ----------------------------------------------------------------------
+  - id: rostralanteriorcingulate
+    name: Rostral anterior cingulate cortex
+    alias: pregenual ACC
+    group: cingulate
+    kind: cortex
+    atlas_labels: [rostralanteriorcingulate]
+    functions:
+      - Regulating emotion
+      - Appraising affective significance
+      - Autonomic regulation
+    refs: [etkin2011]
+
+  - id: caudalanteriorcingulate
+    name: Caudal anterior cingulate cortex
+    alias: dorsal ACC
+    group: cingulate
+    kind: cortex
+    atlas_labels: [caudalanteriorcingulate]
+    functions:
+      - Detecting conflict and errors
+      - Deciding how much cognitive control to invest
+      - The unpleasantness of pain
+    refs: [botvinick2001, shenhav2013, rainville1997]
+
+  - id: posteriorcingulate
+    name: Posterior cingulate cortex
+    group: cingulate
+    kind: cortex
+    atlas_labels: [posteriorcingulate]
+    functions:
+      - Hub of the default mode network
+      - Autobiographical memory and self-relevant thought
+      - Balancing internally and externally directed attention
+    refs: [leech2014, buckner2008]
+
+  - id: isthmuscingulate
+    name: Isthmus of the cingulate gyrus
+    alias: incl. retrosplenial cortex
+    group: cingulate
+    kind: cortex
+    atlas_labels: [isthmuscingulate]
+    functions:
+      - Spatial navigation and orientation (retrosplenial cortex)
+      - Translating between viewpoint-based and map-like spatial representations
+      - Episodic memory
+    refs: [vann2009]
+
+  # ---- insula -------------------------------------------------------------------------
+  - id: insula
+    name: Insula
+    group: insula
+    kind: cortex
+    atlas_labels: [insula]
+    functions:
+      - Awareness of bodily states (interoception)
+      - Detecting salient events (anterior insula, salience network)
+      - Anticipating aversive and uncertain outcomes
+      - Taste (primary gustatory cortex)
+      - Empathy and social emotions
+    refs: [craig2009, uddin2015, critchley2004, veldhuizen2011, singer2004]
+
+  - id: medialwall
+    name: Medial wall
+    alias: non-cortical midline surface
+    group: other
+    kind: medialwall
+    atlas_labels: [unknown, corpuscallosum]
+    functions:
+      - Surface over the corpus callosum and ventricles; not cortex and not part of the parcellation
+    refs: [desikan2006]
+
+  # ---- subcortical --------------------------------------------------------------------
+  - id: thalamus
+    name: Thalamus
+    group: subcortical
+    kind: deep
+    atlas_labels: [10, 49]
+    functions:
+      - Relaying sensory and motor signals to the cortex
+      - Regulating communication between cortical areas and attention
+      - Arousal and sleep–wake regulation
+    refs: [sherman2002, halassa2017]
+
+  - id: caudate
+    name: Caudate nucleus
+    group: subcortical
+    kind: deep
+    atlas_labels: [11, 50]
+    functions:
+      - Goal-directed action selection
+      - Learning from feedback
+      - Planning and working memory through loops with prefrontal cortex
+    refs: [grahn2008, alexander1986]
+
+  - id: putamen
+    name: Putamen
+    group: subcortical
+    kind: deep
+    atlas_labels: [12, 51]
+    functions:
+      - Selecting and controlling movements
+      - Habit and sequence learning
+    refs: [alexander1986]
+
+  - id: pallidum
+    name: Globus pallidus
+    group: subcortical
+    kind: deep
+    atlas_labels: [13, 52]
+    functions:
+      - Main output stage of the basal ganglia (internal segment)
+      - Gating movements
+      - Reward and motivation (ventral pallidum)
+    refs: [alexander1986, smith2009]
+
+  - id: accumbens
+    name: Nucleus accumbens
+    alias: ventral striatum
+    group: subcortical
+    kind: deep
+    atlas_labels: [26, 58]
+    functions:
+      - Anticipating rewards
+      - Motivation and incentive salience
+      - Signals resembling reward prediction errors in fMRI
+    refs: [knutson2001, haber2010]
+
+  - id: hippocampus
+    name: Hippocampus
+    group: subcortical
+    kind: deep
+    atlas_labels: [17, 53]
+    functions:
+      - Forming new episodic memories
+      - Spatial memory and navigation
+      - Imagining future events by recombining past experience
+    refs: [squire1992, schacter2007]
+
+  - id: amygdala
+    name: Amygdala
+    group: subcortical
+    kind: deep
+    atlas_labels: [18, 54]
+    functions:
+      - Detecting threat and emotional significance
+      - Fear learning
+      - Strengthening memory for emotional events
+      - Loss aversion and sensitivity to ambiguity in decisions
+    refs: [phelps2005, demartino2010, hsu2005]
+
+  - id: ventraldc
+    name: Ventral diencephalon
+    alias: FreeSurfer composite label — hypothalamus, mammillary bodies, subthalamic nucleus, substantia nigra and adjacent tracts
+    group: subcortical
+    kind: deep
+    atlas_labels: [28, 60]
+    functions:
+      - Homeostasis — hunger, thirst, temperature and hormones (hypothalamus)
+      - Dopamine neurons signalling reward prediction errors (substantia nigra region)
+      - Motor control (subthalamic nucleus)
+    refs: [fischl2002, schultz1997]
+
+  # ---- hindbrain ----------------------------------------------------------------------
+  - id: cerebellum
+    name: Cerebellum
+    group: hindbrain
+    kind: deep
+    atlas_labels: [8, 47]
+    functions:
+      - Coordinating and timing movement
+      - Motor learning and error correction
+      - Contributions to cognition and emotion through loops with association cortex
+    refs: [buckner2011, schmahmann2019]
+
+  - id: brainstem
+    name: Brainstem
+    alias: midbrain, pons and medulla
+    group: hindbrain
+    kind: deep
+    atlas_labels: [16]
+    functions:
+      - Vital autonomic control — breathing, heart rate, blood pressure
+      - Arousal and sleep–wake regulation (reticular formation)
+      - Neuromodulatory nuclei — dopamine (ventral tegmental area), noradrenaline (locus coeruleus), serotonin (raphe)
+    refs: [parvizi2001, aston_jones2005]
+
+  # ---- white matter -------------------------------------------------------------------
+  - id: corpuscallosum
+    name: Corpus callosum
+    group: white_matter
+    kind: deep
+    atlas_labels: [251, 252, 253, 254, 255]
+    functions:
+      - Largest fibre bundle connecting the two hemispheres
+      - Transfers sensory, motor and cognitive information between hemispheres
+    refs: [gazzaniga2000]

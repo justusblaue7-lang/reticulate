@@ -1,0 +1,182 @@
+# Decision anatomy: structural features a real decision can have.
+#
+# The decision mode rates each feature for a decision (0 absent, 1 minor, 2 present,
+# 3 central). Features with a meta-analytic map contribute to the decision's neural
+# signature: the level-weighted mean of their maps, computed separately for NeuroQuery and
+# Neurosynth. `neuroquery` is a NeuroQuery query; `neurosynth` lists Neurosynth terms, and
+# a study counts when its abstract uses any of them. An empty list means Neurosynth's
+# abstract vocabulary has no term for the construct; the feature then has a NeuroQuery map
+# only, and the two sources are compared only where both have one.
+#
+# `question` is what Claude rates; `ask` is the same question put to the user in the self-check.
+# `dimensions` are the profile dimensions the feature engages (authored); `mechanisms`
+# refer to mechanisms.yaml; `note` flags a map whose literature only partly fits.
+
+version: 0.4.0
+
+features:
+  - id: possible_loss
+    name: Possible loss
+    question: Could the decision-maker lose something they already have, such as money, position, health or relationships?
+    ask: "Could you lose something you already have: money, position, health or relationships?"
+    neuroquery: loss anticipation monetary loss aversion
+    neurosynth: [losses, punishment]
+    dimensions: [risk_tolerance]
+    mechanisms: [loss_aversion, framing]
+
+  - id: known_risk
+    name: Risk with estimable odds
+    question: Do outcomes vary in ways whose probabilities can be estimated, for example from base rates or experience?
+    ask: "Can the odds be estimated, from base rates or experience?"
+    neuroquery: risk taking gambling
+    neurosynth: [risk taking, gambling]
+    dimensions: [risk_tolerance]
+    mechanisms: [probability_weighting]
+
+  - id: unknown_odds
+    name: Unknown odds
+    question: Are the probabilities themselves unknown, so that nobody could say how likely the outcomes are?
+    ask: "Is it impossible to say how likely the outcomes are?"
+    neuroquery: decision uncertainty uncertainty
+    neurosynth: [uncertainty, uncertain]
+    dimensions: [uncertainty_tolerance]
+    mechanisms: [ambiguity_aversion]
+
+  - id: delayed_outcomes
+    name: Delayed consequences
+    question: Do important costs or benefits arrive only months or years after the choice?
+    ask: "Do important costs or benefits arrive only months or years later?"
+    neuroquery: delay discounting intertemporal choice
+    neurosynth: []
+    dimensions: [time_horizon]
+    mechanisms: [present_bias]
+
+  - id: upside
+    name: Potential gain
+    question: Is there a substantial reward to be won, such as money, status or opportunity?
+    ask: "Is there a substantial gain to be won: money, status or opportunity?"
+    neuroquery: reward anticipation monetary reward
+    neurosynth: [reward anticipation, monetary incentive, reward]
+    dimensions: [risk_tolerance]
+    mechanisms: [probability_weighting]
+
+  - id: others_affected
+    name: Consequences for others
+    question: Does the choice change the welfare of other people, or raise questions of fair shares?
+    ask: "Will the choice change other people's welfare, or raise questions of fair shares?"
+    neuroquery: altruistic cooperation
+    neurosynth: []
+    dimensions: [social_orientation]
+    mechanisms: [inequity_aversion]
+
+  - id: social_influence
+    name: Others' opinions
+    question: Will what peers, family or the public think or do weigh on the choice?
+    ask: "Will what peers, family or the public think weigh on you?"
+    neuroquery: conformity social norms
+    neurosynth: []
+    dimensions: [social_orientation]
+    mechanisms: [social_conformity]
+
+  - id: relying_on_others
+    name: Relying on others
+    question: Does the outcome depend on trusting another party to act as promised?
+    ask: "Does the outcome depend on someone else keeping their word?"
+    neuroquery: trust trustworthiness
+    neurosynth: []
+    dimensions: [social_orientation, uncertainty_tolerance]
+    mechanisms: [trust_reciprocity]
+    note: >-
+      The 'trust' literature in NeuroQuery is dominated by judgements of facial
+      trustworthiness (amygdala); trust-game studies, which implicate the caudate, are a
+      minority. Read this map as a rough proxy.
+
+  - id: new_territory
+    name: New territory
+    question: Is at least one option unfamiliar, so that choosing it would also be a way of finding out?
+    ask: "Is one option unfamiliar to you, so that choosing it is also a way of finding out?"
+    neuroquery: novelty exploration
+    neurosynth: [novelty]
+    dimensions: [exploration, experimentation]
+    mechanisms: [explore_exploit]
+
+  - id: default_option
+    name: A default to keep
+    question: Is one option simply to keep things as they are?
+    ask: "Is one option simply to keep things as they are?"
+    neuroquery: ""
+    neurosynth: []
+    dimensions: [experimentation, cognitive_flexibility]
+    mechanisms: [status_quo_bias]
+
+  - id: prior_investment
+    name: Prior investment
+    question: Have time, money or reputation already been committed to one course of action?
+    ask: "Have you already put time, money or reputation into one course?"
+    neuroquery: ""
+    neurosynth: []
+    dimensions: [cognitive_flexibility]
+    mechanisms: [sunk_cost]
+
+  - id: effort
+    name: Sustained effort
+    question: Would an option demand sustained effort, work or attention?
+    ask: "Would an option demand sustained effort, work or attention from you?"
+    neuroquery: effort
+    neurosynth: []  # Neurosynth's 'effort' is mostly listening effort (auditory cortex)
+    dimensions: []
+    mechanisms: [effort_discounting]
+
+  - id: temptation
+    name: Immediate temptation
+    question: Is there a tempting short-term option that conflicts with longer-term goals?
+    ask: "Is there a tempting short-term option that conflicts with your longer-term goals?"
+    neuroquery: self control impulsivity craving
+    neurosynth: [impulsivity, impulsive, craving]
+    dimensions: [time_horizon]
+    mechanisms: [self_control, present_bias]
+
+  - id: complexity
+    name: Analytical complexity
+    question: Does a good answer require holding many variables in mind, calculating or reasoning step by step?
+    ask: "Does a good answer require calculating, or holding many things in mind at once?"
+    neuroquery: reasoning working memory calculation
+    neurosynth: [reasoning, working memory, calculation]
+    dimensions: [analytical_style]
+    mechanisms: [cognitive_reflection, overconfidence]
+
+  - id: threat
+    name: Threat and worry
+    question: Does the decision involve fear, anxiety or a threat to safety or security?
+    ask: "Does the decision involve fear, worry or a threat to your safety or security?"
+    neuroquery: anxiety threat fear
+    neurosynth: [anxiety, threat, fear]
+    dimensions: [uncertainty_tolerance]
+    mechanisms: [threat_and_anxiety]
+
+  - id: moral_stakes
+    name: Moral stakes
+    question: Does the decision raise questions of right and wrong, harm or duty?
+    ask: "Does it raise questions of right and wrong, harm or duty?"
+    neuroquery: moral
+    neurosynth: [moral]
+    dimensions: [social_orientation, analytical_style]
+    mechanisms: [moral_intuition]
+
+  - id: anticipated_regret
+    name: Possible regret
+    question: Will the decision-maker learn how the option not taken would have turned out?
+    ask: "Will you find out how the option you did not take would have turned out?"
+    neuroquery: regret
+    neurosynth: []
+    dimensions: [risk_tolerance]
+    mechanisms: [regret_aversion]
+
+  - id: learning_from_outcomes
+    name: Feedback over time
+    question: Can the choice be staged or adjusted as early results come in?
+    ask: "Can you stage the choice, or adjust it as early results come in?"
+    neuroquery: prediction error reinforcement learning feedback
+    neurosynth: [prediction error, reinforcement learning, feedback]
+    dimensions: [experimentation, cognitive_flexibility]
+    mechanisms: [feedback_learning]

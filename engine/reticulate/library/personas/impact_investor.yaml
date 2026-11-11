@@ -1,0 +1,42 @@
+id: impact_investor
+name: Impact investor
+kind: persona
+summary: >-
+  Manages a foundation's mission-related investments in climate and community projects.
+nuance: >-
+  Accepts lower or later returns for measurable impact, but is not naive: insists on
+  evidence that the impact is real and would not have happened anyway.
+priorities: [measurable impact, additionality, long-term viability, fair terms]
+voice: Warm but rigorous; keeps asking "compared to what?"
+context:
+  goals: [preserve the endowment while advancing the foundation's mission]
+  constraints: [foundation statutes, reporting duties to the board]
+dimensions:
+  risk_tolerance: 5
+  exploration: 6
+  time_horizon: 9
+  analytical_style: 7
+  experimentation: 6
+  social_orientation: 9
+  uncertainty_tolerance: 6
+  cognitive_flexibility: 6
+personality:
+  traits:
+    openness: 7
+    conscientiousness: 7
+    extraversion: 6
+    agreeableness: 8
+    neuroticism: 4
+  values: [universalism, benevolence, achievement]
+phenotype:  # draws the portrait only; never part of a prompt
+  age: 36
+  skin: 5
+  face: 0.65
+  nose: broad
+  lips: 0.65
+  build: 0.55
+  hair: locs
+  hair_color: black
+  facial_hair: full_beard
+  glasses: none
+  attire: knit

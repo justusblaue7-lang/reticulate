@@ -1,0 +1,49 @@
+# Large-scale functional networks of the cerebral cortex (Yeo et al., 2011, 7-network
+# solution). Vertex membership comes from the published annotation on fsaverage
+# (Yeo2011_7Networks_N1000); colours are the published colour table of that annotation.
+
+version: 0.2.0
+
+networks:
+  - id: visual
+    index: 1
+    name: Visual network
+    functions: [visual perception, visual field maps, object and scene processing]
+    refs: [yeo2011, wandell2007]
+
+  - id: somatomotor
+    index: 2
+    name: Somatomotor network
+    functions: [movement execution, somatosensation, auditory processing in its superior temporal portion]
+    refs: [yeo2011, penfield1937]
+
+  - id: dorsal_attention
+    index: 3
+    name: Dorsal attention network
+    functions: [goal-directed spatial attention, eye movements, visuomotor coordination]
+    refs: [yeo2011, corbetta2002]
+
+  - id: ventral_attention
+    index: 4
+    name: Salience / ventral attention network
+    functions: [detecting behaviourally relevant events, reorienting attention, interoceptive and autonomic salience]
+    refs: [yeo2011, seeley2007, uddin2015]
+
+  - id: limbic
+    index: 5
+    name: Limbic network (orbitofrontal–temporal pole)
+    functions: [value representation, affective and semantic association]
+    notes: Orbitofrontal and temporal-pole territory with low fMRI signal; network estimates here are less reliable.
+    refs: [yeo2011]
+
+  - id: frontoparietal
+    index: 6
+    name: Frontoparietal control network
+    functions: [cognitive control, working memory, flexible adaptation of behaviour to goals]
+    refs: [yeo2011, niendam2012]
+
+  - id: default
+    index: 7
+    name: Default mode network
+    functions: [self-referential thought, autobiographical memory, imagining the future, reasoning about other minds]
+    refs: [yeo2011, buckner2008, spreng2009]

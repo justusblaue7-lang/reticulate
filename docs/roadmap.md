@@ -1,0 +1,60 @@
+# Roadmap
+
+## Done
+
+**0.1 Foundation:** science data, profiles, simulation pipeline, API, first interface.
+
+**0.2 Research build**
+- [x] Full-resolution fsaverage atlas: 68 cortical regions, 22 deep structures, cerebellum, brainstem
+- [x] Inspector per structure: curated functions, Yeo networks, NeuroQuery decoding, construct overlap, design-labelled findings
+- [x] Stimulation mode: 27 meta-analytic stimulus maps plus free-text stimuli, with validity checks
+- [x] Eleven non-stereotypical persona avatars with profile glyphs
+- [x] Replicated simulations, dose–response experiments with slope ± SE, run log with full metadata
+- [x] Removed unscientific elements (see epistemics.md); one-click launcher; figure export
+
+**0.3 Decision build**
+- [x] Full NeuroQuery vocabulary (6,308 features) decoded on every structure; batched maps equal the model's
+- [x] Neurosynth release 7 re-analysed on the same grid (association test, 14,371 studies); every curated map in both sources with agreement; median r 0.39 over 1,507 shared terms
+- [x] Cognitive Atlas categories for decoding; free-text and vocabulary maps from both sources
+- [x] Decision mode: anatomy (18 features), neural signature, 19 mechanisms with evidence, panel with neural context, report, tipping points, archive with token cost, print to PDF
+- [x] Avatars with personality (Big Five, Schwartz values) and a drawn phenotype (cameo), excluded from prompts; avatar builder; user avatars
+- [x] Deep-blue and cream design; three modes instead of four
+
+**0.4 Product build**
+- [x] The decision bar: one field for the decision, options as chips, optional details, example decisions; a self-check of 18 questions without AI
+- [x] A decision workspace instead of chapters: overview with the next step or the verdict, what's at play, watch-outs, brain, panel, before you decide, tipping points, with a sticky section bar
+- [x] Countermoves for all 19 mechanisms, seven tested in intervention studies; decision-specific watch-outs written in the analysis call
+- [x] Suggested panel (the avatars who differ most on what the decision engages); one-click panel from the overview; live progress per avatar
+- [x] Connect Claude in the app (key checked with Anthropic, stored in engine/.env); cost and time estimate before every paid step; spend shown in the decision list
+- [x] Tipping points accumulate; verdicts in the decision list; checklist of open questions; print with reasoning and evidence unfolded
+
+## Next, for the thesis
+
+1. **Profile-fidelity study.** Run dose–response sweeps for all eight dimensions on a fixed set
+   of decision problems, five replicates each, and test for monotone, replicable effects on the
+   theoretically expected factors. This is the core validation of the method.
+2. **Model comparison.** Repeat the fidelity study across models and effort levels, and record
+   cost per run.
+3. **Inter-run reliability.** Estimate replicate variance per factor to choose the number of
+   replicates needed for a given precision.
+4. **Human comparison.** Have participants with measured scores (DOSPERT, IUS-12, delay
+   discounting) rate the same factors, and compare their weights with the simulated ones.
+5. **Personal profiles.** Licensed questionnaires and browser tasks produce `measured` scores
+   with reliability estimates.
+6. **Fitted brain model.** HCP-based brain–behaviour models that yield `inferred`
+   characteristics with uncertainty.
+7. **Neural-context ablation.** Run the fidelity study with and without the neural context and
+   test whether the context makes profile effects larger, more specific or more human-like.
+8. **Anatomy reliability.** Compare Claude's anatomy ratings with ratings by trained humans on
+   a set of decisions (weighted kappa per feature), and with users' own self-check answers.
+9. **Countermove uptake.** Whether users who see a countermove change their stated choice or
+   confidence, compared with users who see only the mechanism.
+10. **Cost calibration.** Replace the per-call cost estimate with the measured average once real
+    runs exist.
+
+## Open questions
+
+- The brief's section 8 (personalised Reticulate) was cut off after "reaction-time
+  measurements"; its remaining requirements are unknown.
+- Which decision domains does the thesis study (personal finance, entrepreneurship, public
+  decisions)? This decides the problem set for the fidelity study.

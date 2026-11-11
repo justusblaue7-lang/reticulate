@@ -1,0 +1,254 @@
+# Cognitive dimensions of the Reticulate profile model.
+#
+# Every profile scores every dimension on 0–10: 0 is the low pole, 10 the high
+# pole, 5 means no particular leaning. Scores are tendencies, not abilities and
+# not diagnoses.
+#
+# The eight dimensions are a working hypothesis. They are not orthogonal
+# (exploration and experimentation, for example, are expected to correlate), and
+# the final structure should come from factor analysis of real assessment data.
+#
+# `reasoning.low` / `reasoning.high` are the behavioural anchors the prompt
+# compiler hands to the reasoning engine. They describe how a pole changes what
+# a decision-maker attends to and how they weigh it.
+#
+# `construct_map` names the NeuroQuery query and the Neurosynth terms for the dimension's
+# construct (shown in the atlas as meta-analytic maps) and rates how well the literature
+# covers it. An empty Neurosynth list means its abstract vocabulary has no fitting term.
+#
+# Changes to this file are science changes: they need review (docs/epistemics.md).
+
+version: 0.3.0
+
+dimensions:
+  - id: risk_tolerance
+    name: Risk tolerance
+    low_pole: Cautious
+    high_pole: Risk-seeking
+    definition: >-
+      Willingness to accept variance in outcomes, including a real chance of loss,
+      for a chance at a larger gain, when probabilities are known or can be estimated.
+    constructs: [stated risk preference, revealed risk taking, loss aversion]
+    instruments:
+      - {id: dospert, name: Domain-Specific Risk-Taking scale (DOSPERT), kind: questionnaire, ref: blais2006}
+      - {id: bart, name: Balloon Analogue Risk Task, kind: behavioural_task, ref: lejuez2002}
+      - {id: lottery_choice, name: Lottery and gamble choice paradigms, kind: behavioural_task}
+    notes: >-
+      Stated and revealed risk measures correlate weakly with each other; stated
+      measures are the more reliable trait indicators (frey2017). Keep them as
+      separate inputs when building personal profiles.
+    refs: [frey2017, kuhnen2005]
+    construct_map:
+      query: risk taking risk aversion
+      neurosynth: [risk taking, gambling]
+      quality: good
+      note: >-
+        Dominated by ventral striatum and anterior insula, the regions most often reported for risky choice.
+    reasoning:
+      low: >-
+        Weights downside scenarios and capital preservation heavily, wants a margin of
+        safety, prefers staged and reversible commitments, and treats a large loss as
+        much worse than an equal gain is good.
+      high: >-
+        Focuses on upside and asymmetric payoffs, accepts a real chance of loss for a
+        larger potential gain, and treats not acting as a risk in its own right.
+
+  - id: exploration
+    name: Exploration
+    low_pole: Exploit
+    high_pole: Explore
+    definition: >-
+      Tendency to sample unfamiliar options to gain information instead of
+      choosing the option currently known to be best.
+    constructs: [directed exploration, random exploration, information seeking]
+    instruments:
+      - {id: bandit, name: Multi-armed bandit task, kind: behavioural_task, ref: daw2006}
+      - {id: horizon_task, name: Horizon task, kind: behavioural_task, ref: wilson2014}
+    notes: >-
+      Computational models of bandit tasks separate directed (information-driven)
+      from random exploration; they may need to become two dimensions.
+    refs: [daw2006, wilson2014, badre2012, aston_jones2005]
+    construct_map:
+      query: exploratory behavior decision making
+      neurosynth: []  # 'explore' and 'exploration' in abstracts mostly mean exploratory analyses
+      quality: low
+      note: >-
+        Human explore–exploit studies are few; the term 'exploratory behavior' is common in animal research, so this map is only a rough proxy.
+    reasoning:
+      low: >-
+        Sticks with what is known to work, builds on existing strengths and assets,
+        and sees untested options as a distraction unless the evidence for them is strong.
+      high: >-
+        Values the information an untried option produces, is willing to pay for
+        learning, and looks for adjacent possibilities the obvious options leave out.
+
+  - id: time_horizon
+    name: Time horizon
+    low_pole: Short-term reward
+    high_pole: Long-term optimisation
+    definition: >-
+      How steeply future outcomes are discounted relative to immediate ones.
+    constructs: [delay discounting, future orientation, episodic prospection]
+    instruments:
+      - {id: mcq, name: Monetary Choice Questionnaire, kind: behavioural_task, ref: kirby1999}
+      - {id: delay_discounting, name: Adjusting-amount delay discounting task, kind: behavioural_task}
+    notes: >-
+      Delay discounting is one of the more stable decision traits (odum2011) and is
+      measured in the Human Connectome Project, which makes it a good first target
+      for a fitted brain–behaviour model.
+    refs: [odum2011, mcclure2004, kable2007, peters2010]
+    construct_map:
+      query: delay discounting intertemporal choice impulsivity
+      neurosynth: []
+      quality: good
+      note: >-
+        Reflects the intertemporal-choice literature: ventral striatum, ventromedial and lateral prefrontal cortex.
+    reasoning:
+      low: >-
+        Prefers outcomes that arrive soon and can be felt, discounts distant payoffs
+        heavily, and is sceptical of plans whose value lies years out.
+      high: >-
+        Judges options by where they lead in five to fifteen years, accepts slow or
+        delayed payoff for compounding and positioning, and discounts short-term noise.
+
+  - id: analytical_style
+    name: Analytical style
+    low_pole: Intuitive
+    high_pole: Analytical
+    definition: >-
+      Reliance on explicit, step-by-step reasoning versus fast pattern-based judgement.
+    constructs: [cognitive reflection, need for cognition, faith in intuition]
+    instruments:
+      - {id: crt, name: Cognitive Reflection Test, kind: behavioural_task, ref: frederick2005}
+      - {id: rei, name: Rational-Experiential Inventory, kind: questionnaire, ref: epstein1996}
+      - {id: nfc, name: Need for Cognition scale, kind: questionnaire, ref: cacioppo1982}
+    notes: >-
+      Dual-process accounts are debated; treat this as a thinking-style preference,
+      not as two separate systems in the brain.
+    refs: [frederick2005, epstein1996, deneys2008]
+    construct_map:
+      query: deductive reasoning logical reasoning
+      neurosynth: [reasoning]
+      quality: moderate
+      note: >-
+        Shows the reasoning (analytical) pole only; intuitive judgement has little imaging literature of its own.
+    reasoning:
+      low: >-
+        Trusts gut feel and pattern recognition from experience, reads people and
+        situations holistically, and decides without needing every number.
+      high: >-
+        Breaks the decision into explicit components, wants numbers, base rates and
+        scenarios, and distrusts conclusions that cannot be written down and checked.
+
+  - id: experimentation
+    name: Experimentation
+    low_pole: Conservative
+    high_pole: Experimental
+    definition: >-
+      Preference for novel, unconventional approaches versus proven, conventional ones.
+    constructs: [openness to experience, novelty seeking]
+    instruments:
+      - {id: big_five_openness, name: "Big Five Openness (e.g. NEO-FFI, BFI-2)", kind: questionnaire}
+    notes: >-
+      Expected to correlate with exploration; openness is measured in HCP (NEO-FFI).
+    refs: [deyoung2013, beaty2016]
+    construct_map:
+      query: openness creativity
+      neurosynth: []  # no creativity or openness term in Neurosynth's vocabulary
+      quality: moderate
+      note: >-
+        Openness has a small imaging literature; creativity, its closest well-studied correlate, carries most of this map.
+    reasoning:
+      low: >-
+        Prefers the conventional, proven way of doing things, values tradition and
+        predictability, and needs a strong reason to deviate from established practice.
+      high: >-
+        Is drawn to unconventional ideas and new models, enjoys trying what has not
+        been done, and sees convention as a starting point to be questioned.
+
+  - id: social_orientation
+    name: Social orientation
+    low_pole: Individualistic
+    high_pole: Socially oriented
+    definition: >-
+      Weight given to outcomes for others and to relationships, relative to one's own outcome.
+    constructs: [social value orientation, prosociality, inequity aversion]
+    instruments:
+      - {id: svo_slider, name: Social Value Orientation slider measure, kind: behavioural_task, ref: murphy2011}
+      - {id: economic_games, name: "Dictator, ultimatum and trust games", kind: behavioural_task}
+    notes: >-
+      Social preferences are context-dependent; game behaviour and questionnaire
+      measures should be combined.
+    refs: [murphy2011, fehr2007, rilling2011]
+    construct_map:
+      query: altruism altruistic cooperative behavior
+      neurosynth: []
+      quality: moderate
+      note: >-
+        Prosocial-decision literature: anterior insula, medial and lateral prefrontal cortex.
+    reasoning:
+      low: >-
+        Judges the decision mainly by its effect on own wealth, freedom and goals,
+        and treats other people's interests as constraints, not objectives.
+      high: >-
+        Weighs effects on partners, community and relationships as heavily as own
+        returns, and values trust, fairness and shared benefit.
+
+  - id: uncertainty_tolerance
+    name: Uncertainty tolerance
+    low_pole: Needs certainty
+    high_pole: Tolerates ambiguity
+    definition: >-
+      Comfort with acting when probabilities are unknown or ambiguous. Distinct from
+      risk tolerance, which concerns known probabilities.
+    constructs: [intolerance of uncertainty, ambiguity aversion]
+    instruments:
+      - {id: ius12, name: Intolerance of Uncertainty Scale (IUS-12), kind: questionnaire, ref: carleton2007}
+      - {id: ellsberg, name: Ellsberg-type ambiguity choice tasks, kind: behavioural_task, ref: ellsberg1961}
+    notes: >-
+      Scored so that a high value means high tolerance (the IUS measures intolerance
+      and must be reversed).
+    refs: [hsu2005, grupe2013, ellsberg1961]
+    construct_map:
+      query: uncertainty anxiety decision uncertainty
+      neurosynth: [uncertainty, anxiety]
+      quality: moderate
+      note: >-
+        Combines decision-uncertainty and anxiety literatures, the closest match to intolerance of uncertainty.
+    reasoning:
+      low: >-
+        Wants missing information resolved before committing, is unsettled by
+        unknown unknowns, and prefers options whose outcomes can be estimated.
+      high: >-
+        Is comfortable committing on incomplete information, expects to learn and
+        adjust along the way, and does not need a precise forecast to act.
+
+  - id: cognitive_flexibility
+    name: Cognitive flexibility
+    low_pole: Consistent
+    high_pole: Flexible
+    definition: >-
+      Ease of switching strategies and updating beliefs when circumstances or
+      evidence change, versus holding a consistent course.
+    constructs: [set shifting, reversal learning, belief updating]
+    instruments:
+      - {id: task_switching, name: Task-switching paradigms, kind: behavioural_task, ref: monsell2003}
+      - {id: dccs, name: NIH Toolbox Dimensional Change Card Sort, kind: behavioural_task}
+      - {id: wcst, name: Wisconsin Card Sorting Test, kind: behavioural_task}
+    notes: >-
+      The NIH Toolbox card sort is part of HCP and ABCD; flexibility is the dimension
+      with the best-established network basis in this set.
+    refs: [dajani2015, niendam2012, monsell2003]
+    construct_map:
+      query: task switching set shifting flexibility reversal learning
+      neurosynth: [switching, shifting, reversal]
+      quality: good
+      note: >-
+        Task-switching and reversal-learning literature: frontoparietal control network and orbitofrontal cortex.
+    reasoning:
+      low: >-
+        Values a consistent strategy and commitment, is wary of changing course on
+        new but thin evidence, and judges options by fit with the existing plan.
+      high: >-
+        Readily reframes the problem, updates quickly on new evidence, and is
+        willing to change plan, timing or structure as the situation develops.

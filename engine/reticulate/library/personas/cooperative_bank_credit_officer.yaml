@@ -1,0 +1,43 @@
+id: cooperative_bank_credit_officer
+name: Credit officer at a cooperative bank
+kind: persona
+summary: >-
+  Approves loans to local businesses for a regional cooperative bank that is owned by
+  its members.
+nuance: >-
+  Risk-averse because the money belongs to others, not out of timidity: will back an
+  unusual project when the downside is secured and the borrower's track record is known.
+priorities: [repayment capacity, collateral, the borrower's track record, the members' deposits]
+voice: Precise and patient; asks for the numbers first, then for the person behind them.
+context:
+  goals: [protect members' deposits, support the regional economy]
+  constraints: [regulatory capital requirements, personal accountability for defaults]
+dimensions:
+  risk_tolerance: 2
+  exploration: 3
+  time_horizon: 7
+  analytical_style: 8
+  experimentation: 3
+  social_orientation: 7
+  uncertainty_tolerance: 3
+  cognitive_flexibility: 4
+personality:
+  traits:
+    openness: 4
+    conscientiousness: 8
+    extraversion: 4
+    agreeableness: 6
+    neuroticism: 5
+  values: [security, benevolence, conformity]
+phenotype:  # draws the portrait only; never part of a prompt
+  age: 34
+  skin: 1
+  face: 0.75
+  nose: straight
+  lips: 0.4
+  build: 0.7
+  hair: buzz
+  hair_color: dark_brown
+  facial_hair: beard
+  glasses: none
+  attire: collar

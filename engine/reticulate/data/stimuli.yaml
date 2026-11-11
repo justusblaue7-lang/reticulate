@@ -1,0 +1,246 @@
+# Stimuli for the stimulation mode.
+#
+# Each stimulus is a classic experimental situation with two meta-analytic maps: where
+# published fMRI/PET studies on the topic report activation according to NeuroQuery
+# (Dockès et al., 2020; 13,459 full-text articles) and according to Neurosynth (Yarkoni
+# et al., 2011; 14,371 abstracts with coordinates). They are group-level literature maps,
+# not simulations of neural dynamics and not anyone's measured response.
+#
+# `query` must use NeuroQuery vocabulary terms. `neurosynth` lists Neurosynth terms (a
+# study counts when its abstract uses any of them); an empty list means Neurosynth has no
+# term for the paradigm. The perception and action items serve as validity checks: their
+# maps should fall on the corresponding primary cortices in both sources.
+
+version: 0.3.0
+
+categories:
+  - {id: valuation, name: Value and risk}
+  - {id: social, name: Other people}
+  - {id: control, name: Control and reasoning}
+  - {id: memory, name: Memory and imagination}
+  - {id: body, name: Body and affect}
+  - {id: perception, name: Perception and action}
+
+stimuli:
+  # ---- value and risk -----------------------------------------------------------------
+  - id: reward_anticipation
+    category: valuation
+    name: A possible monetary gain
+    paradigm: Monetary incentive delay task. A cue announces that a quick response can win money; the map reflects anticipation of the gain.
+    query: reward anticipation monetary
+    neurosynth: [reward anticipation, incentive delay]
+    refs: [knutson2001]
+
+  - id: loss_anticipation
+    category: valuation
+    name: A possible monetary loss
+    paradigm: Incentive tasks with loss cues and mixed gambles. A cue announces that money can be lost.
+    query: loss anticipation punishment monetary loss aversion
+    neurosynth: [losses, punishment]
+    refs: [knutson2001, tom2007]
+
+  - id: risky_gamble
+    category: valuation
+    name: A risky gamble
+    paradigm: Choosing between a safe amount and a gamble with known odds, or inflating a balloon that may burst (BART).
+    query: risk taking gambling
+    neurosynth: [risk taking, gambling]
+    refs: [tom2007, lejuez2002]
+
+  - id: uncertain_outcome
+    category: valuation
+    name: An uncertain outcome
+    paradigm: Choices whose outcome probabilities are uncertain or unknown, including Ellsberg-type ambiguity. (The term 'ambiguity' alone is avoided because NeuroQuery links it mainly to lexical ambiguity in language studies.)
+    query: decision uncertainty uncertainty
+    neurosynth: [uncertainty, uncertain]
+    refs: [hsu2005]
+
+  - id: delayed_reward
+    category: valuation
+    name: Waiting for a larger reward
+    paradigm: Intertemporal choice between a smaller amount now and a larger amount later.
+    query: delay discounting intertemporal choice
+    neurosynth: []
+    refs: [mcclure2004, kable2007]
+
+  - id: novelty
+    category: valuation
+    name: Something new
+    paradigm: Novel versus familiar stimuli; novelty signals in hippocampus and dopaminergic midbrain.
+    query: novelty novelty detection
+    neurosynth: [novelty]
+    refs: [bunzeck2006]
+
+  # ---- other people -------------------------------------------------------------------
+  - id: trust_decision
+    category: social
+    name: Trusting another person
+    paradigm: Repeated trust game. Money sent to a partner is multiplied; the partner decides how much to return.
+    query: trust cooperative behavior
+    neurosynth: []
+    note: Dominated by studies of facial trustworthiness (amygdala) rather than trust games (caudate).
+    refs: [king_casas2005]
+
+  - id: others_beliefs
+    category: social
+    name: Inferring what someone believes
+    paradigm: False-belief stories. Participants reason about a character's mistaken belief.
+    query: theory mind mentalizing belief
+    neurosynth: [theory mind, mentalizing]
+    refs: [saxe2003]
+
+  - id: fearful_face
+    category: social
+    name: A fearful face
+    paradigm: Viewing photographs of fearful versus neutral facial expressions.
+    query: fearful faces
+    neurosynth: [fearful faces, fearful]
+    refs: [morris1996]
+
+  - id: others_pain
+    category: social
+    name: Someone else in pain
+    paradigm: Observing a cue that signals a partner is receiving a painful stimulus.
+    query: empathy
+    neurosynth: [empathy]
+    refs: [singer2004]
+
+  # ---- control and reasoning ----------------------------------------------------------
+  - id: response_conflict
+    category: control
+    name: Conflicting cues
+    paradigm: Stroop task. Naming the ink colour of a word that names a different colour.
+    query: conflict stroop
+    neurosynth: [stroop, conflict]
+    refs: [botvinick2001]
+
+  - id: rule_switch
+    category: control
+    name: A change of rules
+    paradigm: Task switching. The rule for responding changes from one trial to the next.
+    query: task switching set shifting
+    neurosynth: [switching, shifting]
+    refs: [monsell2003]
+
+  - id: holding_in_mind
+    category: control
+    name: Holding information in mind
+    paradigm: N-back task. Deciding whether the current item matches the one shown n steps earlier.
+    query: working memory
+    neurosynth: [working memory]
+    refs: [owen2005]
+
+  - id: stopping
+    category: control
+    name: Stopping an action
+    paradigm: Stop-signal task. An occasional signal requires cancelling a response already under way.
+    query: response inhibition stop signal
+    neurosynth: [response inhibition, stop signal]
+    refs: [aron2014]
+
+  # ---- memory and imagination ---------------------------------------------------------
+  - id: personal_memory
+    category: memory
+    name: Recalling a personal event
+    paradigm: Autobiographical memory cued by words or photographs from one's own life.
+    query: autobiographical memory
+    neurosynth: [autobiographical memory, autobiographical]
+    refs: [spreng2009]
+
+  - id: imagining_future
+    category: memory
+    name: Imagining the future
+    paradigm: Constructing a specific future event, often contrasted with remembering a past one.
+    query: future autobiographical memory episodic memory
+    neurosynth: []
+    refs: [schacter2007, spreng2009]
+
+  - id: finding_way
+    category: memory
+    name: Finding a route
+    paradigm: Navigating a virtual town or planning a route between landmarks.
+    query: navigation
+    neurosynth: [navigation]
+    refs: [spreng2009]
+
+  # ---- body and affect ----------------------------------------------------------------
+  - id: painful_heat
+    category: body
+    name: Painful heat
+    paradigm: Thermal stimulation of the skin at painful intensities.
+    query: pain heat noxious
+    neurosynth: [pain, painful, noxious]
+    refs: [wager2013]
+
+  - id: uncertain_threat
+    category: body
+    name: An unpredictable threat
+    paradigm: Anticipating an aversive event whose timing or occurrence is uncertain.
+    query: threat anticipation anxiety
+    neurosynth: [threat, anxiety]
+    refs: [grupe2013]
+
+  - id: heartbeat_attention
+    category: body
+    name: Attending to one's heartbeat
+    paradigm: Heartbeat detection. Judging whether tones are in time with one's own heartbeat.
+    query: interoceptive
+    neurosynth: [interoceptive]
+    refs: [critchley2004]
+
+  # ---- perception and action (validity checks) ----------------------------------------
+  - id: visual_scene
+    category: perception
+    name: Seeing a visual pattern
+    paradigm: Flickering checkerboards and visual scenes; activates early visual cortex.
+    query: visual
+    neurosynth: [visual]
+    refs: [wandell2007]
+
+  - id: faces
+    category: perception
+    name: Seeing a face
+    paradigm: Faces contrasted with objects or houses.
+    query: face perception
+    neurosynth: [faces, face recognition]
+    refs: [kanwisher1997]
+
+  - id: speech
+    category: perception
+    name: Hearing speech
+    paradigm: Listening to spoken sentences.
+    query: speech sentence
+    neurosynth: [speech, sentences]
+    refs: [friederici2011]
+
+  - id: tones
+    category: perception
+    name: Hearing tones
+    paradigm: Pure tones of varying pitch.
+    query: auditory pitch perception
+    neurosynth: [auditory, pitch]
+    refs: [dacosta2011]
+
+  - id: eye_movements
+    category: perception
+    name: Moving the eyes
+    paradigm: Saccades toward visual targets.
+    query: saccadic eye movement
+    neurosynth: [saccades, eye movements]
+    refs: [corbetta2002]
+
+  - id: finger_tapping
+    category: perception
+    name: Tapping fingers
+    paradigm: Finger tapping at a self-paced or cued rhythm.
+    query: finger tapping
+    neurosynth: [finger tapping]
+    refs: [witt2008]
+
+  - id: touch
+    category: perception
+    name: Touch on the hand
+    paradigm: Tactile stimulation of the fingers or palm.
+    query: tactile somatosensory
+    neurosynth: [tactile, somatosensory]
+    refs: [penfield1937]

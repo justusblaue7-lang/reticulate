@@ -1,0 +1,164 @@
+# Published findings that link a brain structure to one of the profile dimensions.
+#
+# Each entry states the design that produced it, because designs license different
+# conclusions:
+#   within_subject          task contrast within people (what a region does during a choice)
+#   individual_differences  variation between people (who shows more of it)
+#   lesion                  patients with damage to the region
+#   stimulation             causal manipulation (TMS, tDCS)
+#   meta_analysis           pooled across many studies
+#   theory                  proposal without direct test
+# `direction` paraphrases the finding; it is not a prediction for any individual.
+
+version: 0.2.0
+
+links:
+  - region: accumbens
+    dimension: risk_tolerance
+    design: within_subject
+    finding: Nucleus accumbens activation preceded risky choices and risk-seeking mistakes in an investment task.
+    refs: [kuhnen2005]
+
+  - region: insula
+    dimension: risk_tolerance
+    design: within_subject
+    finding: Anterior insula activation preceded riskless choices and risk-averse mistakes.
+    refs: [kuhnen2005]
+
+  - region: insula
+    dimension: risk_tolerance
+    design: individual_differences
+    finding: Right insula activation during risk-taking decisions scaled with harm avoidance and neuroticism.
+    refs: [paulus2003]
+
+  - region: amygdala
+    dimension: risk_tolerance
+    design: lesion
+    finding: Two patients with focal bilateral amygdala damage showed no loss aversion in mixed gambles.
+    refs: [demartino2010]
+
+  - region: amygdala
+    dimension: uncertainty_tolerance
+    design: within_subject
+    finding: Amygdala activation was higher when outcome probabilities were unknown (ambiguity) than when they were known (risk).
+    refs: [hsu2005]
+
+  - region: lateralorbitofrontal
+    dimension: uncertainty_tolerance
+    design: lesion
+    finding: Patients with orbitofrontal damage were neutral toward both ambiguity and risk.
+    refs: [hsu2005]
+
+  - region: insula
+    dimension: uncertainty_tolerance
+    design: meta_analysis
+    finding: Anticipation of uncertain threat consistently engages the anterior insula, alongside amygdala and anterior cingulate.
+    refs: [grupe2013]
+
+  - region: frontalpole
+    dimension: exploration
+    design: within_subject
+    finding: Frontopolar cortex was more active when people chose exploratory rather than exploitative options.
+    refs: [daw2006]
+
+  - region: rostralmiddlefrontal
+    dimension: exploration
+    design: individual_differences
+    finding: Rostrolateral prefrontal cortex tracked relative uncertainty between options only in people who explored strategically.
+    refs: [badre2012]
+
+  - region: superiorparietal
+    dimension: exploration
+    design: within_subject
+    finding: The intraparietal sulcus was engaged during exploratory choices, together with frontopolar cortex.
+    refs: [daw2006]
+
+  - region: rostralmiddlefrontal
+    dimension: time_horizon
+    design: stimulation
+    finding: Disrupting left lateral prefrontal cortex with TMS increased choices of immediate over delayed rewards.
+    refs: [figner2010]
+
+  - region: medialorbitofrontal
+    dimension: time_horizon
+    design: within_subject
+    finding: Ventromedial prefrontal cortex tracked the subjective, discounted value of delayed rewards.
+    refs: [kable2007]
+
+  - region: accumbens
+    dimension: time_horizon
+    design: within_subject
+    finding: Ventral striatum responded preferentially to options with immediate rewards; disputed by single-valuation accounts.
+    refs: [mcclure2004, kable2007]
+
+  - region: hippocampus
+    dimension: time_horizon
+    design: within_subject
+    finding: Imagining future events reduced discounting; the effect was linked to cingulate–hippocampus coupling.
+    refs: [peters2010]
+
+  - region: caudalanteriorcingulate
+    dimension: analytical_style
+    design: within_subject
+    finding: Anterior cingulate was engaged when intuitive and logical answers conflicted, even when people gave the intuitive answer.
+    refs: [deneys2008]
+
+  - region: rostralmiddlefrontal
+    dimension: analytical_style
+    design: within_subject
+    finding: Right lateral prefrontal cortex was more active when people overrode the intuitive response.
+    refs: [deneys2008]
+
+  - region: precuneus
+    dimension: experimentation
+    design: individual_differences
+    finding: Openness to experience was associated with more efficient information flow within the default network.
+    refs: [beaty2016]
+
+  - region: posteriorcingulate
+    dimension: experimentation
+    design: individual_differences
+    finding: Openness to experience was associated with more efficient information flow within the default network.
+    refs: [beaty2016]
+
+  - region: accumbens
+    dimension: experimentation
+    design: theory
+    finding: Dopaminergic reward circuitry has been proposed as a shared basis of exploration and openness.
+    refs: [deyoung2013]
+
+  - region: supramarginal
+    dimension: social_orientation
+    design: individual_differences
+    finding: Grey matter volume and activation of the right temporoparietal junction predicted altruistic behaviour.
+    refs: [morishima2012]
+
+  - region: inferiorparietal
+    dimension: social_orientation
+    design: individual_differences
+    finding: Grey matter volume and activation of the right temporoparietal junction predicted altruistic behaviour.
+    refs: [morishima2012]
+
+  - region: insula
+    dimension: social_orientation
+    design: within_subject
+    finding: Unfair offers in the ultimatum game activated anterior insula; stronger activation preceded rejection.
+    refs: [sanfey2003]
+
+  - region: rostralmiddlefrontal
+    dimension: cognitive_flexibility
+    design: meta_analysis
+    finding: Set shifting recruits a superordinate frontoparietal control network that includes dorsolateral prefrontal cortex.
+    refs: [niendam2012]
+
+  - region: superiorparietal
+    dimension: cognitive_flexibility
+    design: meta_analysis
+    finding: Set shifting recruits a superordinate frontoparietal control network that includes superior parietal cortex.
+    refs: [niendam2012]
+
+  - region: insula
+    dimension: cognitive_flexibility
+    design: meta_analysis
+    finding: The anterior insula is among the regions consistently engaged when people switch tasks.
+    refs: [dajani2015]

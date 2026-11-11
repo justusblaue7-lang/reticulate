@@ -1,0 +1,80 @@
+# Personality layer of an avatar: Big Five traits and Schwartz basic values.
+#
+# Traits are scored 0–10 with 5 = population average, like the profile dimensions. They
+# describe how a person tends to feel, think and act in general, while the profile
+# dimensions describe decision tendencies; the two overlap (openness with exploration,
+# neuroticism with uncertainty tolerance) and should be measured separately, for example
+# with the BFI-2 (soto2017).
+#
+# Personality has no brain map in Reticulate: in two samples of about 1,100 people each,
+# the Big Five showed little reliable association with grey- or white-matter structure
+# (avinun2020), and earlier positive findings (deyoung2010) came from small samples.
+#
+# `anchors` are handed to the reasoning engine, as the dimension anchors are.
+
+version: 0.3.0
+
+traits:
+  - id: openness
+    name: Openness
+    low_pole: Conventional
+    high_pole: Open
+    definition: Curiosity, imagination and interest in ideas, art and unconventional experience.
+    anchors:
+      low: Prefers the familiar and the concrete; sceptical of unconventional ideas.
+      high: Curious and imaginative; drawn to new ideas and abstract possibilities.
+
+  - id: conscientiousness
+    name: Conscientiousness
+    low_pole: Spontaneous
+    high_pole: Disciplined
+    definition: Organisation, dependability and persistence in pursuing goals.
+    anchors:
+      low: Spontaneous and flexible; plans little and lets things take their course.
+      high: Organised and dependable; plans ahead, keeps commitments and follows through.
+
+  - id: extraversion
+    name: Extraversion
+    low_pole: Reserved
+    high_pole: Outgoing
+    definition: Sociability, assertiveness and energy in seeking out people and stimulation.
+    anchors:
+      low: Reserved and quiet; prefers depth to breadth in contact with others.
+      high: Sociable, assertive and energetic; seeks out people and stimulation.
+
+  - id: agreeableness
+    name: Agreeableness
+    low_pole: Challenging
+    high_pole: Accommodating
+    definition: Compassion, trust and cooperativeness toward others.
+    anchors:
+      low: Direct and sceptical; willing to confront and to put its own interests first.
+      high: Warm, trusting and cooperative; avoids conflict and attends to others' needs.
+
+  - id: neuroticism
+    name: Neuroticism
+    low_pole: Even-tempered
+    high_pole: Sensitive
+    definition: Proneness to worry, tension and low mood (negative emotionality).
+    anchors:
+      low: Calm under pressure and quick to recover from setbacks.
+      high: Prone to worry and tension; reacts strongly to stress and setbacks.
+
+# Personality and risk taking, for reference: across domains, risk propensity rises with
+# extraversion and openness and falls with neuroticism, agreeableness and
+# conscientiousness (nicholson2005; lauriola2001).
+refs: [soto2017, goldberg1990, nicholson2005, lauriola2001, avinun2020, deyoung2010]
+
+# Schwartz's ten basic values (schwartz1992; schwartz2012). An avatar names up to three.
+values:
+  - {id: self_direction, name: Self-direction, definition: "Independent thought and action: choosing, creating, exploring."}
+  - {id: stimulation, name: Stimulation, definition: "Excitement, novelty and challenge in life."}
+  - {id: hedonism, name: Hedonism, definition: "Pleasure and sensuous gratification for oneself."}
+  - {id: achievement, name: Achievement, definition: "Personal success through demonstrating competence according to social standards."}
+  - {id: power, name: Power, definition: "Social status and prestige, control or dominance over people and resources."}
+  - {id: security, name: Security, definition: "Safety, harmony and stability of society, of relationships and of self."}
+  - {id: conformity, name: Conformity, definition: "Restraint of actions likely to upset or harm others and violate social expectations."}
+  - {id: tradition, name: Tradition, definition: "Respect, commitment and acceptance of the customs and ideas of one's culture or religion."}
+  - {id: benevolence, name: Benevolence, definition: "Preserving and enhancing the welfare of the people one is in frequent contact with."}
+  - {id: universalism, name: Universalism, definition: "Understanding, tolerance and protection of the welfare of all people and of nature."}
+value_refs: [schwartz1992, schwartz2012]
