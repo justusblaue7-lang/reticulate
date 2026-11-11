@@ -1,0 +1,7 @@
+{
+  "folders": [{ "path": ".", "name": "Reticulate" }],
+  "settings": {
+    "files.exclude": { "**/node_modules": true, "**/.venv": true, "**/__pycache__": true, "web/dist": true },
+    "python.defaultInterpreterPath": "engine/.venv/bin/python"
+  }
+}
