@@ -25,15 +25,6 @@ personality:
     agreeableness: 6
     neuroticism: 3
   values: [achievement, benevolence, stimulation]
-phenotype:  # draws the portrait only; never part of a prompt
-  age: 47
-  skin: 4
-  face: 0.8
-  nose: broad
-  lips: 0.5
-  build: 0.8
-  hair: bald
-  hair_color: black
-  facial_hair: stubble
-  glasses: none
-  attire: crew
+person:  # shown in the interface only; never part of a prompt
+  name: Stefan Kruse
+  look: business_male_04

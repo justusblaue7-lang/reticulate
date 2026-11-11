@@ -3,7 +3,7 @@ import { ref } from "../../api";
 import { usd } from "../../format";
 import type { Avatar, Decision, Progress, Science } from "../../types";
 import { DoseResponse } from "../DoseResponse";
-import { Face } from "../Face";
+import { displayName, Face } from "../Face";
 import { clock, engagedDimensions, estimate, observedPerCall, poles, tendencyNames } from "./model";
 
 const LEVELS = [2, 5, 8];
@@ -45,7 +45,7 @@ export function Tipping({ science, decision, configured, running, busy, onRun, o
               <button key={m.id} className={`pick small ${m.id === member?.id ? "on" : ""}`} onClick={() => setMemberId(m.id)}>
                 <Face avatar={m} size={34} />
                 <span>
-                  <strong>{m.name}</strong>
+                  <strong>{displayName(m)}</strong>
                   <small>{decision.panel!.space.recommendations[m.id]?.option}</small>
                 </span>
               </button>
@@ -118,15 +118,15 @@ export function Tipping({ science, decision, configured, running, busy, onRun, o
         const first = flips.indexOf(true);
         const sentence =
           first > 0
-            ? `The answer flips between ${t.values[first - 1]} and ${t.values[first]}: toward ${(t.values[first] > t.values[first - 1] ? hi : lo).toLowerCase()}, ${t.profile.name} chooses “${tallies[first]?.option}”.`
-            : `The answer holds: from ${t.values[0]} to ${t.values[t.values.length - 1]}, ${t.profile.name} chooses “${tallies[0]?.option}”.`;
+            ? `The answer flips between ${t.values[first - 1]} and ${t.values[first]}: toward ${(t.values[first] > t.values[first - 1] ? hi : lo).toLowerCase()}, ${displayName(t.profile)} chooses “${tallies[first]?.option}”.`
+            : `The answer holds: from ${t.values[0]} to ${t.values[t.values.length - 1]}, ${displayName(t.profile)} chooses “${tallies[0]?.option}”.`;
         return (
           <section key={t.id} className="tip-result">
             <header>
               <Face avatar={t.profile} size={40} />
               <div>
                 <h3>
-                  {t.profile.name} · {label}
+                  {displayName(t.profile)} · {label}
                 </h3>
                 <p className={first > 0 ? "flip-line" : "hold-line"}>{sentence}</p>
               </div>

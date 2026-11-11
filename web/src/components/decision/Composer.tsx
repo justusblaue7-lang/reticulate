@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usd } from "../../format";
 import type { Problem, Rating, Science } from "../../types";
-import { ANALYSIS_USD, EXAMPLES, clock } from "./model";
+import { ANALYSIS_USD, EXAMPLES, TURN_USD, clock } from "./model";
 import { SelfCheck } from "./SelfCheck";
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
   problem: Problem;
   onProblem: (problem: Problem) => void;
   busy: { label: string; since: number } | null;
-  onAnalyse: () => void;
+  onStart: () => void;
   onSelfRate: (anatomy: Rating[]) => void;
   onConnect: () => void;
 }
@@ -28,7 +28,7 @@ function useElapsed(since: number | undefined) {
 }
 
 /** The decision bar: the question, its options and details, and the way in. */
-export function Composer({ science, configured, problem, onProblem, busy, onAnalyse, onSelfRate, onConnect }: Props) {
+export function Composer({ science, configured, problem, onProblem, busy, onStart, onSelfRate, onConnect }: Props) {
   const [option, setOption] = useState("");
   const [details, setDetails] = useState(!!problem.context);
   const [selfCheck, setSelfCheck] = useState(false);
@@ -59,7 +59,7 @@ export function Composer({ science, configured, problem, onProblem, busy, onAnal
   const submit = () => {
     if (!ready || busy) return;
     if (!configured) onConnect();
-    else onAnalyse();
+    else onStart();
   };
 
   return (
@@ -138,22 +138,21 @@ export function Composer({ science, configured, problem, onProblem, busy, onAnal
               <span className="spinner" />
               <div>
                 <strong>{busy.label}</strong> <span className="mono muted">{clock(elapsed)}</span>
-                <p>
-                  Claude restates the decision, separates what you know from what you don't, rates 18 features of the decision and
-                  notes which documented biases could pull on it. Usually under two minutes.
-                </p>
+                <p>Reticulate is preparing the first question.</p>
               </div>
             </div>
           ) : (
             <>
               <span className="bar-cost">
-                {configured ? `One Claude call · about ${usd(ANALYSIS_USD)} · ⌘↵` : "Analysis uses Claude with your own API key"}
+                {configured
+                  ? `About ${usd(TURN_USD)} a question, plus ${usd(ANALYSIS_USD)} for the bias analysis · ⌘↵`
+                  : "The dialogue uses Claude with your own API key"}
               </span>
               <button className="text-button" disabled={!ready} onClick={() => setSelfCheck(!selfCheck)}>
                 {selfCheck ? "Close the questions" : "Rate it yourself, without AI"}
               </button>
               <button className="button primary large" disabled={!ready} onClick={submit}>
-                {configured ? "Analyse my decision" : "Connect Claude to analyse"}
+                {configured ? "Start the dialogue" : "Connect Claude to start"}
               </button>
             </>
           )}
@@ -166,7 +165,7 @@ export function Composer({ science, configured, problem, onProblem, busy, onAnal
             <h3>Rate it yourself</h3>
             <p>
               Answer for your decision as you see it. Reticulate shows the biases and brain research that match your answers; no AI is
-              involved. You can still ask the panel later.
+              involved. You can start the dialogue later.
             </p>
           </header>
           <SelfCheck science={science} levels={levels} onChange={(id, l) => setLevels({ ...levels, [id]: l })} />

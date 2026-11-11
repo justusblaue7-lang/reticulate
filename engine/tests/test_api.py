@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -12,8 +14,19 @@ QUESTION = {"question": "Should I open a second location next year?", "options":
 def client(tmp_path):
     library = Library.load(user_dir=tmp_path / "avatars")
     app.dependency_overrides[get_library] = lambda: library
-    yield TestClient(app)
+    with TestClient(app) as test_client:  # keeps one event loop, so background analyses finish
+        yield test_client
     app.dependency_overrides.clear()
+
+
+def analysed(client, decision_id: str) -> dict:
+    """Wait for the background analysis of a decision to finish."""
+    for _ in range(200):
+        body = client.get(f"/api/decisions/{decision_id}").json()
+        if body["analysis"] != "pending":
+            return body
+        time.sleep(0.02)
+    raise AssertionError("the analysis did not finish")
 
 
 @pytest.fixture
@@ -57,6 +70,8 @@ def test_hand_set_anatomy_works_without_claude(unconfigured):
 
 def test_decision_flow_is_saved(configured):
     created = configured.post("/api/decisions", json={"problem": QUESTION}).json()
+    assert created["analysis"] == "pending" and created["dialogue"]["exchanges"] == []
+    created = analysed(configured, created["id"])
     assert created["frame"]["options"] and created["signature"]["dimensions"][0]["dimension_id"] == "risk_tolerance"
     panel = configured.post(
         f"/api/decisions/{created['id']}/panel",
@@ -77,10 +92,13 @@ def test_decision_flow_is_saved(configured):
     listed = configured.get("/api/decisions").json()
     assert listed[0]["id"] == created["id"] and listed[0]["steps"] == ["analysis", "panel", "tipping"]
     assert listed[0]["title"] == QUESTION["question"] and listed[0]["verdict"] in ("1/2 · Go ahead", "1/2 · Keep the status quo")
+    assert listed[0]["file"].startswith("decisions/") and listed[0]["file"].endswith("/decision.json")
 
 
 def test_analysis_keeps_watch_outs_for_known_mechanisms(configured):
     created = configured.post("/api/decisions", json={"problem": QUESTION}).json()
+    created = analysed(configured, created["id"])
+    assert created["analysis"] == "done" and created["usage"]["calls"] == 0  # the fake engine bills nothing
     assert [w["mechanism_id"] for w in created["watch_outs"]] == ["loss_aversion", "present_bias"]
     assert "watch_outs" not in created["frame"]
 
@@ -95,6 +113,7 @@ def test_tipping_rejects_unknown_keys(configured):
 
 def test_reanalysis_drops_a_panel_that_saw_the_old_context(configured):
     created = configured.post("/api/decisions", json={"problem": QUESTION}).json()
+    analysed(configured, created["id"])
     configured.post(f"/api/decisions/{created['id']}/panel", json={"profiles": ["venture_capitalist"], "replicates": 1})
     updated = configured.put(
         f"/api/decisions/{created['id']}/anatomy", json={"anatomy": [{"feature_id": "threat", "level": 3, "source": "user"}]}
@@ -105,7 +124,7 @@ def test_reanalysis_drops_a_panel_that_saw_the_old_context(configured):
 def test_user_avatars_can_be_saved_and_deleted_but_personas_cannot(client):
     persona = next(a for a in client.get("/api/avatars").json() if a["id"] == "venture_capitalist")
     copy = client.post("/api/avatars", json={**persona, "name": "My investor"}).json()
-    assert copy["id"] == "my_investor" and copy["origin"] == "user" and copy["phenotype"]["hair"] == "coily"
+    assert copy["id"] == "my_investor" and copy["origin"] == "user" and copy["person"]["look"] == "male_adult_12"
     assert any(a["id"] == "my_investor" for a in client.get("/api/avatars").json())
     assert client.delete("/api/avatars/venture_capitalist").status_code == 422
     assert client.delete("/api/avatars/my_investor").status_code == 200

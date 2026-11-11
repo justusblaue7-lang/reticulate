@@ -6,6 +6,7 @@ from functools import cache
 from pathlib import Path
 
 ENGINE_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = ENGINE_DIR.parent
 ENV_FILE = ENGINE_DIR / ".env"
 KEY_NAME = "ANTHROPIC_API_KEY"
 
@@ -53,12 +54,27 @@ PRICES = {"claude-opus-5-5": (4.0, 20.0, 0.20, 5.0)}
 class Settings:
     model: str = field(default_factory=lambda: os.getenv("RETICULATE_MODEL", "claude-opus-5-5"))
     effort: str = field(default_factory=lambda: os.getenv("RETICULATE_EFFORT", "high"))
+    dialogue_effort: str = field(default_factory=lambda: os.getenv("RETICULATE_DIALOGUE_EFFORT", "medium"))
     concurrency: int = field(default_factory=lambda: int(os.getenv("RETICULATE_CONCURRENCY", "6")))
-    runs_dir: Path = field(default_factory=lambda: Path(os.getenv("RETICULATE_RUNS_DIR", ENGINE_DIR / "runs")))
-    avatars_dir: Path = field(default_factory=lambda: Path(os.getenv("RETICULATE_AVATARS_DIR", ENGINE_DIR / "avatars")))
+    # Everything the user makes lives in one folder of the project: data/ by default.
+    data_dir: Path = field(default_factory=lambda: Path(os.getenv("RETICULATE_DATA_DIR", ROOT_DIR / "data")))
     cors_origins: list[str] = field(
         default_factory=lambda: _list("RETICULATE_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
     )
+
+    @property
+    def decisions_dir(self) -> Path:
+        """One folder per decision: the record (decision.json) and a readable copy (decision.md)."""
+        return self.data_dir / "decisions"
+
+    @property
+    def runs_dir(self) -> Path:
+        """Research runs from the command line: simulations and dose–response experiments."""
+        return self.data_dir / "runs"
+
+    @property
+    def avatars_dir(self) -> Path:
+        return self.data_dir / "avatars"
 
     @property
     def claude_configured(self) -> bool:

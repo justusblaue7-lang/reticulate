@@ -25,15 +25,6 @@ personality:
     agreeableness: 5
     neuroticism: 4
   values: [self_direction, stimulation, achievement]
-phenotype:  # draws the portrait only; never part of a prompt
-  age: 63
-  skin: 2
-  face: 0.7
-  nose: aquiline
-  lips: 0.45
-  build: 0.5
-  hair: swept
-  hair_color: white
-  facial_hair: moustache
-  glasses: none
-  attire: blazer
+person:  # shown in the interface only; never part of a prompt
+  name: Thomas Brandt
+  look: male_adult_03

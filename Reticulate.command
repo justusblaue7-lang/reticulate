@@ -65,5 +65,6 @@ done
 
 [ -z "$RETICULATE_NO_BROWSER" ] && open "http://localhost:5173"
 say "Reticulate is running at http://localhost:5173"
+echo "Your decisions are saved in $ROOT/data/decisions"
 echo "Close this window or press Ctrl+C to stop. Logs: engine/.server.log, web/.vite.log"
 wait

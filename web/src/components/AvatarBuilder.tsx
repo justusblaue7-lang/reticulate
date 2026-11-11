@@ -1,25 +1,14 @@
-// Build or edit an avatar: identity and situation, phenotype (drawn live as a cameo),
-// personality (Big Five and values) and the eight decision dimensions (with their brain map).
+// Build or edit an avatar: who it is shown as (a 3D person and a name), its role and
+// situation, personality (Big Five and values) and the eight decision dimensions (with their
+// brain map).
 
-import { useState, type ReactNode } from "react";
-import { Cameo, HAIR_TONES, SKIN_TONES } from "../portrait/Cameo";
-import type { Avatar, Hair, HairColor, Phenotype, Science } from "../types";
+import { useEffect, useState, type ReactNode } from "react";
+import { loadCatalogue, type PersonAsset } from "../people/model";
+import { PersonViewer } from "../people/PersonViewer";
+import { portraitUrl } from "../people/model";
+import type { Avatar, Science } from "../types";
 import { SHORT } from "../format";
 import { Glyph } from "./Glyph";
-
-export const DEFAULT_PHENOTYPE: Phenotype = {
-  age: 40,
-  skin: 3,
-  face: 0.5,
-  nose: "straight",
-  lips: 0.5,
-  build: 0.5,
-  hair: "short",
-  hair_color: "dark_brown",
-  facial_hair: "none",
-  glasses: "none",
-  attire: "crew",
-};
 
 export function blankAvatar(science: Science): Avatar {
   const score = (value: number) => ({ value, provenance: "authored" as const, uncertainty: null, source: null });
@@ -35,19 +24,22 @@ export function blankAvatar(science: Science): Avatar {
     dimensions: Object.fromEntries(science.dimensions.map((d) => [d.id, score(5)])),
     personality: { traits: Object.fromEntries(science.personality.traits.map((t) => [t.id, score(5)])), values: [] },
     context: { goals: [], constraints: [], notes: "" },
-    phenotype: { ...DEFAULT_PHENOTYPE },
+    person: null,
   };
 }
 
-const HAIR: Hair[] = ["bald", "buzz", "short", "swept", "wavy", "long", "curly", "coily", "locs", "braids", "bun", "headscarf"];
-const HAIR_COLORS = Object.keys(HAIR_TONES) as HairColor[];
-
-function Choice<T extends string>({ options, value, onChange, label }: { options: readonly T[]; value: T; onChange: (v: T) => void; label?: (v: T) => string }) {
+/** The cast of 3D people to choose a look from. */
+function LookPicker({ value, onChange }: { value: string | null; onChange: (look: string) => void }) {
+  const [people, setPeople] = useState<PersonAsset[]>([]);
+  useEffect(() => {
+    void loadCatalogue().then(setPeople);
+  }, []);
+  if (!people.length) return <p className="note">No 3D people are built yet. Run tools/people/build.py.</p>;
   return (
-    <div className="choice-row">
-      {options.map((o) => (
-        <button key={o} className={o === value ? "on" : ""} onClick={() => onChange(o)}>
-          {label ? label(o) : o.replace("_", " ")}
+    <div className="look-picker" role="radiogroup" aria-label="Look">
+      {people.map((p) => (
+        <button key={p.look} role="radio" aria-checked={value === p.look} className={value === p.look ? "on" : ""} onClick={() => onChange(p.look)}>
+          <img src={portraitUrl(p.look)} alt="" loading="lazy" />
         </button>
       ))}
     </div>
@@ -132,10 +124,9 @@ interface Props {
 }
 
 export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, saving, error, brain }: Props) {
-  const ph = draft.phenotype ?? DEFAULT_PHENOTYPE;
   const personality = draft.personality ?? blankAvatar(science).personality!;
   const context = draft.context ?? { goals: [], constraints: [], notes: "" };
-  const setPh = (patch: Partial<Phenotype>) => onChange({ ...draft, phenotype: { ...ph, ...patch } });
+  const person = draft.person ?? { name: "", look: "" };
   const setDim = (id: string, value: number) =>
     onChange({ ...draft, dimensions: { ...draft.dimensions, [id]: { value, provenance: "authored", uncertainty: null, source: "builder" } } });
   const setTrait = (id: string, value: number) =>
@@ -149,11 +140,11 @@ export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, savi
   return (
     <div className="builder">
       <div className="builder-preview">
-        <Cameo phenotype={ph} size={330} title={draft.name || "New avatar"} />
+        <PersonViewer look={person.look || null} name={person.name || draft.name} className="builder-person" />
         <Glyph scores={science.dimensions.map((d) => draft.dimensions[d.id].value)} size={150} rings={5} labels={science.dimensions.map((d) => SHORT[d.id] ?? d.name)} />
         <div className="brain-box">{brain}</div>
         <div className="builder-actions">
-          <button className="button primary" disabled={saving || draft.name.trim().length < 2} onClick={onSave}>
+          <button className="button primary" disabled={saving || draft.name.trim().length < 2} onClick={() => onSave()}>
             {saving ? "Saving…" : "Save avatar"}
           </button>
           <button className="button" onClick={onCancel}>
@@ -168,14 +159,18 @@ export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, savi
           <legend>Identity and situation</legend>
           <div className="controls-grid">
             <label className="control">
-              <span className="label">Role</span>
-              <input className="field" value={draft.name} placeholder="e.g. Founder of a regional bakery chain" onChange={(e) => onChange({ ...draft, name: e.target.value })} />
+              <span className="label">Name · shown only to you</span>
+              <input className="field" value={person.name} placeholder="e.g. Clara Weiß" onChange={(e) => onChange({ ...draft, person: { ...person, name: e.target.value } })} />
             </label>
             <label className="control">
-              <span className="label">Voice</span>
-              <input className="field" value={draft.voice} placeholder="How this person talks and argues" onChange={(e) => onChange({ ...draft, voice: e.target.value })} />
+              <span className="label">Role · what the simulation sees</span>
+              <input className="field" value={draft.name} placeholder="e.g. Founder of a regional bakery chain" onChange={(e) => onChange({ ...draft, name: e.target.value })} />
             </label>
           </div>
+          <label className="control" style={{ marginTop: 14 }}>
+            <span className="label">Voice</span>
+            <input className="field" value={draft.voice} placeholder="How this person talks and argues" onChange={(e) => onChange({ ...draft, voice: e.target.value })} />
+          </label>
           <label className="control" style={{ marginTop: 14 }}>
             <span className="label">Situation</span>
             <textarea className="field" rows={2} value={draft.summary} onChange={(e) => onChange({ ...draft, summary: e.target.value })} />
@@ -197,52 +192,12 @@ export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, savi
         </fieldset>
 
         <fieldset className="control-group">
-          <legend>Phenotype</legend>
-          <p className="note">Draws the portrait only. Appearance never enters a simulation, so a decision cannot lean on stereotypes about how people look.</p>
-          <div className="controls-grid">
-            <Slider label="Age" value={ph.age} min={18} max={90} onChange={(age) => setPh({ age })} />
-            <div className="control">
-              <span className="label">Skin tone</span>
-              <div className="swatches">
-                {SKIN_TONES.map((c, i) => (
-                  <button key={c} className={ph.skin === i ? "on" : ""} style={{ background: c }} onClick={() => setPh({ skin: i })} aria-label={`Skin tone ${i + 1}`} />
-                ))}
-              </div>
-            </div>
-            <Slider label="Face" value={ph.face} min={0} max={1} step={0.05} low="Fine" high="Strong" display={ph.face.toFixed(2)} onChange={(face) => setPh({ face })} />
-            <Slider label="Build" value={ph.build} min={0} max={1} step={0.05} low="Slight" high="Heavy" display={ph.build.toFixed(2)} onChange={(build) => setPh({ build })} />
-            <Slider label="Lips" value={ph.lips} min={0} max={1} step={0.05} low="Thin" high="Full" display={ph.lips.toFixed(2)} onChange={(lips) => setPh({ lips })} />
-            <div className="control">
-              <span className="label">Nose</span>
-              <Choice options={["straight", "aquiline", "concave", "broad"] as const} value={ph.nose} onChange={(nose) => setPh({ nose })} />
-            </div>
-          </div>
-          <div className="control" style={{ marginTop: 14 }}>
-            <span className="label">Hair</span>
-            <Choice options={HAIR} value={ph.hair} onChange={(hair) => setPh({ hair })} />
-          </div>
-          <div className="controls-grid" style={{ marginTop: 14 }}>
-            <div className="control">
-              <span className="label">Hair colour</span>
-              <div className="swatches">
-                {HAIR_COLORS.map((c) => (
-                  <button key={c} className={ph.hair_color === c ? "on" : ""} style={{ background: HAIR_TONES[c] }} onClick={() => setPh({ hair_color: c })} title={c.replace("_", " ")} />
-                ))}
-              </div>
-            </div>
-            <div className="control">
-              <span className="label">Facial hair</span>
-              <Choice options={["none", "stubble", "moustache", "beard", "full_beard"] as const} value={ph.facial_hair} onChange={(facial_hair) => setPh({ facial_hair })} />
-            </div>
-            <div className="control">
-              <span className="label">Glasses</span>
-              <Choice options={["none", "round", "rectangular"] as const} value={ph.glasses} onChange={(glasses) => setPh({ glasses })} />
-            </div>
-            <div className="control">
-              <span className="label">Attire</span>
-              <Choice options={["crew", "knit", "collar", "blazer", "turtleneck"] as const} value={ph.attire} onChange={(attire) => setPh({ attire })} />
-            </div>
-          </div>
+          <legend>Look</legend>
+          <p className="note">
+            Realistic people from the Microsoft Rocketbox library. The look and the name only show who this avatar is; neither ever enters a
+            simulation, so a decision cannot lean on stereotypes about how people look or what they are called.
+          </p>
+          <LookPicker value={person.look || null} onChange={(look) => onChange({ ...draft, person: { ...person, look } })} />
         </fieldset>
 
         <fieldset className="control-group">
@@ -267,7 +222,7 @@ export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, savi
 
         <fieldset className="control-group">
           <legend>Decision profile</legend>
-          <p className="note">Eight decision tendencies, 5 = no leaning. The brain map beside the portrait follows them.</p>
+          <p className="note">Eight decision tendencies, 5 = no leaning. The brain map beside the person follows them.</p>
           <div className="controls-grid">
             {science.dimensions.map((d) => (
               <Slider key={d.id} label={d.name} value={draft.dimensions[d.id].value} low={d.low_pole} high={d.high_pole} onChange={(v) => setDim(d.id, v)} />

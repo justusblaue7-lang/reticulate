@@ -26,15 +26,6 @@ personality:
     agreeableness: 6
     neuroticism: 5
   values: [self_direction, universalism, benevolence]
-phenotype:  # draws the portrait only; never part of a prompt
-  age: 41
-  skin: 0
-  face: 0.35
-  nose: concave
-  lips: 0.45
-  build: 0.35
-  hair: bun
-  hair_color: auburn
-  facial_hair: none
-  glasses: rectangular
-  attire: turtleneck
+person:  # shown in the interface only; never part of a prompt
+  name: Amara Diallo
+  look: business_female_01

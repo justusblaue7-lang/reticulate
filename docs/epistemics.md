@@ -35,6 +35,26 @@ is a reading of the user's text, not a measurement; the report marks who set eac
 The brain views always state their source, and the overlay reveal is described as a
 threshold sweep, not neural timing.
 
+## What the dialogue may say
+
+The dialogue's job is to help a person reach their own decision. The guide asks; it does not
+choose.
+
+| Allowed | Not allowed |
+|---|---|
+| "If you already worked at the start-up, would you switch back?" (a countermove as a question) | "You are suffering from status quo bias." (a diagnosis) |
+| "You said security matters most, and you lean toward the riskier option. How do these fit?" | "You should take the offer." |
+| Asked "what do you think?": naming the considerations, then handing the decision back | Recommending an option, or inventing facts, figures or studies |
+| "Three of five simulated decision-makers would wait. What do you make of their reason?" | Presenting the panel's view as the answer or as expert advice |
+| The conclusion in the person's own words, with the reasons they gave | Adding reasons they did not give |
+
+The decision-quality ratings in the conclusion (strong, partial, weak per element) are
+Claude's reading of the dialogue, labelled as such; they are not a measurement of the
+decision's quality, and nothing claims that a decision reached in the dialogue is better.
+Whether it is, is the thesis's question (roadmap). Each dialogue records the model, effort
+and prompt version, and every question records its move, stage and the mechanism it
+counters, so dialogues can be analysed.
+
 ## What a decision report may say
 
 | Allowed | Not allowed |
@@ -51,13 +71,15 @@ tokens and cost, and gives no financial, legal or medical advice. Countermoves c
 basis ("Tested in an intervention study" or "Follows from the research; not tested as an
 intervention"), and Claude's watch-outs are labelled as applying them to this decision.
 
-## Appearance and stereotypes
+## Names, looks and stereotypes
 
-Avatars have a drawn phenotype so that people can recognise and relate to them. Appearance is
-excluded from every prompt (tested), and personas' phenotypes are spread across age, skin tone
-and hair without tracking their roles. Including appearance in a prompt would invite the model
-to apply stereotypes; if that is ever studied, it belongs in a separate, preregistered bias
-probe.
+Avatars are shown as fictional people, with a name and a realistic 3D look (Microsoft
+Rocketbox library), so that people can recognise and relate to them. Name and look are
+excluded from every prompt (tested): the simulation sees the role only. Personas' looks are
+spread across gender, age and skin tone without tracking their roles. Including appearance
+or names in a prompt would invite the model to apply stereotypes; if that is ever studied,
+it belongs in a separate, preregistered bias probe. The people are fictional: their models
+are artist-made, and they are not likenesses of, or simulations of, real persons.
 
 ## Validity of the simulation
 
@@ -83,7 +105,7 @@ personality rights (*allgemeines Persönlichkeitsrecht*), and do not generate qu
 
 Personal cognitive twins will hold questionnaire and task data that may count as health data
 under GDPR Art. 9. Get a data-protection assessment and explicit consent before collecting any.
-Runs are stored locally in `engine/runs/` and are not committed to git.
+Decisions, dialogues and runs are stored locally in `data/` and are not committed to git. A dialogue holds what a person says about their own life; treat the folder as personal data.
 
 ## Science review
 

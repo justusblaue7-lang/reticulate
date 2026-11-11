@@ -29,15 +29,6 @@ personality:
     agreeableness: 7
     neuroticism: 4
   values: [tradition, benevolence, security]
-phenotype:  # draws the portrait only; never part of a prompt
-  age: 29
-  skin: 3
-  face: 0.2
-  nose: aquiline
-  lips: 0.55
-  build: 0.4
-  hair: headscarf
-  hair_color: black
-  facial_hair: none
-  glasses: none
-  attire: blazer
+person:  # shown in the interface only; never part of a prompt
+  name: Elif Yıldız
+  look: female_adult_06

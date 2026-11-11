@@ -5,6 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from reticulate.dialogue.schemas import Dialogue
 from reticulate.simulation.schemas import (
     SIMULATION_NOTICE,
     DecisionFrame,
@@ -87,14 +88,18 @@ class DecisionMeta(BaseModel):
 
 
 class Decision(BaseModel):
-    """A decision worked through in the decision mode: the record behind a report."""
+    """A decision worked through in Reticulate: the record behind its folder in data/decisions."""
 
     id: str
     kind: Literal["decision"] = "decision"
     created_at: datetime
     updated_at: datetime
     problem: Problem
-    frame: DecisionFrame | None = None  # None when the anatomy was set by hand without Claude
+    dialogue: Dialogue | None = None  # the Socratic dialogue; None for decisions rated without one
+    analysis: Literal["none", "pending", "done", "failed"] = "none"  # Claude's reading of the decision
+    analysis_error: str | None = None
+    settled: list[str] = []  # open questions the person has ticked off
+    frame: DecisionFrame | None = None  # None until Claude has analysed the decision
     anatomy: list[Rating]
     watch_outs: list[WatchOut] = []  # how engaged mechanisms could pull on this decision (Claude)
     signature: NeuralSignature

@@ -1,0 +1,127 @@
+# The Socratic dialogue: how Reticulate questions a decision.
+#
+# The dialogue walks through the six elements of decision quality: a decision is only as
+# good as its weakest element (Howard, 1988; Spetzler, Winter & Meyer, 2016). Every turn makes
+# one Socratic move. Like countermoves, moves carry their basis: `tested` when a study shows
+# that the move improves judgement or decisions (`finding` says what was shown), `derived`
+# when it follows from research or established practice but has not been tested on its own.
+# The interface labels the two differently, and the prompt is compiled from this file.
+#
+# Changes to this file are science changes: they need review (docs/epistemics.md).
+
+version: 0.5.0
+
+method:
+  summary: >-
+    Guided discovery: the person reaches their own decision through short, open questions,
+    reflections of their own words and summaries, not through advice (Padesky, 1993;
+    Overholser, 1993). In cognitive therapy for depression, more Socratic questioning in a
+    session predicted greater symptom improvement by the next session (Braun et al., 2015).
+  refs: [padesky1993, overholser1993, braun2015, paul2006]
+
+stages:
+  - id: frame
+    name: Frame
+    aim: What exactly is being decided, by when, and what is fixed.
+    refs: [howard1988, spetzler2016]
+  - id: goals
+    name: What matters
+    aim: The objectives the decision should serve, most important first.
+    note: >-
+      Asked for their objectives, people named only about half of those they later
+      recognised as important to them.
+    refs: [bond2008]
+  - id: options
+    name: Options
+    aim: Real alternatives instead of a single yes or no.
+    note: >-
+      Organisational decisions framed as whether-or-not failed more often than decisions
+      that weighed several alternatives.
+    refs: [nutt1999]
+  - id: evidence
+    name: Evidence
+    aim: What is known, what is assumed, and what would change the decision.
+    refs: [howard1988, spetzler2016]
+  - id: tradeoffs
+    name: Trade-offs
+    aim: What each option costs, and whether the person accepts the cost.
+    refs: [spetzler2016]
+  - id: commitment
+    name: Commitment
+    aim: The choice in the person's own words, and a first step.
+    refs: [spetzler2016, gollwitzer2006]
+
+moves:
+  - id: clarify
+    name: Clarify
+    question: What exactly do you mean by …?
+    basis: derived
+    refs: [paul2006]
+  - id: goal
+    name: What matters
+    question: What would a good outcome look like a year from now? What else matters to you?
+    basis: derived
+    refs: [bond2008]
+  - id: assumption
+    name: Assumption
+    question: What are you taking for granted here?
+    basis: derived
+    refs: [paul2006]
+  - id: evidence
+    name: Evidence
+    question: How do you know? What would show you that you are wrong?
+    basis: derived
+    refs: [paul2006]
+  - id: alternative
+    name: Another option
+    question: If neither option were available, what would you do?
+    basis: tested
+    finding: >-
+      Prompting people with their own objectives, one at a time, led them to create more
+      alternatives than they generated unprompted.
+    refs: [siebert2015]
+  - id: perspective
+    name: Distance
+    question: What would you tell a good friend in exactly your position?
+    basis: tested
+    finding: >-
+      People reasoned more wisely about other people's dilemmas than about their own;
+      taking a distanced, third-person view of their own dilemma removed the difference.
+    refs: [grossmann2014]
+  - id: consequence
+    name: Consequences
+    question: If you chose this, what would follow, for you and for others, a year from now?
+    basis: derived
+    refs: [paul2006]
+  - id: opposite
+    name: The other side
+    question: What is the strongest reason against the option you lean toward?
+    basis: tested
+    finding: >-
+      Considering the opposite reduced biased judgement more than an instruction to be
+      fair and unbiased.
+    refs: [lord1984]
+  - id: premortem
+    name: Premortem
+    question: Imagine it is a year from now and this went badly. What happened?
+    basis: tested
+    finding: Imagining that a plan had failed lowered overconfidence in it more than listing pros and cons.
+    refs: [veinott2010]
+  - id: tradeoff
+    name: Trade-off
+    question: What are you willing to give up for this?
+    basis: derived
+    refs: [spetzler2016]
+  - id: perspectives
+    name: Other minds
+    question: Simulated decision-makers weighed this differently. What do you make of their reasons?
+    basis: derived
+    refs: [grossmann2014]
+  - id: commitment
+    name: Commitment
+    question: What will you do first, and when?
+    basis: tested
+    finding: >-
+      If–then plans for when and how to act had a medium-to-large effect on reaching goals
+      across 94 independent tests.
+    refs: [gollwitzer2006]

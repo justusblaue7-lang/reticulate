@@ -29,15 +29,6 @@ personality:
     agreeableness: 5
     neuroticism: 5
   values: [self_direction, achievement, stimulation]
-phenotype:  # draws the portrait only; never part of a prompt
-  age: 44
-  skin: 6
-  face: 0.45
-  nose: broad
-  lips: 0.75
-  build: 0.5
-  hair: braids
-  hair_color: black
-  facial_hair: none
-  glasses: none
-  attire: crew
+person:  # shown in the interface only; never part of a prompt
+  name: Sofia Moreno
+  look: female_adult_11

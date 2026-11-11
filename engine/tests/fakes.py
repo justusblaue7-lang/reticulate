@@ -2,6 +2,7 @@
 
 from itertools import count
 
+from reticulate.dialogue.schemas import Assumption, Conclusion, Notes, QualityCheck, SocraticTurn
 from reticulate.profile import CognitiveProfile
 from reticulate.simulation.schemas import (
     DecisionAnalysis,
@@ -27,12 +28,67 @@ FACTORS = [
 ]
 
 
+# The guide's path through a dialogue: (stage, move, mechanism) per turn.
+PATH = [
+    ("frame", "clarify", "none"),
+    ("goals", "goal", "none"),
+    ("options", "alternative", "status_quo_bias"),
+    ("evidence", "evidence", "none"),
+    ("tradeoffs", "opposite", "loss_aversion"),
+    ("commitment", "commitment", "none"),
+]
+
+
 class FakeEngine:
-    name, model, effort = "fake", None, None
+    name, model, effort, dialogue_effort = "fake", None, None, None
 
     def __init__(self, jitter: bool = False):
         self.jitter = jitter
         self.calls = count()
+        self.seen: list[list[str]] = []  # the answers the guide saw, per turn
+
+    async def ask(self, problem: Problem, exchanges) -> SocraticTurn:
+        answers = ["(skipped)" if e.skipped else (e.answer or "") for e in exchanges]
+        self.seen.append(answers + [e.context for e in exchanges if e.context])
+        stage, move, mechanism = PATH[min(len(exchanges), len(PATH) - 1)]
+        notes = Notes(
+            decision=problem.question,
+            goals=[a for a in answers[1:2]],
+            options=[GO, STAY],
+            facts=[],
+            unknowns=["test unknown"],
+            assumptions=[Assumption(text="test assumption", status="open")],
+            leaning=GO if len(exchanges) >= 3 else "",
+            confidence=7 if len(exchanges) >= 5 else -1,
+        )
+        return SocraticTurn(
+            reflection=f"You said: {answers[-1]}" if answers else "",
+            question=f"Question {len(exchanges) + 1} about {stage}?",
+            move=move,
+            stage=stage,
+            mechanism_id=mechanism if mechanism != "none" else "telepathy" if len(exchanges) == 1 else "none",
+            why="test",
+            scale=stage == "commitment",
+            notes=notes,
+            ready=len(exchanges) >= 4,
+        )
+
+    async def conclude(self, problem: Problem, exchanges) -> Conclusion:
+        answered = [e.answer for e in exchanges if e.answer]
+        return Conclusion(
+            decided=bool(answered),
+            choice=GO,
+            statement=f"I will go ahead, because {answered[-1] if answered else 'of nothing yet'}.",
+            reasons=answered[:2],
+            tradeoffs=["test trade-off"],
+            revisit_if=["test signal"],
+            open_questions=["Ask the bank", "Check the lease"],
+            first_step="Call the bank",
+            if_then="If it is Monday, then I will call the bank.",
+            review="in three months",
+            # out of order and incomplete on purpose: the workflow orders them
+            quality=[QualityCheck(stage="options", level="partial", note="test"), QualityCheck(stage="frame", level="strong", note="test")],
+        )
 
     async def frame(self, problem: Problem) -> DecisionFrame:
         return DecisionFrame(decision=problem.question, options=[GO, STAY], facts=[], unknowns=[],

@@ -1,0 +1,623 @@
+{
+ "licence": "MIT, Microsoft Rocketbox",
+ "people": [
+  {
+   "look": "male_adult_12",
+   "source": "Microsoft Rocketbox: Adults/Male_Adult_12",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ]
+   }
+  },
+  {
+   "look": "female_adult_14",
+   "source": "Microsoft Rocketbox: Adults/Female_Adult_14",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "business_male_02",
+   "source": "Microsoft Rocketbox: Professions/Business_Male_02",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "male_adult_03",
+   "source": "Microsoft Rocketbox: Adults/Male_Adult_03",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "female_adult_06",
+   "source": "Microsoft Rocketbox: Adults/Female_Adult_06",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "male_adult_04",
+   "source": "Microsoft Rocketbox: Adults/Male_Adult_04",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "medical_male_03",
+   "source": "Microsoft Rocketbox: Professions/Medical_Male_03",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "stetoskop": [
+     "color",
+     "normal"
+    ]
+   }
+  },
+  {
+   "look": "business_female_02",
+   "source": "Microsoft Rocketbox: Professions/Business_Female_02",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "glasses": [
+     "alpha",
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "female_adult_11",
+   "source": "Microsoft Rocketbox: Adults/Female_Adult_11",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "business_male_04",
+   "source": "Microsoft Rocketbox: Professions/Business_Male_04",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ]
+   }
+  },
+  {
+   "look": "business_female_01",
+   "source": "Microsoft Rocketbox: Professions/Business_Female_01",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "female_adult_01",
+   "source": "Microsoft Rocketbox: Adults/Female_Adult_01",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "female_adult_03",
+   "source": "Microsoft Rocketbox: Adults/Female_Adult_03",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "female_adult_05",
+   "source": "Microsoft Rocketbox: Adults/Female_Adult_05",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "female_adult_08",
+   "source": "Microsoft Rocketbox: Adults/Female_Adult_08",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "female_adult_10",
+   "source": "Microsoft Rocketbox: Adults/Female_Adult_10",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "female_adult_15",
+   "source": "Microsoft Rocketbox: Adults/Female_Adult_15",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "female_party_02",
+   "source": "Microsoft Rocketbox: Adults/Female_Party_02",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "business_female_03",
+   "source": "Microsoft Rocketbox: Professions/Business_Female_03",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "business_female_04",
+   "source": "Microsoft Rocketbox: Professions/Business_Female_04",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "sports_female_02",
+   "source": "Microsoft Rocketbox: Professions/Sports_Female_02",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "male_adult_01",
+   "source": "Microsoft Rocketbox: Adults/Male_Adult_01",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "male_adult_05",
+   "source": "Microsoft Rocketbox: Adults/Male_Adult_05",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "male_adult_09",
+   "source": "Microsoft Rocketbox: Adults/Male_Adult_09",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "male_adult_13",
+   "source": "Microsoft Rocketbox: Adults/Male_Adult_13",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ]
+   }
+  },
+  {
+   "look": "male_adult_15",
+   "source": "Microsoft Rocketbox: Adults/Male_Adult_15",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ]
+   }
+  },
+  {
+   "look": "male_adult_20",
+   "source": "Microsoft Rocketbox: Adults/Male_Adult_20",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ]
+   }
+  },
+  {
+   "look": "business_male_05",
+   "source": "Microsoft Rocketbox: Professions/Business_Male_05",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ]
+   }
+  },
+  {
+   "look": "business_male_07",
+   "source": "Microsoft Rocketbox: Professions/Business_Male_07",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ]
+   }
+  },
+  {
+   "look": "gardener_male_01",
+   "source": "Microsoft Rocketbox: Professions/Gardener_Male_01",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "medical_male_01",
+   "source": "Microsoft Rocketbox: Professions/Medical_Male_01",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  },
+  {
+   "look": "sports_male_03",
+   "source": "Microsoft Rocketbox: Professions/Sports_Male_03",
+   "parts": {
+    "body": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "head": [
+     "color",
+     "normal",
+     "rough"
+    ],
+    "opacity": [
+     "alpha",
+     "color"
+    ]
+   }
+  }
+ ]
+}

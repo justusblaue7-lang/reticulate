@@ -25,15 +25,6 @@ personality:
     agreeableness: 4
     neuroticism: 4
   values: [achievement, self_direction, security]
-phenotype:  # draws the portrait only; never part of a prompt
-  age: 69
-  skin: 4
-  face: 0.25
-  nose: concave
-  lips: 0.4
-  build: 0.4
-  hair: short
-  hair_color: white
-  facial_hair: none
-  glasses: none
-  attire: blazer
+person:  # shown in the interface only; never part of a prompt
+  name: Ingrid Larsen
+  look: business_female_02

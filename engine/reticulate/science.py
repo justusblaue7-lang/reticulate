@@ -1,5 +1,5 @@
 """The science layer: dimensions, personality, brain structures, networks, findings, stimuli,
-decision features, mechanisms and references.
+decision features, mechanisms, the Socratic dialogue and references.
 
 The content lives in YAML files under reticulate/data so that it can be reviewed and
 versioned as science, separately from code. This module loads it into typed models and
@@ -168,6 +168,44 @@ class DecisionFeature(BaseModel):
     note: str = ""
 
 
+class SocraticStage(BaseModel):
+    """One element of decision quality; the dialogue moves through them in order."""
+
+    id: str
+    name: str
+    aim: str
+    note: str = ""
+    refs: list[str]
+
+
+class SocraticMove(BaseModel):
+    """A kind of question the dialogue can ask, with the basis for asking it."""
+
+    id: str
+    name: str
+    question: str  # the move's typical form
+    basis: Literal["tested", "derived"]
+    finding: str = ""
+    refs: list[str]
+
+    @model_validator(mode="after")
+    def _tested_needs_evidence(self) -> "SocraticMove":
+        if self.basis == "tested" and not (self.finding and self.refs):
+            raise ValueError("a tested move needs its finding and references")
+        return self
+
+
+class SocraticMethod(BaseModel):
+    summary: str
+    refs: list[str]
+
+
+class Socratic(BaseModel):
+    method: SocraticMethod
+    stages: list[SocraticStage]
+    moves: list[SocraticMove]
+
+
 class Science(BaseModel):
     version: str
     dimensions: list[Dimension]
@@ -180,6 +218,7 @@ class Science(BaseModel):
     stimuli: list[Stimulus]
     features: list[DecisionFeature]
     mechanisms: list[Mechanism]
+    socratic: Socratic
     references: dict[str, str]
 
     @model_validator(mode="after")
@@ -215,6 +254,9 @@ class Science(BaseModel):
                 need("dimension", dim, dims)
             for mech in f.mechanisms:
                 need("mechanism", mech, mechanisms)
+        for item in [self.socratic.method, *self.socratic.stages, *self.socratic.moves]:
+            for ref in item.refs:
+                need("reference", ref, refs)
         for r in self.regions:
             need("region group", r.group, {g.id for g in self.region_groups})
         for link in self.links:
@@ -229,6 +271,8 @@ class Science(BaseModel):
             (self.features, "decision feature"),
             (self.mechanisms, "mechanism"),
             (self.personality.traits, "trait"),
+            (self.socratic.stages, "dialogue stage"),
+            (self.socratic.moves, "dialogue move"),
         ):
             ids = [x.id for x in collection]
             for dup in {i for i in ids if ids.count(i) > 1}:
@@ -265,6 +309,12 @@ class Science(BaseModel):
                 return m
         raise KeyError(mechanism_id)
 
+    def move(self, move_id: str) -> SocraticMove:
+        for m in self.socratic.moves:
+            if m.id == move_id:
+                return m
+        raise KeyError(move_id)
+
 
 def _read(name: str) -> dict:
     return yaml.safe_load(files("reticulate.data").joinpath(name).read_text(encoding="utf-8"))
@@ -275,8 +325,9 @@ def science() -> Science:
     regions = _read("regions.yaml")
     stimuli = _read("stimuli.yaml")
     personality = _read("personality.yaml")
+    socratic = _read("socratic.yaml")
     return Science(
-        version="0.4.0",
+        version="0.5.0",
         dimensions=_read("dimensions.yaml")["dimensions"],
         personality={k: personality[k] for k in ("traits", "values", "refs", "value_refs")},
         networks=_read("networks.yaml")["networks"],
@@ -287,5 +338,6 @@ def science() -> Science:
         stimuli=stimuli["stimuli"],
         features=_read("decision_features.yaml")["features"],
         mechanisms=_read("mechanisms.yaml")["mechanisms"],
+        socratic={k: socratic[k] for k in ("method", "stages", "moves")},
         references=_read("references.yaml"),
     )

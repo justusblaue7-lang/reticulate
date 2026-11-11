@@ -1,9 +1,10 @@
-"""Reasoning engine: each simulation stage is a structured-output call to Claude."""
+"""Reasoning engine: every simulation stage, and every turn of the dialogue, is a
+structured-output call to Claude."""
 
 from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import Protocol, TypeVar
+from typing import TYPE_CHECKING, Protocol, TypeVar
 
 import anthropic
 from pydantic import BaseModel
@@ -20,6 +21,9 @@ from reticulate.simulation.schemas import (
     Synthesis,
     Usage,
 )
+
+if TYPE_CHECKING:
+    from reticulate.dialogue.schemas import Conclusion, Exchange, SocraticTurn
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -52,6 +56,11 @@ class ReasoningEngine(Protocol):
     name: str
     model: str | None
     effort: str | None
+    dialogue_effort: str | None
+
+    async def ask(self, problem: Problem, exchanges: "list[Exchange]") -> "SocraticTurn": ...
+
+    async def conclude(self, problem: Problem, exchanges: "list[Exchange]") -> "Conclusion": ...
 
     async def frame(self, problem: Problem) -> DecisionFrame: ...
 
@@ -106,14 +115,32 @@ def _price(model: str, usage) -> Usage:
 
 
 class ClaudeEngine:
-    def __init__(self, model: str, effort: str = "high", client: anthropic.AsyncAnthropic | None = None):
+    def __init__(
+        self,
+        model: str,
+        effort: str = "high",
+        client: anthropic.AsyncAnthropic | None = None,
+        dialogue_effort: str = "medium",
+    ):
         self.model = model
         self.effort = effort
+        self.dialogue_effort = dialogue_effort
         self.name = f"claude:{model}"
         # Resolves credentials from ANTHROPIC_API_KEY (engine/.env is loaded by config).
         self.client = client or anthropic.AsyncAnthropic()
 
     async def _generate(self, system: str, user: str, schema: type[T], effort: str) -> T:
+        return await self._parse(system, [{"role": "user", "content": user}], schema, effort)
+
+    async def _parse(self, system: str, messages: list[dict], schema: type[T], effort: str, cached: bool = False) -> T:
+        extra: dict = {}
+        system_param: str | list[dict] = system
+        if cached:
+            # A dialogue's system prompt is frozen and its conversation only grows, so both are
+            # cached: a breakpoint on the system prompt (shared by every dialogue) and an
+            # automatic one on the last message (this dialogue so far).
+            system_param = [{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}]
+            extra["cache_control"] = {"type": "ephemeral"}
         response = await self.client.beta.messages.parse(
             model=self.model,
             max_tokens=16000,
@@ -122,9 +149,10 @@ class ClaudeEngine:
             # On a safety decline, re-run on Anthropic's recommended fallback model.
             betas=["server-side-fallback-2026-07-01"],
             fallbacks="default",
-            system=system,
-            messages=[{"role": "user", "content": user}],
+            system=system_param,
+            messages=messages,
             output_format=schema,
+            **extra,
         )
         calls = _usage.get()
         if calls is not None and response.usage is not None:
@@ -154,3 +182,17 @@ class ClaudeEngine:
     async def synthesize(self, problem, frame, profiles, perspectives, space, context=None) -> Synthesis:
         system, user = prompts.synthesis_prompt(problem, frame, profiles, perspectives, space, context)
         return await self._generate(system, user, Synthesis, effort=self.effort)
+
+    async def ask(self, problem: Problem, exchanges: "list[Exchange]") -> "SocraticTurn":
+        from reticulate.dialogue import prompts as dialogue
+        from reticulate.dialogue.schemas import SocraticTurn
+
+        messages = dialogue.messages(problem, exchanges)
+        return await self._parse(dialogue.system_prompt(), messages, SocraticTurn, self.dialogue_effort, cached=True)
+
+    async def conclude(self, problem: Problem, exchanges: "list[Exchange]") -> "Conclusion":
+        from reticulate.dialogue import prompts as dialogue
+        from reticulate.dialogue.schemas import Conclusion
+
+        messages = dialogue.messages(problem, exchanges, conclude=True)
+        return await self._parse(dialogue.system_prompt(), messages, Conclusion, self.dialogue_effort, cached=True)

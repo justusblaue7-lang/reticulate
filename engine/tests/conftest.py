@@ -7,11 +7,17 @@ from tests.fakes import FakeEngine
 
 
 @pytest.fixture(autouse=True)
-def runs_dir(tmp_path, monkeypatch):
-    monkeypatch.setenv("RETICULATE_RUNS_DIR", str(tmp_path / "runs"))
+def data_dir(tmp_path, monkeypatch):
+    """Every test writes into its own data folder, never into the project's."""
+    monkeypatch.setenv("RETICULATE_DATA_DIR", str(tmp_path / "data"))
     settings.cache_clear()
-    yield tmp_path / "runs"
+    yield tmp_path / "data"
     settings.cache_clear()
+
+
+@pytest.fixture
+def runs_dir(data_dir):
+    return data_dir / "runs"
 
 
 @pytest.fixture

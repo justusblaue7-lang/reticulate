@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { weightCSS, weightInk } from "../../colors";
 import { usd } from "../../format";
 import type { Avatar, Decision, Progress, Science } from "../../types";
-import { Face } from "../Face";
+import { displayName, Face } from "../Face";
+import { PersonModal } from "../PersonModal";
 import { clock, engagedDimensions, estimate, observedPerCall, panelCalls, suggestPanel, tendencyNames, verdict } from "./model";
 
 interface SetupProps {
@@ -43,7 +44,10 @@ export function PanelSetup({ science, decision, avatars, configured, onConvene, 
           {chosen.map((a) => (
             <figure key={a.id} className="member" title={a.summary}>
               <Face avatar={a} size={64} />
-              <figcaption>{a.name}</figcaption>
+              <figcaption>
+                {displayName(a)}
+                {a.person?.name && <small>{a.name}</small>}
+              </figcaption>
             </figure>
           ))}
           <button className="member add" onClick={() => setPicking(!picking)}>
@@ -64,8 +68,8 @@ export function PanelSetup({ science, decision, avatars, configured, onConvene, 
                       <button key={a.id} className={`pick ${ids.includes(a.id) ? "on" : ""}`} onClick={() => toggle(a.id)} title={a.summary}>
                         <Face avatar={a} size={44} />
                         <span>
-                          <strong>{a.name}</strong>
-                          <small>{a.summary}</small>
+                          <strong>{displayName(a)}</strong>
+                          <small>{a.person?.name ? `${a.name}. ` : ""}{a.summary}</small>
                         </span>
                       </button>
                     ))}
@@ -142,7 +146,7 @@ export function PanelProgress({ progress, members, replicates, since }: { progre
             <figure key={a.id} className={`member ${finished >= replicates ? "answered" : "waiting"}`}>
               <Face avatar={a} size={64} />
               <figcaption>
-                {a.name}
+                {displayName(a)}
                 <small>{finished >= replicates ? "answered" : `thinking · ${finished}/${replicates}`}</small>
               </figcaption>
             </figure>
@@ -161,6 +165,7 @@ export function PanelProgress({ progress, members, replicates, since }: { progre
 export function PanelResult({ science, decision }: { science: Science; decision: Decision }) {
   const panel = decision.panel!;
   const [run, setRun] = useState(0);
+  const [meet, setMeet] = useState<Avatar | null>(null);
   const n = panel.meta.replicates;
   const profiles = new Map(panel.profiles.map((p) => [p.id, p]));
   const v = verdict(panel);
@@ -215,9 +220,12 @@ export function PanelResult({ science, decision }: { science: Science; decision:
           return (
             <article key={p.id} className="voice">
               <header>
-                <Face avatar={p} size={56} />
+                <button className="face-button" onClick={() => setMeet(p)} title={`Meet ${displayName(p)} in 3D`}>
+                  <Face avatar={p} size={56} />
+                </button>
                 <div>
-                  <h4>{p.name}</h4>
+                  <h4>{displayName(p)}</h4>
+                  {p.person?.name && <span className="role">{p.name}</span>}
                   <span className="choice">{view.recommendation}</span>
                 </div>
               </header>
@@ -302,7 +310,7 @@ export function PanelResult({ science, decision }: { science: Science; decision:
                 {panel.space.profile_ids.map((id) => (
                   <th key={id} className="col">
                     <Face avatar={profiles.get(id)!} size={30} />
-                    <span>{profiles.get(id)!.name}</span>
+                    <span>{displayName(profiles.get(id)!)}</span>
                   </th>
                 ))}
               </tr>
@@ -323,7 +331,7 @@ export function PanelResult({ science, decision }: { science: Science; decision:
                         key={id}
                         className="cell"
                         style={{ background: weightCSS(w.mean), color: weightInk(w.mean) }}
-                        title={`${profiles.get(id)!.name}: favours ${f.favours[id]}. ${rationale?.rationale ?? ""}`}
+                        title={`${displayName(profiles.get(id)!)}: favours ${f.favours[id]}. ${rationale?.rationale ?? ""}`}
                       >
                         {n > 1 ? w.mean.toFixed(1) : w.mean}
                       </td>
@@ -335,6 +343,7 @@ export function PanelResult({ science, decision }: { science: Science; decision:
           </table>
         </div>
       </details>
+      {meet && <PersonModal avatar={meet} onClose={() => setMeet(null)} />}
     </div>
   );
 }

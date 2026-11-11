@@ -3,13 +3,14 @@ import { api } from "../api";
 import type { Atlas } from "../atlas/load";
 import { emphasisOverlay, useConstructMaps } from "../brain/emphasis";
 import type { BrainRenderer } from "../brain/renderer";
-import { AvatarBuilder, blankAvatar, DEFAULT_PHENOTYPE } from "../components/AvatarBuilder";
+import { AvatarBuilder, blankAvatar } from "../components/AvatarBuilder";
+import { displayName, Face } from "../components/Face";
 import { Glyph } from "../components/Glyph";
 import { ScaleRow } from "../components/ScaleRow";
 import { Specimen, type OverlaySpec } from "../components/Specimen";
 import { SourceSwitch } from "./AtlasView";
 import { SHORT } from "../format";
-import { Cameo } from "../portrait/Cameo";
+import { PersonViewer } from "../people/PersonViewer";
 import type { Avatar, Science, Source } from "../types";
 
 interface Props {
@@ -23,8 +24,11 @@ interface Props {
 export function Medallion({ avatar, size = 92, on, onClick }: { avatar: Avatar; size?: number; on?: boolean; onClick?: () => void }) {
   return (
     <button className={`medallion ${on ? "on" : ""}`} onClick={onClick} title={avatar.summary}>
-      <Cameo phenotype={avatar.phenotype ?? DEFAULT_PHENOTYPE} size={size} crop="head" />
-      <span>{avatar.name}</span>
+      <Face avatar={avatar} size={size} />
+      <span>
+        {displayName(avatar)}
+        {avatar.person?.name && <small>{avatar.name}</small>}
+      </span>
     </button>
   );
 }
@@ -82,8 +86,9 @@ export function AvatarsView({ atlas, science, renderer, avatars, onAvatars }: Pr
     if (!draft) return;
     setSaving(true);
     setError(null);
+    const person = draft.person && (draft.person.look || draft.person.name.trim()) ? { ...draft.person, name: draft.person.name.trim() } : null;
     try {
-      const saved = await api.saveAvatar(draft);
+      const saved = await api.saveAvatar({ ...draft, person });
       onAvatars(avatars.some((a) => a.id === saved.id) ? avatars.map((a) => (a.id === saved.id ? saved : a)) : [...avatars, saved]);
       setSelectedId(saved.id);
       setDraft(null);
@@ -106,7 +111,7 @@ export function AvatarsView({ atlas, science, renderer, avatars, onAvatars }: Pr
     <main className="view">
       <div className="avatars-view">
         <aside className="gallery">
-          <h3 className="label" style={{ marginTop: 0 }}>Library · authored personas</h3>
+          <h3 className="label" style={{ marginTop: 0 }}>Library · fictional people</h3>
           <div className="gallery-grid">
             {library.map((a) => (
               <Medallion key={a.id} avatar={a} size={78} on={!draft && a.id === selected?.id} onClick={() => { setDraft(null); setFocus(null); setSelectedId(a.id); }} />
@@ -146,7 +151,13 @@ export function AvatarsView({ atlas, science, renderer, avatars, onAvatars }: Pr
               brain={brain(false)}
               focus={focus}
               onFocus={setFocus}
-              onEdit={() => setDraft(selected.origin === "user" ? { ...selected } : { ...selected, id: "new", origin: "user", name: `${selected.name} (variant)` })}
+              onEdit={() =>
+                setDraft(
+                  selected.origin === "user"
+                    ? { ...selected }
+                    : { ...selected, id: "new", origin: "user", name: `${selected.name} (variant)`, person: selected.person ? { ...selected.person, name: "" } : null },
+                )
+              }
               onDelete={selected.origin === "user" ? () => void remove(selected) : null}
             />
           ) : null}
@@ -169,10 +180,11 @@ function Dossier({ science, avatar, brain, focus, onFocus, onEdit, onDelete }: {
   return (
     <article>
       <header className="avatar-head">
-        <Cameo phenotype={avatar.phenotype ?? DEFAULT_PHENOTYPE} size={300} title={avatar.name} />
+        <PersonViewer look={avatar.person?.look} name={displayName(avatar)} className="dossier-person" />
         <div>
-          <div className="label">{avatar.origin === "library" ? "Authored persona" : "Your avatar"} · a vignette, not a real person</div>
-          <h1 className="display">{avatar.name}</h1>
+          <div className="label">{avatar.origin === "library" ? "Fictional person" : "Your avatar"} · a simulated decision-maker, not a real person</div>
+          <h1 className="display">{displayName(avatar)}</h1>
+          {avatar.person?.name && <p className="role">{avatar.name}</p>}
           <p className="summary">{avatar.summary}</p>
           {avatar.nuance && <p className="nuance">{avatar.nuance}</p>}
           <div className="avatar-actions">

@@ -28,15 +28,6 @@ personality:
     agreeableness: 8
     neuroticism: 4
   values: [universalism, benevolence, achievement]
-phenotype:  # draws the portrait only; never part of a prompt
-  age: 36
-  skin: 5
-  face: 0.65
-  nose: broad
-  lips: 0.65
-  build: 0.55
-  hair: locs
-  hair_color: black
-  facial_hair: full_beard
-  glasses: none
-  attire: knit
+person:  # shown in the interface only; never part of a prompt
+  name: Jonas Okafor
+  look: male_adult_04

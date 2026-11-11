@@ -1,20 +1,27 @@
-"""Decision mode: the workflow behind a decision report.
+"""The workflow behind a decision, beside its Socratic dialogue (reticulate.dialogue).
 
 1. Analyse. Claude structures the decision (options, facts, unknowns, factors), rates its
-   anatomy and writes a watch-out for every mechanism the anatomy engages, in one call.
-   Without Claude, the anatomy can be set by hand.
+   anatomy and writes a watch-out for every mechanism the anatomy engages, in one call. It
+   runs in the background while the dialogue starts. Without Claude, the anatomy can be
+   set by hand.
 2. Neural signature. Deterministic: the level-weighted composite of the features'
    meta-analytic maps in both sources, the structures and networks it engages, its overlap
    with the dimensions' construct maps, its decoding against the vocabulary, and the
    mechanisms and published findings that bear on it.
 3. Panel. Every avatar reasons through the decision in replicates, with the neural context
-   unless it is switched off; the perspectives are compared and synthesised.
+   unless it is switched off; the perspectives are compared and synthesised. Its result
+   goes back into the dialogue as a perspective to question.
 4. Tipping points. Dose–response runs on the dimensions the decision engages most; runs
    accumulate, and re-running an avatar and dimension replaces the earlier run.
+
+Steps that call the engine (`analyse`, `run_panel`, `run_tipping`) only read the decision;
+the `with_*` functions apply their results to the latest saved record and return a copy.
 """
 
 import uuid
 from datetime import UTC, datetime
+
+from pydantic import BaseModel
 
 from reticulate import __version__
 from reticulate.atlas import runtime
@@ -33,7 +40,15 @@ from reticulate.science import science
 from reticulate.simulation import prompts
 from reticulate.simulation.engines import ReasoningEngine, total, track_usage
 from reticulate.simulation.pipeline import sensitivity, simulate
-from reticulate.simulation.schemas import FeatureRating, Problem, WatchOut
+from reticulate.simulation.schemas import (
+    DecisionFrame,
+    FeatureRating,
+    Problem,
+    SensitivityResult,
+    SimulationResult,
+    Usage,
+    WatchOut,
+)
 
 MAX_FINDINGS = 8
 MAX_TIPPING_DIMENSIONS = 3
@@ -144,35 +159,78 @@ def context_for(decision: Decision) -> str | None:
     return prompts.render_neural_context(decision.signature, decision.anatomy)
 
 
-async def create(problem: Problem, engine: ReasoningEngine | None, anatomy: list[Rating] | None = None) -> Decision:
-    """Analyse a decision with Claude, or take a hand-set anatomy (then there is no frame yet)."""
+def create(problem: Problem, engine: ReasoningEngine | None, anatomy: list[Rating] | None = None) -> Decision:
+    """A new decision: with a hand-set anatomy (no Claude), or ready for the dialogue and the
+    background analysis."""
     now = datetime.now(UTC)
-    frame, usage, watch_outs = None, None, []
-    if anatomy is None:
-        if engine is None:
-            raise ValueError("rating the anatomy needs Claude; set it by hand instead")
-        with track_usage() as calls:
-            analysis = await engine.analyse(problem)
-        usage = total(calls)
-        frame = analysis.model_dump(exclude={"anatomy", "watch_outs"})
-        anatomy = normalise_anatomy(analysis.anatomy, "model")
-        watch_outs = normalise_watch_outs(analysis.watch_outs)
-    else:
-        anatomy = normalise_anatomy([r.model_copy(update={"source": "user"}) for r in anatomy], "user")
-    decision = Decision(
+    if anatomy is not None:
+        rated = normalise_anatomy([r.model_copy(update={"source": "user"}) for r in anatomy], "user")
+        return Decision(
+            id=uuid.uuid4().hex,
+            created_at=now,
+            updated_at=now,
+            problem=problem,
+            anatomy=rated,
+            signature=signature(rated),
+            meta=_meta(None),
+        )
+    if engine is None:
+        raise ValueError("the dialogue needs Claude; rate the decision by hand instead")
+    from reticulate.dialogue import new_dialogue
+
+    empty = normalise_anatomy([], "model")
+    return Decision(
         id=uuid.uuid4().hex,
         created_at=now,
         updated_at=now,
         problem=problem,
-        frame=frame,
-        anatomy=anatomy,
-        watch_outs=watch_outs,
-        signature=signature(anatomy),
+        dialogue=new_dialogue(engine),
+        analysis="pending",
+        anatomy=empty,
+        signature=signature(empty),
         meta=_meta(engine),
     )
-    if usage:
-        decision.usage = usage
-    return decision
+
+
+class Analysis(BaseModel):
+    frame: DecisionFrame
+    anatomy: list[Rating]
+    watch_outs: list[WatchOut]
+    usage: Usage
+
+
+async def analyse(problem: Problem, engine: ReasoningEngine) -> Analysis:
+    """Claude's reading of the decision: frame, anatomy and watch-outs, in one call."""
+    with track_usage() as calls:
+        result = await engine.analyse(problem)
+    return Analysis(
+        frame=DecisionFrame(**result.model_dump(exclude={"anatomy", "watch_outs"})),
+        anatomy=normalise_anatomy(result.anatomy, "model"),
+        watch_outs=normalise_watch_outs(result.watch_outs),
+        usage=total(calls),
+    )
+
+
+def with_analysis(decision: Decision, analysis: Analysis) -> Decision:
+    """Apply the analysis, unless the person has re-rated the anatomy by hand meanwhile."""
+    hand_rated = any(r.source == "user" and r.level > 0 for r in decision.anatomy)
+    anatomy = decision.anatomy if hand_rated else analysis.anatomy
+    return decision.model_copy(
+        update={
+            "frame": analysis.frame,
+            "anatomy": anatomy,
+            "watch_outs": analysis.watch_outs,
+            "signature": signature(anatomy),
+            "analysis": "done",
+            "analysis_error": None,
+            "usage": decision.usage.merge(analysis.usage),
+            "updated_at": datetime.now(UTC),
+        }
+    )
+
+
+def with_analysis_failed(decision: Decision, error: str) -> Decision:
+    return decision.model_copy(update={"analysis": "failed", "analysis_error": error, "updated_at": datetime.now(UTC)})
 
 
 def update_anatomy(decision: Decision, anatomy: list[Rating]) -> Decision:
@@ -200,36 +258,45 @@ def tipping_calls(decision: Decision, keys: int, values: int, replicates: int) -
     return keys * values * replicates + (0 if frame else 1)
 
 
-async def convene(
+async def run_panel(
     decision: Decision,
     profiles: list[CognitiveProfile],
     engine: ReasoningEngine,
     *,
     replicates: int,
     neural_context: bool = True,
-) -> Decision:
-    decision = decision.model_copy(update={"neural_context": neural_context})
-    result = await simulate(
+) -> SimulationResult:
+    briefed = decision.model_copy(update={"neural_context": neural_context})
+    return await simulate(
         decision.problem,
         profiles,
         engine,
         replicates=replicates,
         frame=decision.frame,
-        context=context_for(decision),
+        context=context_for(briefed),
     )
-    return decision.model_copy(
+
+
+def with_panel(decision: Decision, result: SimulationResult) -> Decision:
+    """Apply a panel's result; earlier tipping runs belonged to the old panel and are dropped.
+    The panel's result also goes into the dialogue, as a perspective to question."""
+    from reticulate.dialogue import queue_note
+    from reticulate.dialogue.prompts import panel_note
+
+    updated = decision.model_copy(
         update={
+            "neural_context": result.meta.neural_context,
             "frame": decision.frame or result.frame,
             "panel": result,
             "tipping": [],
             "usage": decision.usage.merge(result.meta.usage),
-            "meta": _meta(engine),
             "updated_at": datetime.now(UTC),
         }
     )
+    return queue_note(updated, panel_note(updated))
 
 
-async def tipping_points(
+async def run_tipping(
     decision: Decision,
     profile: CognitiveProfile,
     keys: list[str],
@@ -237,21 +304,28 @@ async def tipping_points(
     engine: ReasoningEngine,
     *,
     replicates: int,
-) -> Decision:
+) -> list[SensitivityResult]:
     """Dose–response runs, one per dimension or trait, on the same frame and context."""
     if not 1 <= len(keys) <= MAX_TIPPING_DIMENSIONS:
         raise ValueError(f"choose 1–{MAX_TIPPING_DIMENSIONS} dimensions or traits")
     frame = decision.frame or (decision.panel.frame if decision.panel else None)
-    usage = decision.usage
     results = []
     for key in keys:
         result = await sensitivity(
             decision.problem, profile, key, values, engine, replicates=replicates, frame=frame, context=context_for(decision)
         )
         frame = frame or result.frame
-        usage = usage.merge(result.meta.usage)
         results.append(result)
+    return results
+
+
+def with_tipping(decision: Decision, profile: CognitiveProfile, results: list[SensitivityResult]) -> Decision:
+    keys = {r.dimension for r in results}
     kept = [t for t in decision.tipping if not (t.profile.id == profile.id and t.dimension in keys)]
+    usage = decision.usage
+    for result in results:
+        usage = usage.merge(result.meta.usage)
+    frame = decision.frame or (decision.panel.frame if decision.panel else None) or (results[0].frame if results else None)
     return decision.model_copy(
         update={"frame": frame, "tipping": kept + results, "usage": usage, "updated_at": datetime.now(UTC)}
     )

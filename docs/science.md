@@ -3,7 +3,53 @@
 The machine-readable source of truth is `engine/reticulate/data/`. This document explains what
 each part is, where it comes from, and how it was checked.
 
-## 1. Avatars: profile, personality, phenotype
+## 0. The Socratic dialogue
+
+**Method** (`data/socratic.yaml`). Reticulate leads a person to a decision of their own
+through questions, not advice: guided discovery, with short open questions, reflections of
+the person's own words and summaries (Padesky, 1993; Overholser, 1993; Paul & Elder, 2006).
+Evidence that the method helps comes from cognitive therapy, where more Socratic questioning
+in a session predicted greater symptom improvement by the next session (Braun et al., 2015);
+whether it improves decisions is an open question for the thesis (see roadmap).
+
+**The path: six elements of decision quality.** Frame, what matters, options, evidence,
+trade-offs and commitment (Howard, 1988; Spetzler, Winter & Meyer, 2016). A decision is only
+as good as its weakest element, so the guide spends its questions where the person is
+weakest. Two findings shape the early stages: asked for their objectives, people named only
+about half of those they later recognised as important (Bond, Carlson & Keeney, 2008); and
+organisational decisions framed as whether-or-not failed more often than decisions that
+weighed several alternatives (Nutt, 1999).
+
+**Moves.** Every question makes one of twelve moves, each labelled with its basis like the
+countermoves:
+
+| Move | Basis | Finding |
+|---|---|---|
+| Another option ("if neither were available …") | tested | Prompting with one's own objectives produced more alternatives (Siebert & Keeney, 2015) |
+| Distance ("what would you tell a friend …") | tested | Self-distancing removed the gap between reasoning about one's own and others' dilemmas (Grossmann & Kross, 2014) |
+| The other side | tested | Considering the opposite reduced biased judgement more than an instruction to be unbiased (Lord et al., 1984) |
+| Premortem | tested | Imagining failure lowered overconfidence in a plan more than pros and cons (Veinott et al., 2010) |
+| Commitment (if–then plan) | tested | Implementation intentions, d ≈ 0.65 across 94 tests (Gollwitzer & Sheeran, 2006) |
+| Clarify, what matters, assumption, evidence, consequences, trade-off, other minds | derived | Classic Socratic questions (Paul & Elder, 2006); "what matters" follows from Bond et al. (2008) |
+
+**Biases in the dialogue.** The guide knows the 19 mechanisms and their countermoves. When
+an answer fits one (money already spent, the current state treated as the safe default, only
+the upside in view), the next question is that countermove, and the interface names the
+mechanism ("against status quo bias") with its evidence. It asks; it never diagnoses.
+
+**Working notes and conclusion.** Each turn returns the notes in the person's terms (goals,
+options, facts, unknowns, examined assumptions, leaning, confidence). The conclusion states
+the choice in the first person, the reasons the person gave, what they give up, signals to
+revisit it, open questions, a first step as an if–then plan and a review date, and rates
+how well the dialogue covered each element of decision quality. These ratings are Claude's
+reading of the dialogue, not a measurement, and the interface says so.
+
+**Other minds in the dialogue.** When the panel (section 5) has reasoned, a digest of its
+result goes into the dialogue, and the guide asks the person what they make of a reason that
+differs from theirs. The panel members are simulations; the guide never presents their view
+as the answer.
+
+## 1. Avatars: profile, personality, the person
 
 **Decision dimensions.** Eight bipolar tendencies scored 0–10 (5 = no leaning): risk tolerance,
 exploration, time horizon, analytical style, experimentation, social orientation, uncertainty
@@ -23,15 +69,18 @@ conscientiousness (Nicholson et al., 2005). Personality has **no brain map**: in
 about 1,100 people each, the Big Five showed little reliable association with grey- or
 white-matter structure (Avinun et al., 2020).
 
-**Phenotype.** Age, skin tone, face, nose, lips, build, hair, facial hair, glasses and attire.
-It draws the avatar's cameo portrait and nothing else: the prompt compiler never renders it,
-and a test checks that no appearance attribute reaches a prompt. A simulated decision can
-therefore not lean on stereotypes about how people look.
+**The person.** Every avatar is shown as a fictional person: a name and a realistic 3D look
+from the Microsoft Rocketbox avatar library (MIT licence; 115 artist-made, photo-textured
+people, of which 32 are built into Reticulate). Name and look are for recognition only: the
+prompt compiler renders the role, never the name or the look, and tests check that neither
+reaches a prompt. A simulated decision can therefore not lean on stereotypes about how people
+look or what they are called. (Earlier builds drew a cameo from a phenotype; old avatar files
+keep that field, unused.)
 
-**Personas** (`library/personas/`). Eleven authored vignettes, each with a role, situation,
+**Personas** (`library/personas/`). Eleven fictional people, each with a role, situation,
 goals, constraints and a *nuance*: where the person departs from the stereotype of the role.
-Scores are mid-range and mixed; a test rejects personas pinned to the scale ends. Phenotypes
-are spread across age (26–69), skin tone, face and hair without tracking the roles.
+Scores are mid-range and mixed; a test rejects personas pinned to the scale ends. Their looks
+are spread across gender (six men, five women), age and skin tone without tracking the roles.
 
 ## 2. The atlas
 

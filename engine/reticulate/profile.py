@@ -2,9 +2,9 @@
 
 A profile has three layers that enter a simulation (the eight decision dimensions, the Big
 Five personality traits with up to three basic values, and the situation) and one that
-never does: the phenotype, which only draws the avatar's portrait. Appearance is kept out
-of the prompts so that a simulated decision cannot lean on stereotypes about how people
-look.
+never does: the person it is shown as, a fictional name and a 3D look. Name and appearance
+are kept out of the prompts so that a simulated decision cannot lean on stereotypes about
+how people are called or how they look; the simulation sees the role (`name`) only.
 """
 
 from enum import StrEnum
@@ -81,8 +81,15 @@ Hair = Literal["bald", "buzz", "short", "swept", "wavy", "long", "curly", "coily
 HairColor = Literal["black", "dark_brown", "brown", "auburn", "blond", "grey", "white"]
 
 
+class Person(BaseModel):
+    """Who the avatar is shown as. Never part of a prompt."""
+
+    name: str = Field(default="", max_length=80, description="A fictional person's name, shown in the interface")
+    look: str = Field(default="", pattern=r"^[a-z0-9_]*$", description="id of a 3D person in web/public/people")
+
+
 class Phenotype(BaseModel):
-    """What the avatar looks like. Draws the portrait; never part of a prompt."""
+    """The drawn cameo of builds before 0.5. Read from older avatar files; no longer drawn."""
 
     age: int = Field(default=40, ge=18, le=90)
     skin: int = Field(default=2, ge=0, le=7, description="tone, light (0) to deep (7)")
@@ -109,7 +116,8 @@ class CognitiveProfile(BaseModel):
     dimensions: dict[str, Score]
     personality: Personality | None = None
     context: PersonalContext | None = None
-    phenotype: Phenotype | None = None
+    person: Person | None = None
+    phenotype: Phenotype | None = None  # superseded by `person`
     sources: list[Source] = []
 
     @field_validator("dimensions", mode="before")

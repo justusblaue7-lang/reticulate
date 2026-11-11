@@ -30,15 +30,6 @@ personality:
     agreeableness: 4
     neuroticism: 3
   values: [achievement, stimulation, self_direction]
-phenotype:  # draws the portrait only; never part of a prompt
-  age: 58
-  skin: 6
-  face: 0.3
-  nose: broad
-  lips: 0.6
-  build: 0.45
-  hair: coily
-  hair_color: grey
-  facial_hair: none
-  glasses: round
-  attire: knit
+person:  # shown in the interface only; never part of a prompt
+  name: Daniel Mensah
+  look: male_adult_12

@@ -12,8 +12,8 @@ from reticulate.simulation import ClaudeEngine, Problem, sensitivity, simulate
 def _engine() -> ClaudeEngine:
     config = settings()
     if not config.claude_configured:
-        raise SystemExit("Claude is not configured: add ANTHROPIC_API_KEY to engine/.env")
-    return ClaudeEngine(config.model, config.effort)
+        raise SystemExit("Claude is not configured: connect it in the app or add ANTHROPIC_API_KEY to engine/.env")
+    return ClaudeEngine(config.model, config.effort, dialogue_effort=config.dialogue_effort)
 
 
 def _avatars(_: argparse.Namespace) -> None:

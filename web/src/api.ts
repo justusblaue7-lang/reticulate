@@ -34,6 +34,13 @@ export const api = {
   deleteDecision: (id: string) => send<{ deleted: string }>("DELETE", `/api/decisions/${id}`),
   progress: (id: string) => request<Progress | null>(`/api/decisions/${id}/progress`),
   createDecision: (problem: Problem, anatomy?: Rating[]) => send<Decision>("POST", "/api/decisions", { problem, anatomy }),
+  analyse: (id: string) => send<Decision>("POST", `/api/decisions/${id}/analysis`),
+  reply: (id: string, answer: string | null, skip = false) => send<Decision>("POST", `/api/decisions/${id}/dialogue`, { answer, skip }),
+  conclude: (id: string, answer: string | null) => send<Decision>("POST", `/api/decisions/${id}/dialogue/conclude`, { answer }),
+  revise: (id: string, index: number) => send<Decision>("POST", `/api/decisions/${id}/dialogue/revise`, { index }),
+  reopen: (id: string) => send<Decision>("POST", `/api/decisions/${id}/dialogue/reopen`),
+  settle: (id: string, items: string[]) => send<Decision>("PUT", `/api/decisions/${id}/settled`, { items }),
+  reveal: (id: string) => send<{ path: string }>("POST", `/api/decisions/${id}/reveal`),
   updateAnatomy: (id: string, anatomy: Rating[]) => send<Decision>("PUT", `/api/decisions/${id}/anatomy`, { anatomy }),
   convene: (id: string, profiles: AvatarRef[], replicates: number, neural_context: boolean) =>
     send<Decision>("POST", `/api/decisions/${id}/panel`, { profiles, replicates, neural_context }),

@@ -29,15 +29,6 @@ personality:
     agreeableness: 6
     neuroticism: 5
   values: [security, benevolence, conformity]
-phenotype:  # draws the portrait only; never part of a prompt
-  age: 34
-  skin: 1
-  face: 0.75
-  nose: straight
-  lips: 0.4
-  build: 0.7
-  hair: buzz
-  hair_color: dark_brown
-  facial_hair: beard
-  glasses: none
-  attire: collar
+person:  # shown in the interface only; never part of a prompt
+  name: Minh Tran
+  look: business_male_02

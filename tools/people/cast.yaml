@@ -1,0 +1,43 @@
+# The people Reticulate shows: realistic 3D humans from the Microsoft Rocketbox avatar library
+# (MIT licence, https://github.com/microsoft/Microsoft-Rocketbox). `look` ids are used by the
+# avatars (engine/reticulate/library/personas/*.yaml, `person.look`) and by the avatar builder.
+#
+# Build the assets with:  engine/.venv/bin/python tools/people/build.py
+# The first eleven are the personas; the rest are the cast the builder offers for your own
+# avatars. Occupational costumes (helmets, uniforms, masks) are left out on purpose.
+
+people:
+  # personas
+  - {look: male_adult_12, source: Adults/Male_Adult_12}
+  - {look: female_adult_14, source: Adults/Female_Adult_14}
+  - {look: business_male_02, source: Professions/Business_Male_02}
+  - {look: male_adult_03, source: Adults/Male_Adult_03}
+  - {look: female_adult_06, source: Adults/Female_Adult_06}
+  - {look: male_adult_04, source: Adults/Male_Adult_04}
+  - {look: medical_male_03, source: Professions/Medical_Male_03}
+  - {look: business_female_02, source: Professions/Business_Female_02}
+  - {look: female_adult_11, source: Adults/Female_Adult_11}
+  - {look: business_male_04, source: Professions/Business_Male_04}
+  - {look: business_female_01, source: Professions/Business_Female_01}
+  # cast for your own avatars
+  - {look: female_adult_01, source: Adults/Female_Adult_01}
+  - {look: female_adult_03, source: Adults/Female_Adult_03}
+  - {look: female_adult_05, source: Adults/Female_Adult_05}
+  - {look: female_adult_08, source: Adults/Female_Adult_08}
+  - {look: female_adult_10, source: Adults/Female_Adult_10}
+  - {look: female_adult_15, source: Adults/Female_Adult_15}
+  - {look: female_party_02, source: Adults/Female_Party_02}
+  - {look: business_female_03, source: Professions/Business_Female_03}
+  - {look: business_female_04, source: Professions/Business_Female_04}
+  - {look: sports_female_02, source: Professions/Sports_Female_02}
+  - {look: male_adult_01, source: Adults/Male_Adult_01}
+  - {look: male_adult_05, source: Adults/Male_Adult_05}
+  - {look: male_adult_09, source: Adults/Male_Adult_09}
+  - {look: male_adult_13, source: Adults/Male_Adult_13}
+  - {look: male_adult_15, source: Adults/Male_Adult_15}
+  - {look: male_adult_20, source: Adults/Male_Adult_20}
+  - {look: business_male_05, source: Professions/Business_Male_05}
+  - {look: business_male_07, source: Professions/Business_Male_07}
+  - {look: gardener_male_01, source: Professions/Gardener_Male_01}
+  - {look: medical_male_01, source: Professions/Medical_Male_01}
+  - {look: sports_male_03, source: Professions/Sports_Male_03}

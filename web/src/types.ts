@@ -99,8 +99,26 @@ export interface Mechanism {
   countermove: Countermove;
 }
 
+export interface SocraticStage {
+  id: string;
+  name: string;
+  aim: string;
+  note: string;
+  refs: string[];
+}
+
+export interface SocraticMove {
+  id: string;
+  name: string;
+  question: string;
+  basis: "tested" | "derived";
+  finding: string;
+  refs: string[];
+}
+
 export interface Science {
   version: string;
+  socratic: { method: { summary: string; refs: string[] }; stages: SocraticStage[]; moves: SocraticMove[] };
   dimensions: Dimension[];
   personality: {
     traits: Trait[];
@@ -126,21 +144,10 @@ export interface Score {
   source: string | null;
 }
 
-export type Hair = "bald" | "buzz" | "short" | "swept" | "wavy" | "long" | "curly" | "coily" | "locs" | "braids" | "bun" | "headscarf";
-export type HairColor = "black" | "dark_brown" | "brown" | "auburn" | "blond" | "grey" | "white";
-
-export interface Phenotype {
-  age: number;
-  skin: number; // 0–7, light to deep
-  face: number; // 0–1, fine to strong
-  nose: "straight" | "aquiline" | "concave" | "broad";
-  lips: number;
-  build: number;
-  hair: Hair;
-  hair_color: HairColor;
-  facial_hair: "none" | "stubble" | "moustache" | "beard" | "full_beard";
-  glasses: "none" | "round" | "rectangular";
-  attire: "crew" | "collar" | "blazer" | "turtleneck" | "knit";
+/** Who an avatar is shown as: a fictional name and a 3D person. Never part of a prompt. */
+export interface Person {
+  name: string;
+  look: string; // id of a 3D person in web/public/people
 }
 
 export interface Avatar {
@@ -155,14 +162,16 @@ export interface Avatar {
   dimensions: Record<string, Score>;
   personality: { traits: Record<string, Score>; values: string[] } | null;
   context: { goals: string[]; constraints: string[]; notes: string } | null;
-  phenotype: Phenotype | null;
+  person: Person | null;
+  phenotype?: unknown; // the drawn cameo of builds before 0.5; kept, no longer used
 }
 
 export interface Status {
   version: string;
   science_version: string;
-  claude: { configured: boolean; model: string; effort: string; key_hint: string | null };
+  claude: { configured: boolean; model: string; effort: string; dialogue_effort: string; key_hint: string | null };
   literature: boolean;
+  data_dir: string;
 }
 
 export interface Problem {
@@ -313,12 +322,74 @@ export interface WatchOut {
   check: string; // its countermove for this decision (Claude)
 }
 
+// --- the Socratic dialogue ---------------------------------------------------------------
+
+export interface Notes {
+  decision: string;
+  goals: string[];
+  options: string[];
+  facts: string[];
+  unknowns: string[];
+  assumptions: { text: string; status: "open" | "holds" | "shaky" | "dropped" }[];
+  leaning: string;
+  confidence: number; // 0–10, or -1 when not known
+}
+
+export interface SocraticTurn {
+  reflection: string;
+  question: string;
+  move: string;
+  stage: string;
+  mechanism_id: string; // or "none"
+  why: string;
+  scale: boolean;
+  notes: Notes;
+  ready: boolean;
+}
+
+export interface Exchange {
+  turn: SocraticTurn;
+  asked_at: string;
+  answer: string | null;
+  skipped: boolean;
+  answered_at: string | null;
+  context: string | null;
+  usage: Usage;
+}
+
+export interface Conclusion {
+  decided: boolean;
+  choice: string;
+  statement: string;
+  reasons: string[];
+  tradeoffs: string[];
+  revisit_if: string[];
+  open_questions: string[];
+  first_step: string;
+  if_then: string;
+  review: string;
+  quality: { stage: string; level: "strong" | "partial" | "weak"; note: string }[];
+}
+
+export interface Dialogue {
+  exchanges: Exchange[];
+  pending: string[];
+  conclusion: Conclusion | null;
+  concluded_at: string | null;
+  conclusion_usage: Usage | null;
+  meta: { prompt_version: string; model: string | null; effort: string | null };
+}
+
 export interface Decision {
   id: string;
   kind: "decision";
   created_at: string;
   updated_at: string;
   problem: Problem;
+  dialogue: Dialogue | null;
+  analysis: "none" | "pending" | "done" | "failed";
+  analysis_error: string | null;
+  settled: string[];
   frame: DecisionFrame | null;
   anatomy: Rating[];
   watch_outs: WatchOut[];
@@ -338,6 +409,9 @@ export interface DecisionSummary {
   updated_at: string;
   question: string;
   title: string;
+  status: "decided" | "in dialogue" | "analysed" | "rated";
+  decided: string | null;
+  questions: number;
   verdict: string | null; // "3/4 · Option"
   label: string;
   steps: string[];

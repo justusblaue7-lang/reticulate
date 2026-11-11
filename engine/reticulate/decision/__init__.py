@@ -2,24 +2,36 @@
 
 from reticulate.decision.schemas import Decision, NeuralSignature, Rating
 from reticulate.decision.workflow import (
-    convene,
+    Analysis,
+    analyse,
     create,
     panel_calls,
+    run_panel,
+    run_tipping,
     signature,
     tipping_calls,
-    tipping_points,
     update_anatomy,
+    with_analysis,
+    with_analysis_failed,
+    with_panel,
+    with_tipping,
 )
 
 __all__ = [
+    "Analysis",
     "Decision",
     "NeuralSignature",
     "Rating",
-    "convene",
+    "analyse",
     "create",
     "panel_calls",
+    "run_panel",
+    "run_tipping",
     "signature",
     "tipping_calls",
-    "tipping_points",
     "update_anatomy",
+    "with_analysis",
+    "with_analysis_failed",
+    "with_panel",
+    "with_tipping",
 ]
