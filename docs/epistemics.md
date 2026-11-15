@@ -7,7 +7,7 @@
 | `measured` | Observed for this person (task, questionnaire, recording) | not yet collected |
 | `inferred` | Predicted for this person by a validated model, with uncertainty | not used until such a model exists |
 | `meta-analytic` | Aggregated from published group-level studies | every brain map (NeuroQuery, Neurosynth) |
-| `authored` | Set by a person | persona scores and traits, builder edits, counterfactual values, anatomy ratings corrected by the user |
+| `authored` | Set by a person | persona scores and traits, builder edits, counterfactual values, anatomy ratings corrected by the user, the person's own pattern (self-rated) |
 
 A derived quantity is never labelled more strongly than its weakest input. The construct
 emphasis map and the decision signature combine `meta-analytic` maps with `authored` weights
@@ -47,6 +47,9 @@ choose.
 | Asked "what do you think?": naming the considerations, then handing the decision back | Recommending an option, or inventing facts, figures or studies |
 | "Three of five simulated decision-makers would wait. What do you make of their reason?" | Presenting the panel's view as the answer or as expert advice |
 | The conclusion in the person's own words, with the reasons they gave | Adding reasons they did not give |
+| "You described yourself as someone who takes the safer option. Is that what is happening here?" (at most twice, as a question) | "Because you are cautious, …" or any score or dimension name |
+| A question that brings in what a leaning tends to leave out (the cost of not acting, for someone cautious) | Steering the person against their temperament, or treating a leaning as a flaw |
+| "You usually stick with what works, and here you propose a leap. What makes this case different?" | "That is not like you." |
 
 The decision-quality ratings in the conclusion (strong, partial, weak per element) are
 Claude's reading of the dialogue, labelled as such; they are not a measurement of the
@@ -54,6 +57,23 @@ decision's quality, and nothing claims that a decision reached in the dialogue i
 Whether it is, is the thesis's question (roadmap). Each dialogue records the model, effort
 and prompt version, and every question records its move, stage and the mechanism it
 counters, so dialogues can be analysed.
+
+## The person's own pattern
+
+The pattern (data/pattern.yaml in the engine, data/pattern.yaml in the data folder) is a
+self-rating: sixteen statements authored for Reticulate, two per dimension, one reversed. It is
+`authored`, not `measured`: the items are not a validated instrument, their reliability is
+unknown, and two items per dimension are too few for a trait estimate. The interface says
+"self-rated" and "not a measurement" wherever the pattern appears, and shows positions and
+leanings, not decimals.
+
+What each leaning leaves out of view, its counterweight question and the mechanisms it makes
+likelier are `derived` from the dimension definitions and the mechanisms' summaries. Whether
+tailoring the dialogue to a self-rated pattern improves decisions has not been tested; the
+dialogue study (roadmap) compares dialogues with and without a pattern. A dialogue keeps a
+snapshot of the pattern it started with, and every question records the leaning it
+counterweighs (`pattern`), so the comparison can be made. The conclusion's "your pattern in
+this decision" is Claude's reading of the dialogue, labelled as such.
 
 ## What a decision report may say
 

@@ -159,9 +159,14 @@ def context_for(decision: Decision) -> str | None:
     return prompts.render_neural_context(decision.signature, decision.anatomy)
 
 
-def create(problem: Problem, engine: ReasoningEngine | None, anatomy: list[Rating] | None = None) -> Decision:
-    """A new decision: with a hand-set anatomy (no Claude), or ready for the dialogue and the
-    background analysis."""
+def create(
+    problem: Problem,
+    engine: ReasoningEngine | None,
+    anatomy: list[Rating] | None = None,
+    pattern: dict[str, float] | None = None,
+) -> Decision:
+    """A new decision: with a hand-set anatomy (no Claude), or ready for the dialogue (holding
+    the person's pattern, if any) and the background analysis."""
     now = datetime.now(UTC)
     if anatomy is not None:
         rated = normalise_anatomy([r.model_copy(update={"source": "user"}) for r in anatomy], "user")
@@ -184,7 +189,7 @@ def create(problem: Problem, engine: ReasoningEngine | None, anatomy: list[Ratin
         created_at=now,
         updated_at=now,
         problem=problem,
-        dialogue=new_dialogue(engine),
+        dialogue=new_dialogue(engine, pattern),
         analysis="pending",
         anatomy=empty,
         signature=signature(empty),

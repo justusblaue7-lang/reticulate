@@ -77,6 +77,11 @@ class Settings:
         return self.data_dir / "avatars"
 
     @property
+    def pattern_file(self) -> Path:
+        """The person's own pattern (self-rated), one file."""
+        return self.data_dir / "pattern.yaml"
+
+    @property
     def claude_configured(self) -> bool:
         return bool(os.getenv(KEY_NAME) or os.getenv("ANTHROPIC_AUTH_TOKEN"))
 

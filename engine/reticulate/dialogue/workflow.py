@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 
 from reticulate.dialogue import prompts
 from reticulate.dialogue.schemas import Conclusion, Dialogue, DialogueMeta, Exchange, SocraticTurn
+from reticulate.pattern import leanings
 from reticulate.science import science
 from reticulate.simulation.engines import ReasoningEngine, total, track_usage
 from reticulate.simulation.schemas import Usage
@@ -34,6 +35,7 @@ def _version() -> str:
         + prompts.SKIPPED
         + prompts.UNANSWERED
         + prompts.CONCLUDE
+        + inspect.getsource(prompts.person_block)
         + str(SocraticTurn.model_json_schema())
         + str(Conclusion.model_json_schema())
     )
@@ -43,8 +45,11 @@ def _version() -> str:
 PROMPT_VERSION = _version()
 
 
-def new_dialogue(engine: ReasoningEngine | None) -> Dialogue:
+def new_dialogue(engine: ReasoningEngine | None, pattern: dict[str, float] | None = None) -> Dialogue:
+    """A dialogue, holding a snapshot of the person's pattern if they have one."""
     return Dialogue(
+        pattern=pattern,
+        pattern_at=datetime.now(UTC) if pattern else None,
         meta=DialogueMeta(
             prompt_version=PROMPT_VERSION,
             model=getattr(engine, "model", None),
@@ -57,8 +62,13 @@ def _clamp(value: int, low: int, high: int) -> int:
     return max(low, min(high, value))
 
 
-def normalise_turn(turn: SocraticTurn) -> SocraticTurn:
-    """Unknown mechanisms become 'none'; confidence stays within -1…10; lists lose duplicates."""
+def _leaning_ids(pattern: dict[str, float] | None) -> set[str]:
+    return {x.dimension for x in leanings(pattern)} if pattern else set()
+
+
+def normalise_turn(turn: SocraticTurn, pattern: dict[str, float] | None = None) -> SocraticTurn:
+    """Unknown mechanisms and leanings become 'none' (a leaning only counts with a pattern);
+    confidence stays within -1…10; lists lose duplicates."""
     known = {m.id for m in science().mechanisms}
     notes = turn.notes
 
@@ -82,6 +92,7 @@ def normalise_turn(turn: SocraticTurn) -> SocraticTurn:
     return turn.model_copy(
         update={
             "mechanism_id": turn.mechanism_id if turn.mechanism_id in known else "none",
+            "pattern": turn.pattern if turn.pattern in _leaning_ids(pattern) else "none",
             "question": turn.question.strip(),
             "reflection": turn.reflection.strip(),
             "notes": notes,
@@ -89,20 +100,26 @@ def normalise_turn(turn: SocraticTurn) -> SocraticTurn:
     )
 
 
-def normalise_conclusion(conclusion: Conclusion) -> Conclusion:
-    """One quality check per stage, in the order of the science layer."""
+def normalise_conclusion(conclusion: Conclusion, pattern: dict[str, float] | None = None) -> Conclusion:
+    """One quality check per stage, in the order of the science layer; pattern notes only for
+    dimensions of the person's pattern, one each."""
     by_stage = {q.stage: q for q in conclusion.quality}
     ordered = [by_stage[s.id] for s in science().socratic.stages if s.id in by_stage]
-    return conclusion.model_copy(update={"quality": ordered})
+    notes: dict = {}
+    for n in conclusion.pattern_notes:
+        if n.dimension in _leaning_ids(pattern) and n.note.strip() and n.dimension not in notes:
+            notes[n.dimension] = n.model_copy(update={"note": n.note.strip()})
+    return conclusion.model_copy(update={"quality": ordered, "pattern_notes": list(notes.values())})
 
 
 # --- engine calls -------------------------------------------------------------------------
 
 
 async def first_turn(decision: Decision, engine: ReasoningEngine) -> tuple[SocraticTurn, Usage]:
+    pattern = decision.dialogue.pattern if decision.dialogue else None
     with track_usage() as calls:
-        turn = await engine.ask(decision.problem, [])
-    return normalise_turn(turn), total(calls)
+        turn = await engine.ask(decision.problem, [], pattern=pattern)
+    return normalise_turn(turn, pattern), total(calls)
 
 
 async def next_turn(decision: Decision, engine: ReasoningEngine) -> tuple[SocraticTurn, Usage]:
@@ -114,8 +131,8 @@ async def next_turn(decision: Decision, engine: ReasoningEngine) -> tuple[Socrat
     if len(dialogue.exchanges) >= MAX_EXCHANGES:
         raise ValueError(f"the dialogue has reached {MAX_EXCHANGES} questions; conclude it")
     with track_usage() as calls:
-        turn = await engine.ask(decision.problem, dialogue.exchanges)
-    return normalise_turn(turn), total(calls)
+        turn = await engine.ask(decision.problem, dialogue.exchanges, pattern=dialogue.pattern)
+    return normalise_turn(turn, dialogue.pattern), total(calls)
 
 
 async def conclusion(decision: Decision, engine: ReasoningEngine) -> tuple[Conclusion, Usage]:
@@ -123,8 +140,8 @@ async def conclusion(decision: Decision, engine: ReasoningEngine) -> tuple[Concl
     if not dialogue.exchanges:
         raise ValueError("there is nothing to conclude yet")
     with track_usage() as calls:
-        result = await engine.conclude(decision.problem, dialogue.exchanges)
-    return normalise_conclusion(result), total(calls)
+        result = await engine.conclude(decision.problem, dialogue.exchanges, pattern=dialogue.pattern)
+    return normalise_conclusion(result, dialogue.pattern), total(calls)
 
 
 # --- changes to the record ----------------------------------------------------------------

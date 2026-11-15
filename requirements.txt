@@ -1,0 +1,8 @@
+# The public engine on Vercel (api/index.py). The local app installs engine/pyproject.toml.
+anthropic>=2.3
+fastapi>=0.115
+pydantic>=2.7
+pyyaml>=6.0
+numpy>=1.26
+scipy>=1.11
+nibabel>=5.2

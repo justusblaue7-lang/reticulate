@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "../api";
+import { PUBLIC, api } from "../api";
 import type { Status } from "../types";
 
 interface Props {
@@ -49,8 +49,14 @@ export function ClaudeDialog({ status, onStatus, onClose }: Props) {
         {connected ? (
           <>
             <p className="dialog-text">
-              Key in use: <span className="mono">{status?.claude.key_hint ?? "from the environment"}</span>. It is stored on
-              this computer only, in <span className="mono">engine/.env</span>.
+              Key in use: <span className="mono">{status?.claude.key_hint ?? "from the environment"}</span>.{" "}
+              {PUBLIC ? (
+                <>It is kept in this browser only and sent to Anthropic with each request; Reticulate's server never stores it.</>
+              ) : (
+                <>
+                  It is stored on this computer only, in <span className="mono">engine/.env</span>.
+                </>
+              )}
             </p>
             <div className="dialog-actions">
               <button
@@ -98,8 +104,14 @@ export function ClaudeDialog({ status, onStatus, onClose }: Props) {
               <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noreferrer">
                 console.anthropic.com
               </a>{" "}
-              → API keys. Reticulate checks it with Anthropic and keeps it on this computer, in{" "}
-              <span className="mono">engine/.env</span>.
+              → API keys. Reticulate checks it with Anthropic and keeps it{" "}
+              {PUBLIC ? (
+                "in this browser only. Reticulate's server passes it to Anthropic with each request and never stores it."
+              ) : (
+                <>
+                  on this computer, in <span className="mono">engine/.env</span>.
+                </>
+              )}
             </p>
             {error && <p className="error">{error}</p>}
             <div className="dialog-actions">

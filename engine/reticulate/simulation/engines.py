@@ -58,9 +58,11 @@ class ReasoningEngine(Protocol):
     effort: str | None
     dialogue_effort: str | None
 
-    async def ask(self, problem: Problem, exchanges: "list[Exchange]") -> "SocraticTurn": ...
+    async def ask(self, problem: Problem, exchanges: "list[Exchange]", pattern: dict[str, float] | None = None) -> "SocraticTurn": ...
 
-    async def conclude(self, problem: Problem, exchanges: "list[Exchange]") -> "Conclusion": ...
+    async def conclude(
+        self, problem: Problem, exchanges: "list[Exchange]", pattern: dict[str, float] | None = None
+    ) -> "Conclusion": ...
 
     async def frame(self, problem: Problem) -> DecisionFrame: ...
 
@@ -132,14 +134,19 @@ class ClaudeEngine:
     async def _generate(self, system: str, user: str, schema: type[T], effort: str) -> T:
         return await self._parse(system, [{"role": "user", "content": user}], schema, effort)
 
-    async def _parse(self, system: str, messages: list[dict], schema: type[T], effort: str, cached: bool = False) -> T:
+    async def _parse(
+        self, system: str, messages: list[dict], schema: type[T], effort: str, cached: bool = False, person: str | None = None
+    ) -> T:
         extra: dict = {}
         system_param: str | list[dict] = system
         if cached:
             # A dialogue's system prompt is frozen and its conversation only grows, so both are
-            # cached: a breakpoint on the system prompt (shared by every dialogue) and an
-            # automatic one on the last message (this dialogue so far).
+            # cached: a breakpoint on the system prompt (shared by every dialogue), one on the
+            # person's pattern (fixed for the dialogue) and an automatic one on the last
+            # message (this dialogue so far).
             system_param = [{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}]
+            if person:
+                system_param.append({"type": "text", "text": person, "cache_control": {"type": "ephemeral"}})
             extra["cache_control"] = {"type": "ephemeral"}
         response = await self.client.beta.messages.parse(
             model=self.model,
@@ -183,16 +190,22 @@ class ClaudeEngine:
         system, user = prompts.synthesis_prompt(problem, frame, profiles, perspectives, space, context)
         return await self._generate(system, user, Synthesis, effort=self.effort)
 
-    async def ask(self, problem: Problem, exchanges: "list[Exchange]") -> "SocraticTurn":
+    async def ask(self, problem: Problem, exchanges: "list[Exchange]", pattern: dict[str, float] | None = None) -> "SocraticTurn":
         from reticulate.dialogue import prompts as dialogue
         from reticulate.dialogue.schemas import SocraticTurn
 
         messages = dialogue.messages(problem, exchanges)
-        return await self._parse(dialogue.system_prompt(), messages, SocraticTurn, self.dialogue_effort, cached=True)
+        return await self._parse(
+            dialogue.system_prompt(), messages, SocraticTurn, self.dialogue_effort, cached=True, person=dialogue.person_block(pattern)
+        )
 
-    async def conclude(self, problem: Problem, exchanges: "list[Exchange]") -> "Conclusion":
+    async def conclude(
+        self, problem: Problem, exchanges: "list[Exchange]", pattern: dict[str, float] | None = None
+    ) -> "Conclusion":
         from reticulate.dialogue import prompts as dialogue
         from reticulate.dialogue.schemas import Conclusion
 
         messages = dialogue.messages(problem, exchanges, conclude=True)
-        return await self._parse(dialogue.system_prompt(), messages, Conclusion, self.dialogue_effort, cached=True)
+        return await self._parse(
+            dialogue.system_prompt(), messages, Conclusion, self.dialogue_effort, cached=True, person=dialogue.person_block(pattern)
+        )

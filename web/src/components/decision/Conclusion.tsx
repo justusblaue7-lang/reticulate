@@ -1,3 +1,4 @@
+import { PUBLIC } from "../../api";
 import type { Decision, Science } from "../../types";
 
 const LEVEL = { strong: "Strong", partial: "Partial", weak: "Weak" } as const;
@@ -87,6 +88,26 @@ export function Conclusion({ science, decision, busy, onSettle, onReopen, onPane
         </div>
       )}
 
+      {(c.pattern_notes ?? []).length > 0 && (
+        <div className="pattern-notes">
+          <span className="eyebrow">Your pattern in this decision</span>
+          <ul>
+            {c.pattern_notes.map((n) => {
+              const dim = science.dimensions.find((d) => d.id === n.dimension);
+              const value = decision.dialogue?.pattern?.[n.dimension];
+              const pole = dim && value !== undefined ? (value < 5 ? dim.low_pole : dim.high_pole) : dim?.name;
+              return (
+                <li key={n.dimension}>
+                  <strong>{pole}</strong>
+                  <span>{n.note}</span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="note">Claude's reading of the dialogue, set against the pattern you rated yourself.</p>
+        </div>
+      )}
+
       {c.quality.length > 0 && (
         <details className="quality" open={weakest.length > 0}>
           <summary>
@@ -122,7 +143,7 @@ export function Conclusion({ science, decision, busy, onSettle, onReopen, onPane
           Print or save as PDF
         </button>
         <button className="button quiet" onClick={onReveal}>
-          Show in folder
+          {PUBLIC ? "Download" : "Show in folder"}
         </button>
       </div>
     </section>

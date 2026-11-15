@@ -206,6 +206,48 @@ class Socratic(BaseModel):
     moves: list[SocraticMove]
 
 
+class PatternItem(BaseModel):
+    id: str
+    dimension: str
+    pole: Literal["low", "high"]
+    text: str
+
+
+class Leaning(BaseModel):
+    """What a pronounced leaning toward one pole tends to leave out, and how to ask about it."""
+
+    watch: str
+    counterweight: str
+    style: str = ""
+    mechanisms: list[str] = []
+
+
+class DimensionLeanings(BaseModel):
+    dimension: str
+    low: Leaning
+    high: Leaning
+
+
+class PatternMethod(BaseModel):
+    summary: str
+    scale: list[str]
+    basis: Literal["derived"]
+
+
+class PatternScience(BaseModel):
+    """The self-rating behind a person's own pattern, and how the dialogue uses it."""
+
+    method: PatternMethod
+    items: list[PatternItem]
+    leanings: list[DimensionLeanings]
+
+    def leaning(self, dimension_id: str, pole: Literal["low", "high"]) -> Leaning:
+        for entry in self.leanings:
+            if entry.dimension == dimension_id:
+                return entry.low if pole == "low" else entry.high
+        raise KeyError(dimension_id)
+
+
 class Science(BaseModel):
     version: str
     dimensions: list[Dimension]
@@ -219,6 +261,7 @@ class Science(BaseModel):
     features: list[DecisionFeature]
     mechanisms: list[Mechanism]
     socratic: Socratic
+    pattern: PatternScience
     references: dict[str, str]
 
     @model_validator(mode="after")
@@ -257,6 +300,20 @@ class Science(BaseModel):
         for item in [self.socratic.method, *self.socratic.stages, *self.socratic.moves]:
             for ref in item.refs:
                 need("reference", ref, refs)
+        for item in self.pattern.items:
+            need("dimension", item.dimension, dims)
+        for entry in self.pattern.leanings:
+            need("dimension", entry.dimension, dims)
+            for mech in entry.low.mechanisms + entry.high.mechanisms:
+                need("mechanism", mech, mechanisms)
+        for dim in dims:
+            poles = sorted(i.pole for i in self.pattern.items if i.dimension == dim)
+            if poles != ["high", "low"]:
+                problems.append(f"pattern items for '{dim}' need one low and one high statement")
+            if sum(e.dimension == dim for e in self.pattern.leanings) != 1:
+                problems.append(f"pattern leanings for '{dim}' need exactly one entry")
+        if len(self.pattern.method.scale) != 5:
+            problems.append("the pattern scale needs five labels")
         for r in self.regions:
             need("region group", r.group, {g.id for g in self.region_groups})
         for link in self.links:
@@ -273,6 +330,7 @@ class Science(BaseModel):
             (self.personality.traits, "trait"),
             (self.socratic.stages, "dialogue stage"),
             (self.socratic.moves, "dialogue move"),
+            (self.pattern.items, "pattern item"),
         ):
             ids = [x.id for x in collection]
             for dup in {i for i in ids if ids.count(i) > 1}:
@@ -326,8 +384,9 @@ def science() -> Science:
     stimuli = _read("stimuli.yaml")
     personality = _read("personality.yaml")
     socratic = _read("socratic.yaml")
+    pattern = _read("pattern.yaml")
     return Science(
-        version="0.5.0",
+        version="0.6.0",
         dimensions=_read("dimensions.yaml")["dimensions"],
         personality={k: personality[k] for k in ("traits", "values", "refs", "value_refs")},
         networks=_read("networks.yaml")["networks"],
@@ -339,5 +398,6 @@ def science() -> Science:
         features=_read("decision_features.yaml")["features"],
         mechanisms=_read("mechanisms.yaml")["mechanisms"],
         socratic={k: socratic[k] for k in ("method", "stages", "moves")},
+        pattern={k: pattern[k] for k in ("method", "items", "leanings")},
         references=_read("references.yaml"),
     )

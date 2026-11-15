@@ -5,7 +5,7 @@
 ```
 web/ (React, three.js)                          engine/ (Python, FastAPI)
 ┌──────────────────────────────┐   /api   ┌────────────────────────────────────────────────┐
-│ Decide · Avatars · Atlas     │ ───────▶ │ api.py           one lock per decision         │
+│ one page: home · decision    │ ───────▶ │ api.py           one lock per decision         │
 │                              │          │  ├─ science.py    data/*.yaml, cross-checked   │
 │ views/DecisionView — the     │          │  ├─ dialogue/     Socratic turns, conclusion   │
 │   dialogue and its tabs      │          │  ├─ decision/     analysis, signature, panel,  │
@@ -18,6 +18,17 @@ web/ (React, three.js)                          engine/ (Python, FastAPI)
                ├── web/public/atlas  ◀── reticulate build-atlas ──▶ engine/.cache
                └── web/public/people ◀── tools/people/build.py, bake.py
 ```
+
+## Your pattern (`reticulate/pattern.py`, `data/pattern.yaml`)
+
+The person rates sixteen statements (GET/PUT/DELETE `/api/pattern`); `pattern.score` maps
+each dimension's pair (the low-pole item reversed) to 0–10, `leanings` returns the
+dimensions at least 1.25 from 5 ("some") or 2.5 ("clear"). A new decision's dialogue takes a
+snapshot (`Dialogue.pattern`, `pattern_at`). `prompts.person_block` compiles the snapshot into
+a `<person>` block (each leaning's pole, behavioural anchor, what it leaves out of view, its
+counterweight, style and mechanisms), sent as a second cached system block after the frozen
+system prompt. Turns carry `pattern` (the leaning a question counterweighs, normalised to
+pronounced leanings only), the conclusion `pattern_notes`.
 
 ## The dialogue (`reticulate/dialogue/`)
 
@@ -101,7 +112,13 @@ rendered into a prompt; the simulation sees the role (`name`) only.
 
 ## Interface (`web/src`)
 
-- `views/DecisionView.tsx`: the home (one field for the decision) and the workspace with
+- One page. `views/Site.tsx` holds the nav, the ⌘K palette (`components/Palette.tsx`) and
+  either the home or an open decision (`#decide/<id>[/<tab>]`). `views/Home.tsx` is the
+  home: the command window (`Composer`: the decision, options, details, recent decisions,
+  examples), how it works, biases with countermoves, and `views/Patterns.tsx` (the cognitive
+  patterns, formerly the Avatars mode: a strip of minds, one dossier with its brain map, the
+  builder). The standalone Brain-atlas mode was removed in 0.6; the brain stays in the
+  decision's "In the brain" tab and in each pattern. An open decision has
   four tabs: Dialogue (stage rail, thread, answer box, working notes, the conclusion; other
   minds and biases at the side), Biases (watch-outs, what's at play), Other minds (panel,
   what would flip it) and In the brain.
@@ -112,7 +129,15 @@ rendered into a prompt; the simulation sees the role (`name`) only.
   person's still, `PersonModal.tsx` one person in 3D over the page.
 - `brain/renderer.ts`: imperative three.js renderer for the atlas; one instance serves all
   views.
-- Print styles turn a decision into a cream-paper document with everything unfolded.
+- The art: `tools/art/build.py` turns `socratic art/` into `web/public/art/<slug>.webp` and
+  `-sm.webp`; `src/art.ts` lists each work (alt text, credit, crop, and the work of each
+  element of decision quality); `components/Art.tsx` shows one, tinted into the palette.
+- `components/PatternCheck.tsx`: the self-rating (keys 1–5) and what the dialogue will watch for.
+- `styles.css`: black and blue. Tokens at `:root` (greys, white at stepped opacities for
+  text and borders, one blue accent); Inter, JetBrains Mono, and Instrument Serif for the
+  hero line. Windows (`.rc-window`: search bar, list, action bar), cards with a faint top
+  highlight, key caps (`.kbd`). Print styles turn a decision into a paper document with
+  everything unfolded.
 
 ## HTTP API
 

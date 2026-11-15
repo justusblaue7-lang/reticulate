@@ -145,7 +145,7 @@ export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, savi
         <div className="brain-box">{brain}</div>
         <div className="builder-actions">
           <button className="button primary" disabled={saving || draft.name.trim().length < 2} onClick={() => onSave()}>
-            {saving ? "Saving…" : "Save avatar"}
+            {saving ? "Saving…" : "Save pattern"}
           </button>
           <button className="button" onClick={onCancel}>
             Cancel

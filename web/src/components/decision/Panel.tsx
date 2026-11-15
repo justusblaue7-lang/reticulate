@@ -37,8 +37,8 @@ export function PanelSetup({ science, decision, avatars, configured, onConvene, 
       <div className="panel-who">
         <p className="panel-why">
           {isSuggested && engaged.length
-            ? `Suggested: the ${chosen.length} avatars who differ most on ${engaged.join(" and ")}, the tendencies this decision engages most.`
-            : `${chosen.length} avatar${chosen.length === 1 ? "" : "s"} on the panel.`}
+            ? `Suggested: the ${chosen.length} minds who differ most on ${engaged.join(" and ")}, the tendencies this decision engages most.`
+            : `${chosen.length} mind${chosen.length === 1 ? "" : "s"} on the panel.`}
         </p>
         <div className="panel-faces">
           {chosen.map((a) => (
@@ -57,7 +57,7 @@ export function PanelSetup({ science, decision, avatars, configured, onConvene, 
         {picking && (
           <div className="picker">
             {[
-              ["Your avatars", own],
+              ["Your patterns", own],
               ["Library", library],
             ].map(([label, list]) =>
               (list as Avatar[]).length ? (
@@ -79,8 +79,8 @@ export function PanelSetup({ science, decision, avatars, configured, onConvene, 
             )}
             <p className="note">
               Up to eight. {!isSuggested && <button className="text-button" onClick={() => setIds(suggested)}>Use the suggestion</button>}{" "}
-              <a className="text-button" href="#avatars">
-                Create your own avatar
+              <a className="text-button" href="#patterns">
+                Build your own pattern
               </a>
             </p>
           </div>
@@ -89,7 +89,7 @@ export function PanelSetup({ science, decision, avatars, configured, onConvene, 
 
       <div className="panel-go">
         <label className="runs">
-          <span>Runs per avatar</span>
+          <span>Runs per mind</span>
           <span className="segmented">
             {[1, 2, 3, 5].map((n) => (
               <button key={n} className={replicates === n ? "on" : ""} onClick={() => setReplicates(n)}>
@@ -231,7 +231,7 @@ export function PanelResult({ science, decision }: { science: Science; decision:
               </header>
               <p className="quote">“{view.summary}”</p>
               <div className="voice-meta">
-                <span title="Confidence the avatar reports">
+                <span title="Confidence the mind reports">
                   Confidence <span className="meter"><span style={{ width: `${view.confidence * 10}%` }} /></span> {view.confidence}/10
                 </span>
                 {n > 1 && <span title="How many runs chose this option">{stable}/{n} runs agree</span>}
@@ -297,7 +297,7 @@ export function PanelResult({ science, decision }: { science: Science; decision:
       )}
 
       <details className="weights">
-        <summary>How each avatar weighed the factors</summary>
+        <summary>How each mind weighed the factors</summary>
         <div className="matrix-wrap">
           <table className="matrix">
             <caption className="note">

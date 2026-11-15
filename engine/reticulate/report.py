@@ -54,6 +54,12 @@ def markdown(decision: Decision) -> str:
         lines += _sub("First step", [conclusion.first_step, "", f"*{conclusion.if_then}*"] if conclusion.first_step else [])
         if conclusion.review:
             lines += ["", f"Review: {conclusion.review}"]
+        if conclusion.pattern_notes:
+            dims = {d.id: d.name for d in sci.dimensions}
+            lines += _sub(
+                "Your pattern in this decision, as Claude reads the dialogue",
+                [f"- **{dims.get(n.dimension, n.dimension)}.** {n.note}" for n in conclusion.pattern_notes],
+            )
         if conclusion.quality:
             rows = ["| Element | Coverage | Note |", "|---|---|---|"]
             rows += [f"| {stages.get(q.stage, q.stage)} | {LEVEL[q.level]} | {q.note} |" for q in conclusion.quality]
@@ -70,6 +76,10 @@ def markdown(decision: Decision) -> str:
             tag = f"{stages.get(turn.stage, turn.stage)} · {move.name if move else turn.move}"
             if turn.mechanism_id in mechanisms:
                 tag += f" · against {mechanisms[turn.mechanism_id].name.lower()}"
+            if turn.pattern != "none":
+                dim = sci.dimension(turn.pattern)
+                value = (dialogue.pattern or {}).get(turn.pattern, 5)
+                tag += f" · for your leaning toward {(dim.low_pole if value < 5 else dim.high_pole).lower()}"
             if turn.reflection:
                 lines += [f"*{turn.reflection}*", ""]
             lines += [f"**{i}. {turn.question}**  ", f"<sub>{tag}</sub>"]
@@ -78,6 +88,17 @@ def markdown(decision: Decision) -> str:
             elif exchange.answer is not None:
                 lines += ["", *[f"> {line}" if line else ">" for line in exchange.answer.splitlines()]]
             lines.append("")
+        if dialogue.pattern:
+            from reticulate.pattern import leanings
+
+            found = leanings(dialogue.pattern)
+            held = ", ".join(
+                f"{(sci.dimension(x.dimension).low_pole if x.pole == 'low' else sci.dimension(x.dimension).high_pole).lower()}"
+                f" ({sci.dimension(x.dimension).name.lower()} {x.value:g}/10)"
+                for x in found
+            )
+            when = f", self-rated on {dialogue.pattern_at:%d %B %Y}" if dialogue.pattern_at else ""
+            lines = [f"*Held with your pattern{when}: {held or 'no pronounced leaning'}.*", "", *lines]
         out += _section("The dialogue", lines[:-1])
 
         notes = dialogue.notes

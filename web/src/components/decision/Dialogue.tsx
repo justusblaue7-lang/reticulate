@@ -1,7 +1,8 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usd } from "../../format";
 import type { Decision, Exchange, Science } from "../../types";
-import { Cites } from "../StructureCard";
+import { leaningOf } from "../../pattern";
+import { Cites } from "../Cites";
 import { clock, TURN_USD } from "./model";
 
 export type DialogueBusy = { kind: "reply" | "conclude"; since: number; answer: string | null } | null;
@@ -50,8 +51,19 @@ export function StageRail({ science, decision }: { science: Science; decision: D
 }
 
 /** Why the guide asked this: the Socratic move, its basis, and the bias it counters. */
-function Why({ science, exchange }: { science: Science; exchange: Exchange }) {
+type Values = Record<string, number> | null;
+
+/** The person's leaning a question counterweighs: the pole they lean to, and what it leaves out. */
+function aimedAt(science: Science, pattern: Values, dimension: string) {
+  const dim = science.dimensions.find((d) => d.id === dimension);
+  if (!dim || !pattern || pattern[dimension] === undefined) return null;
+  const pole = pattern[dimension] < 5 ? "low" : "high";
+  return { dim, pole: pole === "low" ? dim.low_pole : dim.high_pole, lean: leaningOf(science, dimension, pole) };
+}
+
+function Why({ science, exchange, pattern }: { science: Science; exchange: Exchange; pattern: Values }) {
   const turn = exchange.turn;
+  const aimed = turn.pattern && turn.pattern !== "none" ? aimedAt(science, pattern, turn.pattern) : null;
   const move = science.socratic.moves.find((m) => m.id === turn.move);
   const mechanism = science.mechanisms.find((m) => m.id === turn.mechanism_id);
   return (
@@ -63,6 +75,13 @@ function Why({ science, exchange }: { science: Science; exchange: Exchange }) {
           {move.basis === "tested" ? move.finding : "A classic Socratic question; it follows from the method rather than from an intervention study."}{" "}
           <span className={`basis ${move.basis}`}>{move.basis === "tested" ? "Tested" : "Derived"}</span>
           <Cites refs={move.refs} science={science} />
+        </p>
+      )}
+      {aimed && (
+        <p className="why-move why-pattern">
+          <span className="kicker">For your pattern · {aimed.pole}</span>
+          You described yourself as leaning {aimed.pole.toLowerCase()} ({aimed.dim.name.toLowerCase()}). {aimed.lean?.watch} This question brings
+          in the other side; it does not say your leaning is wrong. <span className="basis derived">Derived</span>
         </p>
       )}
       {mechanism && (
@@ -77,9 +96,10 @@ function Why({ science, exchange }: { science: Science; exchange: Exchange }) {
   );
 }
 
-function Turn({ science, exchange, index, latest }: { science: Science; exchange: Exchange; index: number; latest: boolean }) {
+function Turn({ science, exchange, index, latest, pattern }: { science: Science; exchange: Exchange; index: number; latest: boolean; pattern: Values }) {
   const [open, setOpen] = useState(false);
   const turn = exchange.turn;
+  const aimed = turn.pattern && turn.pattern !== "none" ? aimedAt(science, pattern, turn.pattern) : null;
   const stage = science.socratic.stages.find((s) => s.id === turn.stage);
   const mechanism = science.mechanisms.find((m) => m.id === turn.mechanism_id);
   return (
@@ -93,12 +113,13 @@ function Turn({ science, exchange, index, latest }: { science: Science; exchange
       </p>
       <div className="turn-meta">
         <span>{stage?.name ?? turn.stage}</span>
+        {aimed && <span className="for-pattern" title={aimed.lean?.watch}>for your leaning · {aimed.pole.toLowerCase()}</span>}
         {mechanism && <span className="against">against {mechanism.name.toLowerCase()}</span>}
         <button className="why-toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? "Close" : "Why this question?"}
         </button>
       </div>
-      {open && <Why science={science} exchange={exchange} />}
+      {open && <Why science={science} exchange={exchange} pattern={pattern} />}
     </li>
   );
 }
@@ -161,7 +182,7 @@ export function DialogueThread({ science, decision, busy, error, configured, onA
       <ol className="thread">
         {exchanges.map((exchange, i) => (
           <Fragment key={i}>
-            <Turn science={science} exchange={exchange} index={i} latest={!concluded && i === exchanges.length - 1} />
+            <Turn science={science} exchange={exchange} index={i} latest={!concluded && i === exchanges.length - 1} pattern={decision.dialogue?.pattern ?? null} />
             {(exchange.answer != null || exchange.skipped) && <Answer exchange={exchange} onChange={() => change(i)} disabled={!!busy} />}
           </Fragment>
         ))}

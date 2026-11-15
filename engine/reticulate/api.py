@@ -20,6 +20,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from reticulate import __version__, decision, dialogue, runs
+from reticulate import pattern as personal
 from reticulate.atlas import runtime as atlas_runtime
 from reticulate import config
 from reticulate.config import settings
@@ -246,6 +247,31 @@ def get_science() -> dict:
     return science().model_dump(mode="json")
 
 
+# ---- the person's own pattern --------------------------------------------------------------
+
+
+@app.get("/api/pattern")
+def get_pattern() -> personal.PersonalPattern | None:
+    """The person's self-rated pattern, or null before they have rated themselves."""
+    return personal.load(settings().pattern_file)
+
+
+@app.put("/api/pattern")
+def put_pattern(request: personal.PatternRequest) -> personal.PersonalPattern:
+    """Score the self-rating (and any adjustments) and save it. Dialogues already started keep
+    the pattern they began with; new dialogues use this one."""
+    try:
+        result = personal.build(request)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from None
+    return personal.save(settings().pattern_file, result)
+
+
+@app.delete("/api/pattern")
+def delete_pattern() -> dict:
+    return {"deleted": personal.delete(settings().pattern_file)}
+
+
 @app.put("/api/settings/claude")
 async def connect_claude(request: ClaudeKey) -> dict:
     """Check a key against the Models API, then keep it in engine/.env."""
@@ -349,7 +375,8 @@ async def create_decision(
     its first question (POST …/dialogue) and Claude's analysis starts in the background."""
     if request.anatomy is None and engine is None:
         raise NotConfigured()
-    result = decision.create(request.problem, engine, request.anatomy)
+    held = personal.snapshot(personal.load(settings().pattern_file)) if request.anatomy is None else None
+    result = decision.create(request.problem, engine, request.anatomy, held)
     runs.save(result)
     if request.anatomy is None:
         _start_analysis(result.id, result.problem, engine)
@@ -377,7 +404,9 @@ async def reply(decision_id: str, request: ReplyRequest, engine: ReasoningEngine
 
     def answered(d: Decision) -> Decision:
         if d.dialogue is None:
-            d = d.model_copy(update={"dialogue": dialogue.new_dialogue(engine)})
+            # The dialogue holds the person's pattern as it is now, for every turn to come.
+            snapshot = personal.snapshot(personal.load(settings().pattern_file))
+            d = d.model_copy(update={"dialogue": dialogue.new_dialogue(engine, snapshot)})
         if d.dialogue.conclusion is not None:
             raise ValueError("the dialogue is concluded; reopen it to continue")
         if d.dialogue.open is not None:

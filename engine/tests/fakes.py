@@ -2,7 +2,7 @@
 
 from itertools import count
 
-from reticulate.dialogue.schemas import Assumption, Conclusion, Notes, QualityCheck, SocraticTurn
+from reticulate.dialogue.schemas import Assumption, Conclusion, Notes, PatternNote, QualityCheck, SocraticTurn
 from reticulate.profile import CognitiveProfile
 from reticulate.simulation.schemas import (
     DecisionAnalysis,
@@ -46,8 +46,10 @@ class FakeEngine:
         self.jitter = jitter
         self.calls = count()
         self.seen: list[list[str]] = []  # the answers the guide saw, per turn
+        self.patterns: list[dict[str, float] | None] = []  # the pattern the guide held, per call
 
-    async def ask(self, problem: Problem, exchanges) -> SocraticTurn:
+    async def ask(self, problem: Problem, exchanges, pattern=None) -> SocraticTurn:
+        self.patterns.append(pattern)
         answers = ["(skipped)" if e.skipped else (e.answer or "") for e in exchanges]
         self.seen.append(answers + [e.context for e in exchanges if e.context])
         stage, move, mechanism = PATH[min(len(exchanges), len(PATH) - 1)]
@@ -67,13 +69,16 @@ class FakeEngine:
             move=move,
             stage=stage,
             mechanism_id=mechanism if mechanism != "none" else "telepathy" if len(exchanges) == 1 else "none",
+            # turn 3 counterweighs a leaning; turn 2 names a dimension with no leaning (dropped)
+            pattern="risk_tolerance" if len(exchanges) == 2 else "exploration" if len(exchanges) == 1 else "none",
             why="test",
             scale=stage == "commitment",
             notes=notes,
             ready=len(exchanges) >= 4,
         )
 
-    async def conclude(self, problem: Problem, exchanges) -> Conclusion:
+    async def conclude(self, problem: Problem, exchanges, pattern=None) -> Conclusion:
+        self.patterns.append(pattern)
         answered = [e.answer for e in exchanges if e.answer]
         return Conclusion(
             decided=bool(answered),
@@ -88,6 +93,10 @@ class FakeEngine:
             review="in three months",
             # out of order and incomplete on purpose: the workflow orders them
             quality=[QualityCheck(stage="options", level="partial", note="test"), QualityCheck(stage="frame", level="strong", note="test")],
+            pattern_notes=[
+                PatternNote(dimension="risk_tolerance", note="My caution made staying feel safe."),
+                PatternNote(dimension="telepathy", note="dropped: not a dimension"),
+            ],
         )
 
     async def frame(self, problem: Problem) -> DecisionFrame:

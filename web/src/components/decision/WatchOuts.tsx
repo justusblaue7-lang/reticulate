@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DESIGN_LABEL } from "../../format";
 import type { Decision, Science } from "../../types";
-import { Cites } from "../StructureCard";
+import { Cites } from "../Cites";
 import { PULL } from "./model";
 
 /** The documented mechanisms this decision engages, each with what to do about it. */

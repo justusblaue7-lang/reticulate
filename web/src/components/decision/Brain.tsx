@@ -3,9 +3,9 @@ import { conjunction, loadMap, weightedMean, type Atlas } from "../../atlas/load
 import type { BrainRenderer } from "../../brain/renderer";
 import { DESIGN_LABEL, SOURCE_LABEL, SOURCE_LINE, pct, structureName } from "../../format";
 import type { Decision, Science, Source } from "../../types";
-import { SourceSwitch } from "../../views/AtlasView";
+import { SourceSwitch } from "../SourceSwitch";
 import { Specimen } from "../Specimen";
-import { Cites } from "../StructureCard";
+import { Cites } from "../Cites";
 
 type Choice = Source | "both";
 type Look = "lh-lateral" | "rh-lateral" | "deep";

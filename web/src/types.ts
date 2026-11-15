@@ -99,6 +99,36 @@ export interface Mechanism {
   countermove: Countermove;
 }
 
+export interface PatternItem {
+  id: string;
+  dimension: string;
+  pole: "low" | "high";
+  text: string;
+}
+
+export interface PatternLeaning {
+  watch: string;
+  counterweight: string;
+  style: string;
+  mechanisms: string[];
+}
+
+export interface PatternScience {
+  method: { summary: string; scale: string[]; basis: "derived" };
+  items: PatternItem[];
+  leanings: { dimension: string; low: PatternLeaning; high: PatternLeaning }[];
+}
+
+/** The person's own pattern: self-rated, never measured. */
+export interface PersonalPattern {
+  kind: "personal_pattern";
+  provenance: "authored";
+  answers: Record<string, number>;
+  dimensions: Record<string, { value: number; adjusted: boolean }>;
+  updated_at: string;
+  science_version: string;
+}
+
 export interface SocraticStage {
   id: string;
   name: string;
@@ -119,6 +149,7 @@ export interface SocraticMove {
 export interface Science {
   version: string;
   socratic: { method: { summary: string; refs: string[] }; stages: SocraticStage[]; moves: SocraticMove[] };
+  pattern: PatternScience;
   dimensions: Dimension[];
   personality: {
     traits: Trait[];
@@ -341,6 +372,7 @@ export interface SocraticTurn {
   move: string;
   stage: string;
   mechanism_id: string; // or "none"
+  pattern: string; // the dimension whose leaning this question counterweighs, or "none"
   why: string;
   scale: boolean;
   notes: Notes;
@@ -369,9 +401,12 @@ export interface Conclusion {
   if_then: string;
   review: string;
   quality: { stage: string; level: "strong" | "partial" | "weak"; note: string }[];
+  pattern_notes: { dimension: string; note: string }[];
 }
 
 export interface Dialogue {
+  pattern: Record<string, number> | null; // the person's pattern when the dialogue started
+  pattern_at: string | null;
   exchanges: Exchange[];
   pending: string[];
   conclusion: Conclusion | null;

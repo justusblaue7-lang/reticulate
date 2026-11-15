@@ -36,9 +36,22 @@
 - [x] A data folder in the project: one folder per decision with the record and a readable Markdown copy; avatars and research runs beside it; records of earlier builds moved in automatically
 - [x] Version history: the project is a git repository; personal data stays out of it
 
+**0.6 Product site**
+- [x] One page instead of three modes: a hero with the command window (type the decision, add options and details, open a recent one, try an example), how it works, biases with countermoves, the cognitive patterns, one call to action
+- [x] ⌘K palette: find any decision, start one from the query, jump to a section; replaces the history sidebar
+- [x] Black-and-blue design: near-black ground, one blue accent, Inter and Instrument Serif, rounded windows and cards, key caps for shortcuts
+- [x] Removed the standalone Brain-atlas mode (structure index, literature map browser, free-text maps); the brain stays in each decision and each pattern
+- [x] "Avatars" are called cognitive patterns (minds, in the panel); version and prompt numbers leave the screen and stay in the record
+
+**0.7 Your pattern, and the art**
+- [x] Your pattern: sixteen self-rating statements, two per dimension with one reversed, scored 0–10; adjustable; saved in data/pattern.yaml; labelled self-rated, never measured
+- [x] The dialogue holds a snapshot of the pattern from its start. For each clear leaning it asks one counterweight question where the decision touches it, gives priority to the mechanisms the leaning makes likelier, names departures from the usual leaning, asks in the person's style, and never shows scores or labels. Each question records the leaning it counterweighs; the conclusion says how the leanings showed (Claude's reading)
+- [x] The art: the works of `socratic art/`, prepared by tools/art/build.py and gathered into one passage through the Socratic method: a framed work held still while the questions pass ("I know that I don't know", then one question per element of decision quality), the current work slowly regaining its colour; *The Death of Socrates* closes it. Two framed plates with museum labels elsewhere; each element's work heads the open decision as the dialogue moves; credits on the home page
+
 ## Next, for the thesis
 
-0. **Dialogue study.** Does the dialogue improve decisions? Compare people who decide with
+0. **Dialogue study.** Does the dialogue improve decisions, and does holding it with the
+   person's pattern add to that (pattern vs. no pattern, recorded per question)? Compare people who decide with
    the dialogue against people who see only the analysis (or nothing), on decision quality
    rated blind by trained raters, decisional conflict (O'Connor, 1995), regret and stated
    confidence after a few weeks. Pre-register; record every dialogue's moves and stages.

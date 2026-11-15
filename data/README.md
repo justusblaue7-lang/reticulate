@@ -10,6 +10,7 @@ data/
       decision.md     the decision to read: your decision, the dialogue, biases, the panel
       decision.json   the full record: every question and answer, the analysis, the panel,
                       the model, prompt versions, tokens and cost
+  pattern.yaml        your pattern: how you rated your own decision-making (self-rated)
   avatars/            your own avatars, one YAML file each
   runs/               research runs from the command line (reticulate simulate | sensitivity)
 ```

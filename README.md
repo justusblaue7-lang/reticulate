@@ -7,7 +7,7 @@ could pull on the decision (each with a countermove), how simulated decision-mak
 different temperaments would weigh it, and what brain-imaging research reports for
 decisions like it.
 
-> Build 0.5. Read [docs/epistemics.md](docs/epistemics.md) before showing results to
+> Build 0.7. Read [docs/epistemics.md](docs/epistemics.md) before showing results to
 > anyone: it states what each part may and may not be taken to mean.
 
 ## Open it
@@ -23,6 +23,11 @@ keeps it in `engine/.env` on this computer. Without a key you can rate a decisio
 
 ## How a decision goes
 
+0. **Your pattern** (once, about two minutes). Rate sixteen statements about how you usually
+   decide. The dialogue then aims its questions at what your leanings tend to leave out
+   (the cost of not acting, for someone cautious; what you would choose if no one knew, for
+   someone who weighs others' expectations). It is a self-description, never shown back as a
+   label, and stays in `data/pattern.yaml`.
 1. **Ask.** Type the decision ("Should I …"); options and details are optional.
 2. **Dialogue.** Reticulate asks one question at a time and reflects your answers back. The
    questions walk through the six elements of decision quality (frame, what matters,

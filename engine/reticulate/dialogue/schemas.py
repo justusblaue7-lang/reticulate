@@ -8,7 +8,7 @@ come from data/socratic.yaml, so the schema always matches the science layer.
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from reticulate.science import science
 from reticulate.simulation.schemas import Usage
@@ -51,6 +51,9 @@ class SocraticTurn(BaseModel):
     mechanism_id: str = Field(
         description="id of the mechanism whose countermove this question applies, or 'none'"
     )
+    pattern: str = Field(
+        description="id of the dimension in <person> whose leaning this question counterweighs, or 'none'"
+    )
     why: str = Field(description="Why this question now, in one short sentence addressed to the person")
     scale: bool = Field(description="True when the question asks for a number from 0 to 10")
     notes: Notes
@@ -59,11 +62,26 @@ class SocraticTurn(BaseModel):
         "and the person has a leaning"
     )
 
+    @model_validator(mode="before")
+    @classmethod
+    def _earlier_builds(cls, data):
+        # Records written before 0.6 have no pattern field; the schema keeps it required.
+        if isinstance(data, dict) and "pattern" not in data:
+            data = {**data, "pattern": "none"}
+        return data
+
 
 class QualityCheck(BaseModel):
     stage: StageId
     level: Literal["strong", "partial", "weak"]
     note: str = Field(description="What the dialogue established, or what is missing, in one sentence")
+
+
+class PatternNote(BaseModel):
+    dimension: str = Field(description="id of a dimension in <person>")
+    note: str = Field(
+        description="In the first person: how this leaning showed in the decision and how it was checked, one sentence"
+    )
 
 
 class Conclusion(BaseModel):
@@ -82,6 +100,17 @@ class Conclusion(BaseModel):
     if_then: str = Field(description="The first step as a plan: 'If (or when) …, then I will …'")
     review: str = Field(description="When to look at the decision again, e.g. 'in three months' or a date")
     quality: list[QualityCheck] = Field(description="One check per element of decision quality, in order")
+    pattern_notes: list[PatternNote] = Field(
+        description="For leanings in <person> that came up in this decision: how each showed and was checked. "
+        "Empty without a <person> block or when none came up"
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _earlier_builds(cls, data):
+        if isinstance(data, dict) and "pattern_notes" not in data:
+            data = {**data, "pattern_notes": []}
+        return data
 
 
 # --- the record ---------------------------------------------------------------------------
@@ -106,6 +135,9 @@ class DialogueMeta(BaseModel):
 
 
 class Dialogue(BaseModel):
+    # The person's self-rated pattern when the dialogue started (0–10 per dimension), or None.
+    pattern: dict[str, float] | None = None
+    pattern_at: datetime | None = None
     exchanges: list[Exchange] = []
     pending: list[str] = []  # app notes waiting to go out with the next answer
     conclusion: Conclusion | None = None

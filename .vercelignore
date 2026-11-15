@@ -1,0 +1,8 @@
+socratic art/
+data/
+engine/.venv/
+engine/.env
+engine/tests/
+**/node_modules/
+**/__pycache__/
+web/dist/

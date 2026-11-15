@@ -32,7 +32,7 @@ export function Tipping({ science, decision, configured, running, busy, onRun, o
   const [low, high] = poles(science, key);
 
   if (!decision.panel) {
-    return <p className="empty">Ask the panel first. Then you can test which tendency would have to change for an avatar's answer to flip.</p>;
+    return <p className="empty">Ask the panel first. Then you can test which tendency would have to change for a mind's answer to flip.</p>;
   }
 
   return (
@@ -63,7 +63,7 @@ export function Tipping({ science, decision, configured, running, busy, onRun, o
             ))}
           </div>
           <p className="note">
-            {names.get(key)} runs from {low.toLowerCase()} (0) to {high.toLowerCase()} (10); this avatar is at{" "}
+            {names.get(key)} runs from {low.toLowerCase()} (0) to {high.toLowerCase()} (10); this mind is at{" "}
             {member ? (member.dimensions[key] ?? member.personality?.traits[key])?.value ?? 5 : 5}. Reticulate re-runs it with{" "}
             {names.get(key)?.toLowerCase()} set to {LEVELS.slice(0, -1).join(", ")} and {LEVELS[LEVELS.length - 1]}, everything else held fixed.{" "}
             <span className="dot-mark inline" /> marks the tendencies this decision engages.
