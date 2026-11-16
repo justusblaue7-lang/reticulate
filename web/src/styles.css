@@ -6089,97 +6089,14 @@ button.rc-item:hover {
   letter-spacing: -1px;
 }
 
-/* the method: one stage, the questions pass over it */
+/* where Socrates began */
 
 .passage {
-  position: relative;
   margin-top: 110px;
 }
 
-.passage-stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.passage-stage > .band-art {
-  --fade-y: linear-gradient(180deg, transparent 0%, #000 22%, #000 74%, transparent 100%);
-  opacity: 0;
-  transition: opacity 1.4s ease;
-}
-
-.passage-stage > .band-art.on {
-  opacity: 1;
-}
-
-.passage-stage > .band-art img {
-  transition: filter 1.4s ease, transform 14s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-.passage-stage > .band-art.on img {
-  transform: scale(1.06);
-}
-
-.passage-meta {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.passage-rail {
-  display: flex;
-  gap: 6px;
-}
-
-.passage-rail li {
-  width: 16px;
-  height: 2px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.14);
-  transition: width 0.6s ease, background 0.6s ease;
-}
-
-.passage-rail li.past {
-  background: rgba(255, 255, 255, 0.36);
-}
-
-.passage-rail li.on {
-  width: 32px;
-  background: var(--blue-2);
-}
-
-.passage-steps {
-  position: relative;
-  margin-top: -100vh;
-  margin-top: -100svh;
-}
-
-.passage-steps li {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  max-width: 620px;
-  min-height: 92vh;
-  opacity: 0.1;
-  transition: opacity 0.9s ease;
-}
-
-.passage-steps li.first,
-.passage-steps li:last-child {
-  min-height: 100vh;
-  min-height: 100svh;
-}
-
-.passage-steps li.on {
-  opacity: 1;
+.aporia-band .maxim {
+  margin-top: 16px;
 }
 
 .passage-label {
@@ -6193,30 +6110,6 @@ button.rc-item:hover {
 .passage-label .numeral {
   color: var(--blue-2);
   font: 400 22px var(--display);
-}
-
-.saying {
-  max-width: 14ch;
-  margin-top: 16px;
-  color: #fff;
-  font: 400 clamp(42px, 5.2vw, 76px)/1.03 var(--display);
-  letter-spacing: -1px;
-  text-wrap: balance;
-}
-
-.passage-steps li.first .saying {
-  max-width: 11ch;
-  font-size: clamp(52px, 7.2vw, 108px);
-  line-height: 0.98;
-  letter-spacing: -1.5px;
-}
-
-.gloss {
-  max-width: 42ch;
-  margin-top: 22px;
-  color: var(--fg-3);
-  font: 400 17px/1.6 var(--sans);
-  text-wrap: pretty;
 }
 
 /* biases: the battle of gods and titans, dissolved behind the window */
@@ -6327,22 +6220,6 @@ button.rc-item:hover {
     text-align: left;
   }
 
-  .passage-stage > .band-art {
-    --fade-y: linear-gradient(180deg, transparent 0%, #000 12%, #000 42%, transparent 80%);
-    height: 100%;
-  }
-
-  .passage-steps li {
-    justify-content: flex-end;
-    min-height: 100vh;
-    min-height: 100svh;
-    padding-bottom: 18vh;
-  }
-
-  .passage-meta .band-credit {
-    display: none;
-  }
-
   .backdrop {
     inset: -12% -10%;
   }
@@ -6352,12 +6229,6 @@ button.rc-item:hover {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .passage-stage > .band-art img {
-    transition: none;
-    transform: none !important;
-  }
-}
 
 .quote-band blockquote {
   margin: 0;

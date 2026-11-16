@@ -121,7 +121,7 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
         </div>
       </section>
 
-      <Passage science={science} />
+      <Passage />
 
       <section className="block container biases" id="biases">
         <div className="split">
