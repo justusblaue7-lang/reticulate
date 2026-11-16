@@ -1,5 +1,5 @@
-socratic art/
-data/
+/socratic art/
+/data/
 engine/.venv/
 engine/.env
 engine/tests/
