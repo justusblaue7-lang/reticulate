@@ -34,7 +34,7 @@ export function AtPlay({ science, decision, busy, onSave }: Props) {
           <span className="muted">
             {panelAtRisk && changed
               ? "Saving discards the panel's answers: the panel reasoned with the old ratings and would need to be asked again."
-              : "Watch-outs and brain map follow your ratings."}
+              : "The watch-outs follow your ratings."}
           </span>
           <button className="button quiet" onClick={() => setEditing(false)}>
             Cancel

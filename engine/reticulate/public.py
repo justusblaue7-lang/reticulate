@@ -26,7 +26,6 @@ from reticulate.api import (
     ReplyRequest,
     ReviseRequest,
     SettledRequest,
-    TippingRequest,
     _anthropic_error,
     _engine_error,
     _explain,
@@ -191,10 +190,6 @@ class PanelOn(PanelRequest):
     decision: Decision
 
 
-class TippingOn(TippingRequest):
-    decision: Decision
-
-
 @app.post("/api/decision/new")
 def new_decision(request: NewRequest, x_anthropic_key: str | None = Header(default=None)) -> Result:
     """A new decision. Rated by hand it needs no Claude; otherwise the browser asks for the
@@ -303,18 +298,6 @@ async def panel(request: PanelOn, engine: ReasoningEngine = Depends(get_engine))
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from None
     return _result(decision.with_panel(request.decision, result))
-
-
-@app.post("/api/decision/tipping")
-async def tipping(request: TippingOn, engine: ReasoningEngine = Depends(get_engine)) -> Result:
-    profile = _resolve(request.profile)
-    try:
-        results = await decision.run_tipping(
-            request.decision, profile, request.keys, request.values, engine, replicates=request.replicates
-        )
-    except (KeyError, ValueError) as exc:
-        raise HTTPException(422, str(exc)) from None
-    return _result(decision.with_tipping(request.decision, profile, results))
 
 
 @app.exception_handler(HTTPException)

@@ -56,8 +56,6 @@ const localApi = {
   updateAnatomy: (id: string, anatomy: Rating[]) => send<Decision>("PUT", `/api/decisions/${id}/anatomy`, { anatomy }),
   convene: (id: string, profiles: AvatarRef[], replicates: number, neural_context: boolean) =>
     send<Decision>("POST", `/api/decisions/${id}/panel`, { profiles, replicates, neural_context }),
-  tipping: (id: string, profile: AvatarRef, keys: string[], values: number[], replicates: number) =>
-    send<Decision>("POST", `/api/decisions/${id}/tipping`, { profile, keys, values, replicates }),
 };
 
 // ---- the public site: a stateless engine, the records in this browser ---------------------
@@ -171,7 +169,6 @@ const publicApi: typeof localApi = {
   },
   updateAnatomy: (id, anatomy) => on(id, "anatomy", { anatomy }),
   convene: (id, profiles, replicates, neural_context) => on(id, "panel", { profiles, replicates, neural_context }),
-  tipping: (id, profile, keys, values, replicates) => on(id, "tipping", { profile, keys, values, replicates }),
 };
 
 export const api = PUBLIC ? publicApi : localApi;

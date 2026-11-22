@@ -1,5 +1,5 @@
 // Shared vocabulary and arithmetic of the decision mode.
-import type { Avatar, Decision, Problem, Science, SimulationResult } from "../../types";
+import type { Avatar, Decision, Problem, Science } from "../../types";
 
 /** Example decisions for the decision bar; each fills the bar, nothing is sent. */
 export const EXAMPLES: { label: string; problem: Problem }[] = [
@@ -102,27 +102,6 @@ export function suggestPanel(avatars: Avatar[], decision: Decision, science: Sci
     chosen.push(best!);
   }
   return chosen.map((a) => a.id);
-}
-
-/** The panel's verdict: options ranked by how many members chose them. */
-export function verdict(panel: SimulationResult) {
-  const ids = panel.space.profile_ids;
-  const supporters = (option: string) => ids.filter((id) => panel.space.recommendations[id]?.option === option);
-  const options = [...new Set([...panel.frame.options, ...ids.map((id) => panel.space.recommendations[id]?.option).filter(Boolean)])];
-  const ranked = options
-    .map((option) => ({ option, ids: supporters(option) }))
-    .sort((a, b) => b.ids.length - a.ids.length || options.indexOf(a.option) - options.indexOf(b.option));
-  const total = ids.length;
-  const lead = ranked[0];
-  const tie = ranked.length > 1 && ranked[1].ids.length === lead.ids.length;
-  const statement =
-    tie
-      ? `The panel is split between “${lead.option}” and “${ranked[1].option}”.`
-      : lead.ids.length === total
-        ? `All ${total} choose “${lead.option}”.`
-        : `${lead.ids.length} of ${total} choose “${lead.option}”.`;
-  const alignment = tie ? "split" : lead.ids.length === total ? "unanimous" : lead.ids.length / total >= 0.75 ? "largely aligned" : "divided";
-  return { ranked, total, lead, tie, statement, alignment };
 }
 
 export const unique = (items: string[]) => [...new Map(items.map((s) => [s.trim().toLowerCase(), s.trim()])).values()];

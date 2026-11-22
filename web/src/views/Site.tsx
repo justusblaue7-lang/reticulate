@@ -1,18 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { PUBLIC, api, ref } from "../api";
-import type { Atlas } from "../atlas/load";
-import type { BrainRenderer } from "../brain/renderer";
 import { AtPlay } from "../components/decision/AtPlay";
-import { Brain } from "../components/decision/Brain";
 import type { ComposerHandle } from "../components/decision/Composer";
 import { Conclusion } from "../components/decision/Conclusion";
 import { DialogueThread, StageRail, type DialogueBusy } from "../components/decision/Dialogue";
-import { estimate, observedPerCall, panelCalls, suggestPanel, TURN_USD, verdict } from "../components/decision/model";
+import { Minds } from "../components/decision/Minds";
+import { TURN_USD } from "../components/decision/model";
 import { Notes } from "../components/decision/Notes";
 import { PanelProgress, PanelResult, PanelSetup } from "../components/decision/Panel";
-import { Tipping } from "../components/decision/Tipping";
 import { WatchOuts } from "../components/decision/WatchOuts";
-import { Face } from "../components/Face";
 import { Kbd, MOD, Mark } from "../components/Mark";
 import { Palette } from "../components/Palette";
 import { usd } from "../format";
@@ -22,11 +18,11 @@ import { leanings, leaningOf } from "../pattern";
 import type { Avatar, Decision, DecisionSummary, PersonalPattern, Problem, Progress, Rating, Science, Status } from "../types";
 import { Home } from "./Home";
 
+const AtlasView = lazy(() => import("./AtlasView"));
+
 interface Props {
-  atlas: Atlas;
   science: Science;
   status: Status | null;
-  renderer: BrainRenderer;
   avatars: Avatar[];
   onAvatars: (avatars: Avatar[]) => void;
   pattern: PersonalPattern | null;
@@ -41,14 +37,13 @@ const SECTIONS = [
   { id: "patterns", label: "Other minds" },
 ];
 
-type Work = { kind: "start" | "open" | "save" | "panel" | "tipping" | "self"; label: string; since: number; id?: string };
-type Tab = "dialogue" | "biases" | "panel" | "brain";
+type Work = { kind: "start" | "open" | "save" | "panel" | "self"; label: string; since: number; id?: string };
+type Tab = "dialogue" | "biases" | "panel";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "dialogue", label: "Dialogue" },
   { id: "biases", label: "Biases" },
-  { id: "panel", label: "Other minds" },
-  { id: "brain", label: "In the brain" },
+  { id: "panel", label: "Their reasoning" },
 ];
 
 const EMPTY: Problem = { question: "", context: "", options: [] };
@@ -63,8 +58,9 @@ const date = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "
 const message = (e: unknown) => (e instanceof Error ? e.message : String(e));
 const newer = (a: Decision, b: Decision | null) => !b || b.id !== a.id || a.updated_at >= b.updated_at;
 
-export function Site({ atlas, science, status, renderer, avatars, onAvatars, pattern, onPattern, onConnect }: Props) {
+export function Site({ science, status, avatars, onAvatars, pattern, onPattern, onConnect }: Props) {
   const [palette, setPalette] = useState(false);
+  const [atlas, setAtlas] = useState(location.hash === "#atlas");
   const composer = useRef<ComposerHandle>(null);
   const [archive, setArchive] = useState<DecisionSummary[]>([]);
   const [decision, setDecision] = useState<Decision | null>(null);
@@ -148,9 +144,9 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
     return () => clearInterval(timer);
   }, [decision?.id, decision?.analysis, apply, refresh]);
 
-  // Live progress while the panel or a tipping run is in flight.
+  // Live progress while the minds are reasoning.
   useEffect(() => {
-    if (!work?.id || (work.kind !== "panel" && work.kind !== "tipping")) return;
+    if (!work?.id || work.kind !== "panel") return;
     const id = work.id;
     const poll = () =>
       api
@@ -190,10 +186,12 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
     return () => window.removeEventListener("keydown", key);
   }, []);
 
-  // Links to a section (#patterns, and the old #avatars and #atlas) land on it, from anywhere.
+  // Links to a section (#patterns, and the old #avatars) land on it, from anywhere; #atlas
+  // opens the brain atlas.
   useEffect(() => {
     const land = (delay: number) => {
-      const legacy: Record<string, string> = { "#avatars": "patterns", "#atlas": "patterns" };
+      setAtlas(location.hash === "#atlas");
+      const legacy: Record<string, string> = { "#avatars": "patterns" };
       const id = legacy[location.hash] ?? location.hash.slice(1);
       if (SECTIONS.some((s) => s.id === id)) setTimeout(() => document.getElementById(id)?.scrollIntoView(), delay);
     };
@@ -203,12 +201,25 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
+  const openAtlas = () => {
+    history.pushState(null, "", "#atlas");
+    setAtlas(true);
+    window.scrollTo({ top: 0 });
+  };
+
+  const closeAtlas = () => {
+    history.pushState(null, "", current.current ? `#decide/${current.current.id}` : "#");
+    setAtlas(false);
+  };
+
   const toSection = (id: string) => {
+    setAtlas(false);
     if (current.current) void open(null);
     setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
   };
 
   const fresh = (question?: string) => {
+    setAtlas(false);
     if (question !== undefined) setDraft({ ...EMPTY, question });
     void open(null);
     setTimeout(() => composer.current?.focus(), 60);
@@ -288,10 +299,11 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
       }
     })();
 
-  const convene = (members: Avatar[], replicates: number, neural: boolean) => {
+  // The minds are briefed on the behavioural research behind the decision's biases, never on brain maps.
+  const convene = (members: Avatar[], replicates: number) => {
     if (!decision) return;
     setPanelRun({ members, replicates });
-    void run({ kind: "panel", label: "The panel is reasoning", id: decision.id }, () => api.convene(decision.id, members.map(ref), replicates, neural));
+    void run({ kind: "panel", label: "The minds are reasoning", id: decision.id }, () => api.convene(decision.id, members.map(ref), replicates, true));
   };
 
   const remove = async (id: string) => {
@@ -347,12 +359,20 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
         </p>
       )}
 
-      {!decision ? (
+      {atlas ? (
+        <Suspense
+          fallback={
+            <p className="waiting container" role="status">
+              <span className="spinner" /> Loading the atlas…
+            </p>
+          }
+        >
+          <AtlasView science={science} onClose={closeAtlas} />
+        </Suspense>
+      ) : !decision ? (
         <Home
           ref={composer}
-          atlas={atlas}
           science={science}
-          renderer={renderer}
           avatars={avatars}
           onAvatars={onAvatars}
           pattern={pattern}
@@ -368,13 +388,12 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
           onConnect={onConnect}
           onFocus={() => fresh()}
           onSection={toSection}
+          onAtlas={openAtlas}
         />
       ) : (
         <main className="container decision-page">
           <Workspace
-            atlas={atlas}
             science={science}
-            renderer={renderer}
             avatars={avatars}
             configured={configured}
             decision={decision}
@@ -399,9 +418,6 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
             onAnalyse={() => void api.analyse(decision.id).then(apply).catch((e) => setError(message(e)))}
             onConvene={convene}
             onSave={(anatomy) => void run({ kind: "save", label: "Saving the ratings", id: decision.id }, () => api.updateAnatomy(decision.id, anatomy))}
-            onTipping={(profile, key, values, replicates) =>
-              void run({ kind: "tipping", label: "Testing the tipping point", id: decision.id }, () => api.tipping(decision.id, profile, [key], values, replicates))
-            }
             onReveal={() => void api.reveal(decision.id).catch((e) => setError(message(e)))}
             onDelete={() => void remove(decision.id)}
             onPatternSetup={() => toSection("you")}
@@ -418,7 +434,10 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
           <span>Reticulate asks; you decide. Nothing here is financial, legal or medical advice.</span>
           <span>
             {archive.length} decision{archive.length === 1 ? "" : "s"} {PUBLIC ? "in this browser" : `in ${status?.data_dir ?? "data"}/decisions`}
-            {spent > 0 && <> · {usd(spent)} spent on Claude</>}
+            {spent > 0 && <> · {usd(spent)} spent on Claude</>} ·{" "}
+            <button className="text-button quiet" onClick={openAtlas}>
+              Brain atlas
+            </button>
           </span>
         </div>
       </footer>
@@ -431,6 +450,7 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
           onOpen={(id) => void open(id)}
           onNew={fresh}
           onSection={toSection}
+          onAtlas={openAtlas}
           onConnect={onConnect}
         />
       )}
@@ -439,9 +459,7 @@ export function Site({ atlas, science, status, renderer, avatars, onAvatars, pat
 }
 
 interface WorkspaceProps {
-  atlas: Atlas;
   science: Science;
-  renderer: BrainRenderer;
   avatars: Avatar[];
   configured: boolean;
   decision: Decision;
@@ -461,9 +479,8 @@ interface WorkspaceProps {
   onReopen: () => void;
   onSettle: (items: string[]) => void;
   onAnalyse: () => void;
-  onConvene: (members: Avatar[], replicates: number, neural: boolean) => void;
+  onConvene: (members: Avatar[], replicates: number) => void;
   onSave: (anatomy: Rating[]) => void;
-  onTipping: (profile: string | Avatar, key: string, values: number[], replicates: number) => void;
   onReveal: () => void;
   onDelete: () => void;
   onPatternSetup: () => void;
@@ -510,21 +527,93 @@ function Waiting({ decision, onAnalyse, configured, onConnect }: { decision: Dec
   );
 }
 
+/** You, in this decision: the leanings the questions counterweigh, and whether each came up. */
+function YouCard({ science, decision, onPatternSetup }: { science: Science; decision: Decision; onPatternSetup: () => void }) {
+  const dialogue = decision.dialogue;
+  const held = leanings(science, dialogue?.pattern);
+  const asked = new Set(dialogue?.exchanges.map((e) => e.turn.pattern) ?? []);
+  return (
+    <section className="rail-card you-card">
+      <header className="rail-head">
+        <h3>You</h3>
+        <p>
+          {!dialogue?.pattern
+            ? "This dialogue runs without your pattern."
+            : held.length
+              ? "The questions bring in what your leanings tend to leave out."
+              : "No pronounced leaning: the questions go where this decision needs them."}
+        </p>
+      </header>
+      {dialogue?.pattern && held.length > 0 && (
+        <ul className="held">
+          {held.map((l) => (
+            <li key={l.dimension} className={asked.has(l.dimension) ? "asked" : ""} title={leaningOf(science, l.dimension, l.pole)?.watch}>
+              <span className={`attitude ${l.strength}`}>{l.poleName}</span>
+              <span className="held-state">{asked.has(l.dimension) ? "✓ asked" : dialogue.conclusion ? "did not come up" : l.strength === "clear" ? "to come" : "if it bears"}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {!dialogue?.pattern && (
+        <button className="text-button" onClick={onPatternSetup}>
+          Add your pattern for the next decision
+        </button>
+      )}
+    </section>
+  );
+}
+
+/** The documented biases that could pull on this decision, in brief. */
+function BiasCard({ science, decision, onOpen }: { science: Science; decision: Decision; onOpen: () => void }) {
+  const engaged = decision.signature.mechanisms.slice(0, 4);
+  return (
+    <section className="rail-card bias-card">
+      <header className="rail-head">
+        <h3>Pulling on it</h3>
+        {decision.analysis === "pending" ? (
+          <p>
+            <span className="spinner tiny" /> Looking for documented biases…
+          </p>
+        ) : !engaged.length ? (
+          <p>No documented bias stands out yet.</p>
+        ) : null}
+      </header>
+      {engaged.length > 0 && (
+        <ul className="bias-list">
+          {engaged.map((m) => {
+            const mechanism = science.mechanisms.find((x) => x.id === m.mechanism_id);
+            if (!mechanism) return null;
+            return (
+              <li key={m.mechanism_id}>
+                <button onClick={onOpen} title={mechanism.countermove.text}>
+                  <span className="rc-icon bias" />
+                  <span>{mechanism.name}</span>
+                  <span className={`rc-tag ${mechanism.countermove.basis === "tested" ? "good" : ""}`}>{mechanism.countermove.basis === "tested" ? "Tested" : "Derived"}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {engaged.length > 0 && (
+        <button className="text-button" onClick={onOpen}>
+          What to do about them
+        </button>
+      )}
+    </section>
+  );
+}
+
 function Workspace(props: WorkspaceProps) {
-  const { atlas, science, renderer, avatars, configured, decision, tab, work, talk, progress, panelRun, onTab, onConnect } = props;
+  const { science, avatars, configured, decision, tab, work, talk, progress, panelRun, onTab, onConnect } = props;
   const dialogue = decision.dialogue;
   const panel = decision.panel;
   const panelBusy = work?.kind === "panel" && work.id === decision.id;
   const analysed = decision.analysis === "done" || decision.anatomy.some((r) => r.level > 0);
   const biases = decision.signature.mechanisms.filter((m) => m.level >= 2).length || decision.signature.mechanisms.length;
-  const suggested = useMemo(() => suggestPanel(avatars, decision, science), [avatars, decision, science]);
-  const suggestedAvatars = suggested.map((id) => avatars.find((a) => a.id === id)).filter((a): a is Avatar => !!a);
-  const quick = estimate(panelCalls(decision, suggestedAvatars.length, 2), observedPerCall(decision));
   const title = dialogue?.exchanges.at(-1)?.turn.notes.decision || decision.frame?.decision || decision.problem.question;
   const usage = decision.usage;
   const model = decision.dialogue?.meta.model ?? decision.meta.model;
-  const v = panel ? verdict(panel) : null;
-  const profiles = new Map(panel?.profiles.map((p) => [p.id, p]) ?? []);
 
   const download = () => {
     const blob = new Blob([JSON.stringify(decision, null, 2)], { type: "application/json" });
@@ -538,123 +627,23 @@ function Workspace(props: WorkspaceProps) {
   const stageNow = science.socratic.stages.find(
     (s) => s.id === (dialogue?.conclusion ? "commitment" : dialogue?.exchanges.at(-1)?.turn.stage ?? "frame"),
   );
-  const held = leanings(science, dialogue?.pattern);
-  const asked = new Set(dialogue?.exchanges.map((e) => e.turn.pattern) ?? []);
-  const patternCard = dialogue ? (
-    <section className="pattern-card-side">
-      <h3 className="eyebrow">Your pattern</h3>
-      {dialogue.pattern ? (
-        held.length ? (
-          <>
-            <p className="note">The questions bring in what your leanings tend to leave out.</p>
-            <ul className="held">
-              {held.map((l) => (
-                <li key={l.dimension} className={asked.has(l.dimension) ? "asked" : ""} title={leaningOf(science, l.dimension, l.pole)?.watch}>
-                  <span className="held-mark" aria-hidden>
-                    {asked.has(l.dimension) ? "✓" : ""}
-                  </span>
-                  <span className="held-name">{l.poleName}</span>
-                  <span className="held-state">{asked.has(l.dimension) ? "asked" : dialogue.conclusion ? "did not come up" : l.strength === "clear" ? "to come" : "if it bears"}</span>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <p className="note">Your pattern has no pronounced leaning, so the dialogue spends its questions where this decision needs them.</p>
-        )
-      ) : (
-        <>
-          <p className="note">This dialogue runs without your pattern. Rate yourself once, and new dialogues aim at what your way of deciding leaves out.</p>
-          <button className="text-button" onClick={props.onPatternSetup}>
-            Add your pattern
-          </button>
-        </>
-      )}
-    </section>
-  ) : null;
+  const questions = dialogue?.exchanges.length ?? 0;
 
-  const otherMinds = (
-    <section className="minds">
-      <h3 className="eyebrow">Other minds</h3>
-      {panelBusy ? (
-        <>
-          <p className="note">
-            {panelRun?.members.length ?? 0} simulated decision-makers are reasoning it through{progress ? ` · ${progress.done} of ${progress.total} calls` : ""}. Keep
-            talking; their reasons join the dialogue when they are done.
-          </p>
-          <div className="minds-faces">
-            {(panelRun?.members ?? []).map((a) => (
-              <span key={a.id} className={(progress?.labels[a.id] ?? 0) >= (panelRun?.replicates ?? 1) ? "answered" : "waiting"}>
-                <Face avatar={a} size={34} />
-              </span>
-            ))}
-          </div>
-        </>
-      ) : v ? (
-        <>
-          <p className="minds-verdict">{v.statement}</p>
-          <div className="minds-faces">
-            {v.ranked
-              .filter((r) => r.ids.length)
-              .flatMap((r) => r.ids)
-              .map((id) => (
-                <Face key={id} avatar={profiles.get(id)!} size={34} />
-              ))}
-          </div>
-          <p className="note">{dialogue?.pending.length ? "Their reasons go along with your next answer." : "Their reasons are part of the dialogue."}</p>
-          <button className="text-button" onClick={() => onTab("panel")}>
-            Read their reasoning
-          </button>
-        </>
-      ) : (
-        <>
-          <p className="note">
-            {suggestedAvatars.length} simulated decision-makers with different temperaments reason through your decision. What they weigh differently
-            comes back into the dialogue as a question for you.
-          </p>
-          <div className="minds-faces">
-            {suggestedAvatars.map((a) => (
-              <Face key={a.id} avatar={a} size={34} />
-            ))}
-          </div>
-          {configured ? (
-            <button className="button small" disabled={!!work} onClick={() => props.onConvene(suggestedAvatars, 2, true)}>
-              Ask them · about {usd(quick.usd)}, {quick.minutes} min
-            </button>
-          ) : (
-            <button className="button small" onClick={onConnect}>
-              Connect Claude
-            </button>
-          )}
-        </>
-      )}
-    </section>
+  const thread = dialogue && (
+    <DialogueThread
+      science={science}
+      decision={decision}
+      busy={talk}
+      error={props.talkError}
+      configured={configured}
+      onAnswer={props.onAnswer}
+      onSkip={props.onSkip}
+      onConclude={props.onConclude}
+      onRevise={props.onRevise}
+      onRetry={props.onNext}
+      onConnect={onConnect}
+    />
   );
-
-  const biasHint =
-    decision.analysis === "pending" ? (
-      <section className="hint">
-        <h3 className="eyebrow">Biases</h3>
-        <p className="note">
-          <span className="spinner tiny" /> Looking for documented biases in your decision…
-        </p>
-      </section>
-    ) : decision.watch_outs.length || biases ? (
-      <section className="hint">
-        <h3 className="eyebrow">Biases</h3>
-        <p className="note">
-          {biases} documented {biases === 1 ? "bias" : "biases"} could pull on this decision:{" "}
-          {decision.signature.mechanisms
-            .slice(0, 3)
-            .map((m) => science.mechanisms.find((x) => x.id === m.mechanism_id)?.name.toLowerCase())
-            .join(", ")}
-          .
-        </p>
-        <button className="text-button" onClick={() => onTab("biases")}>
-          What to do about them
-        </button>
-      </section>
-    ) : null;
 
   return (
     <div className="workspace">
@@ -680,99 +669,105 @@ function Workspace(props: WorkspaceProps) {
       </div>
 
       {tab === "dialogue" && (
-        <div className="talk">
-          <div className="talk-main">
-            <header className="decision-head">
-              <Art slug={STAGE_ART[stageNow?.id ?? "frame"] ?? "facade"} className="stage-art" reveal sizes="(max-width: 980px) 100vw, 760px" />
-              <div className="decision-head-text">
-                <p className="eyebrow">
-                  Your decision · {date(decision.created_at)}
-                  {dialogue ? ` · ${dialogue.exchanges.length} question${dialogue.exchanges.length === 1 ? "" : "s"}` : ""}
-                  {dialogue && stageNow ? ` · now: ${stageNow.name.toLowerCase()}` : ""}
-                </p>
-                <h1 className="decision-title">{decision.problem.question}</h1>
-                {decision.problem.options.length > 0 && (
-                  <div className="options-row">
-                    {decision.problem.options.map((o, i) => (
-                      <span key={o} className="option-pill">
-                        <b>{String.fromCharCode(65 + i)}</b>
-                        {o}
-                      </span>
-                    ))}
-                  </div>
-                )}
+        <>
+          <header className="room-head">
+            <Art slug={STAGE_ART[stageNow?.id ?? "frame"] ?? "facade"} className="band-art" decorative sizes="(max-width: 980px) 100vw, 60vw" />
+            <div className="room-head-text">
+              <p className="eyebrow">
+                Your decision · {date(decision.created_at)}
+                {dialogue && stageNow ? ` · now: ${stageNow.name.toLowerCase()}` : ""}
+              </p>
+              <h1 className="room-title">{decision.problem.question}</h1>
+              {decision.problem.options.length > 0 && (
+                <div className="options-row">
+                  {decision.problem.options.map((o, i) => (
+                    <span key={o} className="option-pill">
+                      <b>{String.fromCharCode(65 + i)}</b>
+                      {o}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {dialogue && <StageRail science={science} decision={decision} />}
+            </div>
+          </header>
+
+          <div className="room">
+            <aside className="room-you no-print">
+              <YouCard science={science} decision={decision} onPatternSetup={props.onPatternSetup} />
+              <Notes notes={dialogue?.exchanges.at(-1)?.turn.notes} />
+            </aside>
+
+            <section className="room-talk">
+              <div className="rc-window room-window">
+                <div className="room-window-head">
+                  <span className="room-window-title">
+                    <Mark size={18} />
+                    {dialogue?.conclusion ? "Your decision" : "Dialogue"}
+                  </span>
+                  <span className="room-window-meta">
+                    {questions ? `${questions} question${questions === 1 ? "" : "s"}` : "Not started"}
+                    {usage.calls ? ` · ${usd(usage.cost_usd)}` : ""}
+                  </span>
+                </div>
+                <div className="room-window-body">
+                  {dialogue?.conclusion && (
+                    <Conclusion
+                      science={science}
+                      decision={decision}
+                      busy={!!talk}
+                      onSettle={props.onSettle}
+                      onReopen={props.onReopen}
+                      onPanel={() => onTab("panel")}
+                      onReveal={props.onReveal}
+                    />
+                  )}
+                  {dialogue ? (
+                    dialogue.conclusion ? (
+                      <details className="transcript">
+                        <summary>The dialogue · {dialogue.exchanges.length} questions</summary>
+                        {thread}
+                      </details>
+                    ) : (
+                      thread
+                    )
+                  ) : (
+                    <div className="start-dialogue">
+                      <p>
+                        Think this decision through in a Socratic dialogue: one question at a time, until your decision and your first step are
+                        clear. About {usd(TURN_USD)} a question.
+                      </p>
+                      {configured ? (
+                        <button className="button primary" disabled={!!talk} onClick={props.onNext}>
+                          Start the dialogue
+                        </button>
+                      ) : (
+                        <button className="button primary" onClick={onConnect}>
+                          Connect Claude to start
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </header>
-            {dialogue && <StageRail science={science} decision={decision} />}
-            {dialogue?.conclusion && (
-              <Conclusion
+            </section>
+
+            <aside className="room-minds no-print">
+              <Minds
                 science={science}
                 decision={decision}
-                busy={!!talk}
-                onSettle={props.onSettle}
-                onReopen={props.onReopen}
-                onPanel={() => onTab("panel")}
-                onReveal={props.onReveal}
+                avatars={avatars}
+                configured={configured}
+                running={panelBusy ? { members: panelRun?.members ?? [], progress } : null}
+                disabled={!!work}
+                onAsk={(members) => props.onConvene(members, 1)}
+                onConnect={onConnect}
+                onReasoning={() => onTab("panel")}
               />
-            )}
-            {dialogue ? (
-              dialogue.conclusion ? (
-                <details className="transcript">
-                  <summary>The dialogue · {dialogue.exchanges.length} questions</summary>
-                  <DialogueThread
-                    science={science}
-                    decision={decision}
-                    busy={talk}
-                    error={props.talkError}
-                    configured={configured}
-                    onAnswer={props.onAnswer}
-                    onSkip={props.onSkip}
-                    onConclude={props.onConclude}
-                    onRevise={props.onRevise}
-                    onRetry={props.onNext}
-                    onConnect={onConnect}
-                  />
-                </details>
-              ) : (
-                <DialogueThread
-                  science={science}
-                  decision={decision}
-                  busy={talk}
-                  error={props.talkError}
-                  configured={configured}
-                  onAnswer={props.onAnswer}
-                  onSkip={props.onSkip}
-                  onConclude={props.onConclude}
-                  onRevise={props.onRevise}
-                  onRetry={props.onNext}
-                  onConnect={onConnect}
-                />
-              )
-            ) : (
-              <div className="start-dialogue">
-                <p>
-                  Think this decision through in a Socratic dialogue: one question at a time, until your decision and your first step are clear.
-                  About {usd(TURN_USD)} a question.
-                </p>
-                {configured ? (
-                  <button className="button primary" disabled={!!talk} onClick={props.onNext}>
-                    Start the dialogue
-                  </button>
-                ) : (
-                  <button className="button primary" onClick={onConnect}>
-                    Connect Claude to start
-                  </button>
-                )}
-              </div>
-            )}
+              <BiasCard science={science} decision={decision} onOpen={() => onTab("biases")} />
+            </aside>
           </div>
-          <div className="talk-side no-print">
-            {patternCard}
-            <Notes notes={dialogue?.exchanges.at(-1)?.turn.notes} />
-            {otherMinds}
-            {biasHint}
-          </div>
-        </div>
+        </>
       )}
 
       {tab === "biases" && (
@@ -785,7 +780,7 @@ function Workspace(props: WorkspaceProps) {
               title="What's at play"
               lede={
                 decision.anatomy.some((r) => r.source === "model")
-                  ? "The features of your decision that research links to how people decide, rated by Claude from your description. Correct anything that is off; the watch-outs and the brain map follow."
+                  ? "The features of your decision that research links to how people decide, rated by Claude from your description. Correct anything that is off; the watch-outs follow."
                   : "The features of your decision that research links to how people decide, as you rated them."
               }
             >
@@ -796,45 +791,23 @@ function Workspace(props: WorkspaceProps) {
       )}
 
       {tab === "panel" && (
-        <>
-          <Sheet
-            title="Other minds"
-            lede="Simulated decision-makers reason through your decision, each from its own tendencies, personality and values. Their reasons come back into your dialogue as a perspective to question; none of them predicts what a real person would do."
-          >
-            {panelBusy ? (
-              <PanelProgress progress={progress} members={panelRun?.members ?? []} replicates={panelRun?.replicates ?? 1} since={work!.since} />
-            ) : panel ? (
-              <>
-                <PanelResult science={science} decision={decision} />
-                <details className="again no-print">
-                  <summary>Ask a different panel</summary>
-                  <PanelSetup science={science} decision={decision} avatars={avatars} configured={configured} onConvene={props.onConvene} onConnect={onConnect} again />
-                </details>
-              </>
-            ) : (
-              <PanelSetup science={science} decision={decision} avatars={avatars} configured={configured} onConvene={props.onConvene} onConnect={onConnect} />
-            )}
-          </Sheet>
-          <Sheet
-            title="What would flip it"
-            lede="Would a different temperament change the answer? Reticulate re-runs one person with a single tendency changed and everything else held fixed."
-          >
-            <Tipping
-              science={science}
-              decision={decision}
-              configured={configured}
-              busy={!!work}
-              running={work?.kind === "tipping" && work.id === decision.id ? { progress, since: work.since } : null}
-              onRun={props.onTipping}
-              onConnect={onConnect}
-            />
-          </Sheet>
-        </>
-      )}
-
-      {tab === "brain" && (
-        <Sheet title="In the brain" lede="What brain-imaging research reports for decisions with these features.">
-          {analysed ? <Brain atlas={atlas} science={science} renderer={renderer} decision={decision} /> : <Waiting decision={decision} onAnalyse={props.onAnalyse} configured={configured} onConnect={onConnect} />}
+        <Sheet
+          title="Their reasoning"
+          lede="Simulated decision-makers reason through your decision, each from its own attitudes, personality and values. Their reasons come back into your dialogue as a perspective to question; none of them predicts what a real person would do."
+        >
+          {panelBusy ? (
+            <PanelProgress progress={progress} members={panelRun?.members ?? []} replicates={panelRun?.replicates ?? 1} since={work!.since} />
+          ) : panel ? (
+            <>
+              <PanelResult science={science} decision={decision} />
+              <details className="again no-print">
+                <summary>Ask a different table</summary>
+                <PanelSetup science={science} decision={decision} avatars={avatars} configured={configured} onConvene={props.onConvene} onConnect={onConnect} again />
+              </details>
+            </>
+          ) : (
+            <PanelSetup science={science} decision={decision} avatars={avatars} configured={configured} onConvene={props.onConvene} onConnect={onConnect} />
+          )}
         </Sheet>
       )}
 
@@ -846,9 +819,11 @@ function Workspace(props: WorkspaceProps) {
           <button className="button dark" onClick={() => window.print()}>
             Print or PDF
           </button>
-          <button className="button dark" onClick={download}>
-            Download
-          </button>
+          {!PUBLIC && (
+            <button className="button dark" onClick={download}>
+              Download
+            </button>
+          )}
           <button className="button dark danger" onClick={props.onDelete}>
             Delete
           </button>

@@ -79,8 +79,8 @@ How to use the neural context, when it is given:
 aversion or present bias. These describe people on average. Judge from the profile how \
 strongly each applies to this decision-maker, and let that shape the reasoning where it \
 matters.
-- It is published group-level literature, not a measurement of anyone's brain. Never cite \
-brain regions as reasons for a choice.
+- It is published group-level literature, not a measurement of anyone. Never cite brain \
+regions or brain activity as reasons for a choice.
 
 Output rules:
 - Assess every factor of the decision frame exactly once, using its factor_id.
@@ -153,17 +153,10 @@ def render_profile(profile: CognitiveProfile) -> str:
     return "\n".join(lines)
 
 
-def _region_name(key: str) -> str:
-    hemi, _, region_id = key.rpartition(".")
-    try:
-        name = science().region(region_id).name
-    except KeyError:
-        name = region_id
-    return f"{'left' if hemi == 'lh' else 'right'} {name[0].lower() + name[1:]}" if hemi else name
-
-
 def render_neural_context(signature: NeuralSignature, anatomy: list[Rating]) -> str:
-    """The decision's anatomy, engaged mechanisms and meta-analytic signature, as prompt text."""
+    """The decision's anatomy and the mechanisms behavioural research documents for it, as
+    prompt text. Brain maps are not part of it: they describe group-level literature, not a
+    decision-maker, and Reticulate does not reason from them."""
     sci = science()
     rated = [r for r in sorted(anatomy, key=lambda r: -r.level) if r.level > 0]
     levels = {0: "absent", 1: "minor", 2: "present", 3: "central"}
@@ -183,17 +176,6 @@ def render_neural_context(signature: NeuralSignature, anatomy: list[Rating]) -> 
     if engaged:
         names = ", ".join(sci.dimension(d.dimension_id).name.lower() for d in engaged)
         lines += ["", f"Profile dimensions this decision engages most: {names}."]
-    regions = []
-    for source, label in (("neuroquery", "NeuroQuery"), ("neurosynth", "Neurosynth")):
-        part = getattr(signature, source)
-        if part:
-            regions.append(f"{label}: {', '.join(_region_name(r.key) for r in part.top_regions[:5])}")
-    if regions:
-        lines += [
-            "",
-            "Meta-analytic signature (where published studies of these features report activation; "
-            "group-level literature, not anyone's brain): " + "; ".join(regions) + ".",
-        ]
     return "\n".join(lines)
 
 

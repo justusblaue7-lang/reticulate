@@ -19,11 +19,12 @@ interface Props {
   onOpen: (id: string) => void;
   onNew: (question?: string) => void;
   onSection: (id: string) => void;
+  onAtlas: () => void;
   onConnect: () => void;
 }
 
 /** ⌘K: find a decision, start one, or jump to a part of the page. */
-export function Palette({ archive, connected, onClose, onOpen, onNew, onSection, onConnect }: Props) {
+export function Palette({ archive, connected, onClose, onOpen, onNew, onSection, onAtlas, onConnect }: Props) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const input = useRef<HTMLInputElement>(null);
@@ -51,6 +52,7 @@ export function Palette({ archive, connected, onClose, onOpen, onNew, onSection,
           { key: "you", title: "Your pattern", run: () => onSection("you") },
           { key: "patterns", title: "Other minds", run: () => onSection("patterns") },
           { key: "how", title: "How it works", run: () => onSection("how") },
+          { key: "atlas", title: "Brain atlas", run: onAtlas },
           { key: "claude", title: connected ? "Claude connection" : "Connect Claude", run: onConnect },
         ] as const
       )
@@ -61,7 +63,7 @@ export function Palette({ archive, connected, onClose, onOpen, onNew, onSection,
       { name: "Actions", items: actions },
       { name: "Decisions", items: decisions },
     ].filter((g) => g.items.length);
-  }, [archive, query, connected, onOpen, onNew, onSection, onConnect]);
+  }, [archive, query, connected, onOpen, onNew, onSection, onAtlas, onConnect]);
 
   const flat = groups.flatMap((g) => g.items);
   const current = Math.min(active, flat.length - 1);

@@ -134,10 +134,6 @@ a {
   font: 600 24px/1.1 var(--sans);
 }
 
-.subtitle {
-  font: 500 17px/1.2 var(--sans);
-}
-
 .lede {
   color: var(--cream-2);
   font-size: 14.5px;
@@ -279,11 +275,6 @@ select.field {
   background-repeat: no-repeat;
 }
 
-.field-label {
-  display: block;
-  margin: 18px 0 7px;
-}
-
 .segmented {
   display: inline-flex;
   border: 1px solid var(--line-2);
@@ -339,13 +330,6 @@ input[type="checkbox"] {
   margin-left: 8px;
   color: var(--cream-2);
   vertical-align: 1px;
-}
-
-.hbar {
-  display: block;
-  height: 6px;
-  background: var(--cream-2);
-  opacity: 0.85;
 }
 
 .rule {
@@ -549,15 +533,6 @@ input[type="checkbox"] {
   gap: 10px;
 }
 
-.leader {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 25;
-}
-
 /* ---- atlas -------------------------------------------------------------------------------- */
 
 .atlas {
@@ -575,11 +550,6 @@ input[type="checkbox"] {
   scrollbar-color: var(--line-2) transparent;
 }
 
-.tabs button.on {
-  color: var(--cream);
-  border-bottom-color: var(--cream);
-}
-
 .index section,
 .maps section {
   margin-top: 18px;
@@ -595,16 +565,6 @@ input[type="checkbox"] {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--line);
-}
-
-.index-name:hover,
-.map-list button:hover,
-.index li.active .index-name {
-  color: var(--cream);
-}
-
-.index li.active .index-name {
-  font-weight: 600;
 }
 
 .sides {
@@ -625,17 +585,6 @@ input[type="checkbox"] {
 .sides button:hover,
 .sides button.on {
   border-color: var(--line-2);
-  color: var(--cream);
-}
-
-.map-list button.on {
-  color: var(--cream);
-  font-weight: 600;
-}
-
-.suggestions button:hover,
-.suggestions button.active {
-  background: rgba(255, 255, 255, 0.07);
   color: var(--cream);
 }
 
@@ -670,11 +619,6 @@ input[type="checkbox"] {
   background: var(--cream-3);
 }
 
-.network-shares .mono {
-  margin-left: auto;
-  color: var(--cream-3);
-}
-
 .terms {
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -692,10 +636,6 @@ input[type="checkbox"] {
   font: 500 9.5px var(--mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-}
-
-.construct-table tr.strong th {
-  color: var(--cream);
 }
 
 .quality {
@@ -726,29 +666,6 @@ input[type="checkbox"] {
   flex-wrap: wrap;
   gap: 4px 16px;
   margin-top: 26px;
-  color: var(--cream-3);
-}
-
-.ranked li button {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 90px 44px;
-  align-items: center;
-  gap: 10px;
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  padding: 6px 0;
-  color: var(--cream-2);
-  cursor: pointer;
-  text-align: left;
-}
-
-.ranked li button:hover {
-  color: var(--cream);
-}
-
-.ranked .side {
   color: var(--cream-3);
 }
 
@@ -788,66 +705,6 @@ input[type="checkbox"] {
 
 /* ---- avatars ------------------------------------------------------------------------------ */
 
-.avatars-view {
-  display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
-  gap: 40px;
-}
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px 10px;
-}
-
-.medallion {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: 0;
-  padding: 0;
-  color: var(--cream-3);
-  cursor: pointer;
-  font-size: 11px;
-  line-height: 1.3;
-  text-align: center;
-}
-
-.medallion.on {
-  color: var(--cream);
-}
-
-.gallery h3 {
-  margin: 22px 0 12px;
-}
-
-.new-avatar {
-  width: 100%;
-  justify-content: center;
-  margin-top: 22px;
-}
-
-.avatar-head {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 36px;
-  align-items: center;
-  padding-bottom: 28px;
-  border-bottom: 1px solid var(--line);
-}
-
-.avatar-head .display {
-  margin: 8px 0 12px;
-}
-
-.avatar-head .summary {
-  color: var(--cream-2);
-  font-size: 15px;
-  max-width: 66ch;
-}
-
 .nuance {
   margin-top: 14px;
   padding-left: 14px;
@@ -855,27 +712,6 @@ input[type="checkbox"] {
   color: var(--cream-2);
   font: 500 14px/1.4 var(--sans);
   max-width: 62ch;
-}
-
-.avatar-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.avatar-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: 40px;
-  margin-top: 28px;
-}
-
-.avatar-body section + section {
-  margin-top: 30px;
-}
-
-.avatar-body h3 {
-  margin-bottom: 12px;
 }
 
 .scales {
@@ -974,16 +810,6 @@ button.value-chip.on {
   border-color: var(--cream);
 }
 
-.brain-box {
-  height: 520px;
-}
-
-.profile-figure {
-  display: flex;
-  justify-content: center;
-  margin: 4px 0 14px;
-}
-
 .glyph-label {
   font: 500 9px var(--mono);
   letter-spacing: 0.06em;
@@ -1011,11 +837,6 @@ button.value-chip.on {
   flex-direction: column;
   align-items: center;
   gap: 16px;
-}
-
-.builder-preview .brain-box {
-  width: 100%;
-  height: 290px;
 }
 
 .builder-actions {
@@ -1103,14 +924,6 @@ button.value-chip.on {
   vertical-align: -1px;
 }
 
-.status-line {
-  margin-top: 14px;
-  color: var(--cream-2);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 .icon-button {
   background: none;
   border: 0;
@@ -1128,59 +941,6 @@ button.value-chip.on {
   padding: 18px 0;
   color: var(--cream-3);
   font: 500 15px/1.4 var(--sans);
-}
-
-.decoded {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  color: var(--cream-2);
-  font: 500 13px var(--sans);
-}
-
-.decoded .mono {
-  font-style: normal;
-  color: var(--cream-3);
-  font-size: 10.5px;
-  margin-left: 4px;
-}
-
-.dose-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(214px, 1fr));
-  gap: 18px 22px;
-  margin-top: 16px;
-}
-
-.dose-panel figcaption {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--cream-2);
-  margin-bottom: 2px;
-}
-
-.dose-panel svg .grid {
-  stroke: var(--line);
-}
-
-.dose-panel svg .tick {
-  font: 9.5px var(--mono);
-  fill: var(--cream-3);
-}
-
-.dose-panel svg .fit {
-  stroke: var(--lacquer);
-  stroke-width: 1.5;
-}
-
-.dose-panel svg .whisker {
-  stroke: var(--cream-3);
-}
-
-.dose-panel svg .point {
-  fill: var(--cream);
 }
 
 .button.large {
@@ -1338,7 +1098,6 @@ details > summary:hover {
   gap: 10px;
   margin-top: 24px;
 }
-
 
 .selfcheck-panel {
   margin-top: 16px;
@@ -1562,13 +1321,6 @@ details > summary:hover {
 }
 
 /* the decision's head */
-
-.decision-title {
-  margin-top: 12px;
-  max-width: 36ch;
-  font: 600 32px/1.14 var(--sans);
-  letter-spacing: -0.005em;
-}
 
 .options-row {
   display: flex;
@@ -1808,34 +1560,6 @@ details > summary:hover {
   gap: 36px;
 }
 
-.brain-figure {
-  position: relative;
-}
-
-.brain-figure .specimen {
-  height: 440px;
-}
-
-.brain-look {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 2;
-  background: rgba(7, 8, 10, 0.6);
-}
-
-.brain-figure figcaption {
-  margin-top: 8px;
-  color: var(--cream-3);
-  font-size: 12px;
-}
-
-.brain-lede {
-  font-size: 15.5px;
-  line-height: 1.6;
-  color: var(--cream-2);
-}
-
 .engaged {
   margin: 14px 0 18px;
   border-top: 1px solid var(--line);
@@ -1846,15 +1570,6 @@ details > summary:hover {
   gap: 2px;
   padding: 11px 0;
   border-bottom: 1px solid var(--line);
-}
-
-.engaged-name {
-  font: 500 16px/1.2 var(--sans);
-}
-
-.engaged-role {
-  color: var(--cream-3);
-  font-size: 13.5px;
 }
 
 .agree {
@@ -1868,36 +1583,8 @@ details > summary:hover {
   color: var(--cream-3);
 }
 
-.caveat {
-  margin-top: 12px;
-  padding-left: 12px;
-  border-left: 1px solid var(--line-2);
-  color: var(--cream-3);
-  font-size: 12.5px;
-  line-height: 1.55;
-}
-
 .tech {
   margin-top: 20px;
-}
-
-.tech-body {
-  display: grid;
-  gap: 12px;
-  margin-top: 12px;
-  padding-left: 16px;
-  border-left: 1px solid var(--line);
-}
-
-.tech-row {
-  display: grid;
-  grid-template-columns: 100px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-}
-
-.tech-body h4 {
-  margin-top: 6px;
 }
 
 .findings {
@@ -2123,69 +1810,6 @@ details > summary:hover {
   margin-top: 18px;
 }
 
-.verdict-block {
-  padding-bottom: 30px;
-  border-bottom: 1px solid var(--line);
-}
-
-.verdict-line {
-  font: 600 29px/1.15 var(--sans);
-  max-width: 32ch;
-}
-
-.support {
-  display: grid;
-  gap: 10px;
-  margin-top: 22px;
-  max-width: 860px;
-}
-
-.support li {
-  display: grid;
-  grid-template-columns: minmax(160px, 260px) minmax(80px, 1fr) 150px 44px;
-  align-items: center;
-  gap: 16px;
-}
-
-.support .option {
-  font-size: 15px;
-  color: var(--cream-2);
-}
-
-.support li.lead .option {
-  color: var(--cream);
-  font-weight: 500;
-}
-
-.support .track {
-  height: 8px;
-  background: var(--line);
-}
-
-.support .track span {
-  display: block;
-  height: 100%;
-  background: var(--cream-3);
-}
-
-.support li.lead .track span {
-  background: var(--cream);
-}
-
-.support .who {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.support .who > * + * {
-  margin-left: -6px;
-}
-
-.support .tally {
-  text-align: right;
-  color: var(--cream-2);
-}
-
 .synthesis-overview {
   margin-top: 24px;
   max-width: 76ch;
@@ -2380,34 +2004,6 @@ details > summary:hover {
 
 /* tipping points */
 
-.tipping-setup {
-  display: grid;
-  gap: 22px;
-  padding: 22px 24px;
-  border: 1px solid var(--line-2);
-}
-
-.tip-field .eyebrow {
-  margin-bottom: 10px;
-}
-
-.tip-members {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tip-members .pick {
-  width: 230px;
-}
-
-.tip-keys {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
 .key {
   display: inline-flex;
   align-items: center;
@@ -2430,80 +2026,6 @@ details > summary:hover {
   border-color: var(--cream);
   color: var(--navy-900);
   font-weight: 500;
-}
-
-.dot-mark {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--lacquer);
-}
-
-.dot-mark.inline {
-  vertical-align: 1px;
-}
-
-.tip-result {
-  margin-top: 26px;
-  padding-top: 22px;
-  border-top: 1px solid var(--line);
-}
-
-.tip-result header {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-}
-
-.tip-result h3 {
-  font: 500 18px/1.2 var(--sans);
-}
-
-.flip-line,
-.hold-line {
-  margin-top: 4px;
-  font-size: 15px;
-}
-
-.flip-line {
-  color: var(--cream);
-}
-
-.hold-line {
-  color: var(--cream-2);
-}
-
-.flip-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0;
-  margin: 18px 0 14px;
-  border: 1px solid var(--line-2);
-}
-
-.flip-strip > div {
-  display: grid;
-  gap: 4px;
-  padding: 14px 16px;
-  border-right: 1px solid var(--line);
-}
-
-.flip-strip > div:last-child {
-  border-right: 0;
-}
-
-.flip-strip strong {
-  font: 500 14px/1.3 var(--sans);
-}
-
-.flip-strip .flip {
-  background: rgba(224, 119, 77, 0.12);
-  box-shadow: inset 3px 0 0 var(--lacquer);
-}
-
-.tip-result details .note {
-  margin-top: 10px;
 }
 
 /* the record */
@@ -2541,16 +2063,6 @@ details > summary:hover {
   grid-template-columns: minmax(0, 1fr) 300px;
   gap: 52px;
   padding-top: 40px;
-}
-
-.talk-main {
-  min-width: 0;
-  max-width: 740px;
-}
-
-.talk .decision-title {
-  font-size: 34px;
-  max-width: 30ch;
 }
 
 .stage-rail {
@@ -2866,17 +2378,6 @@ details > summary:hover {
 
 /* the side of the dialogue: working notes, other minds, biases */
 
-.talk-side {
-  position: sticky;
-  top: calc(var(--header) + 70px);
-  align-self: start;
-  display: grid;
-  gap: 16px;
-  max-height: calc(100vh - var(--header) - 90px);
-  overflow-y: auto;
-  scrollbar-width: thin;
-}
-
 .notes,
 .minds,
 .hint {
@@ -3002,22 +2503,9 @@ details > summary:hover {
   gap: 10px;
 }
 
-.minds-faces {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.minds-faces > * + * {
-  margin-left: -6px;
-}
-
 .minds-faces .waiting,
 .member.waiting .face {
   animation: breathe 1.8s ease-in-out infinite;
-}
-
-.minds-verdict {
-  font: 500 14px/1.35 var(--sans);
 }
 
 .minds .button,
@@ -3307,39 +2795,10 @@ details > summary:hover {
   height: 420px;
 }
 
-.avatar-head {
-  grid-template-columns: 320px minmax(0, 1fr);
-}
-
 .role {
   margin-top: 2px;
   color: var(--cream-3);
   font-size: 13.5px;
-}
-
-.avatar-head .role {
-  margin: -4px 0 12px;
-  font-size: 15px;
-}
-
-.medallion .face {
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.medallion:hover .face,
-.medallion.on .face {
-  transform: translateY(-2px);
-}
-
-.medallion.on .face {
-  box-shadow: 0 0 0 2px var(--cream);
-}
-
-.medallion span small {
-  display: block;
-  margin-top: 2px;
-  color: var(--cream-3);
-  font-size: 10.5px;
 }
 
 .look-picker {
@@ -3416,18 +2875,10 @@ details > summary:hover {
 }
 
 @media (max-width: 1100px) {
-  .decide-app {
-    grid-template-columns: minmax(0, 1fr);
-  }
 
   .talk {
     grid-template-columns: minmax(0, 1fr);
     gap: 28px;
-  }
-
-  .talk-side {
-    position: static;
-    max-height: none;
   }
 
   .conclusion-grid {
@@ -3449,45 +2900,8 @@ details > summary:hover {
     --gutter: 16px;
   }
 
-  .masthead {
-    grid-template-columns: auto 1fr;
-    gap: 12px;
-  }
-
-  .modes {
-    gap: 16px;
-    justify-self: end;
-  }
-
-  .modes button {
-    font-size: 17px;
-  }
-
-  .claude-button {
-    display: none;
-  }
-
   .home {
     padding-top: 36px;
-  }
-
-  .home-head h1 {
-    font-size: 44px;
-  }
-
-  .bar-question {
-    font-size: 22px;
-    padding: 16px 16px 8px;
-  }
-
-  .bar-row {
-    grid-template-columns: minmax(0, 1fr);
-    padding: 8px 16px;
-  }
-
-  .bar-foot {
-    flex-wrap: wrap;
-    padding: 12px 16px;
   }
 
   .pulls,
@@ -3510,11 +2924,6 @@ details > summary:hover {
 
   .at-play .feature-reason {
     grid-column: 2;
-  }
-
-  .decision-title,
-  .talk .decision-title {
-    font-size: 28px;
   }
 
   .turn.latest .question {
@@ -3561,15 +2970,6 @@ details > summary:hover {
 
   .modal-person {
     height: 52vh;
-  }
-
-  .support li {
-    grid-template-columns: minmax(0, 1fr) 44px;
-  }
-
-  .support .track,
-  .support .who {
-    display: none;
   }
 }
 
@@ -3628,10 +3028,6 @@ details > summary:hover {
   .move,
   .panel-progress {
     background: none !important;
-  }
-
-  .decide-app {
-    display: block;
   }
 
   .stage {
@@ -4634,44 +4030,6 @@ button.rc-item:hover {
   display: inline-flex;
 }
 
-.mini-stages {
-  display: grid;
-  gap: 6px;
-  justify-self: start;
-  padding-left: 12px;
-}
-
-.mini-stages li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--fg-4);
-  font: 500 13px var(--sans);
-}
-
-.mini-stages .dot {
-  width: 8px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.16);
-}
-
-.mini-stages li.done {
-  color: var(--fg-3);
-}
-
-.mini-stages li.done .dot {
-  background: var(--blue);
-}
-
-.mini-stages li.now {
-  color: #fff;
-}
-
-.mini-stages li.now .dot {
-  background: var(--blue-2);
-  box-shadow: 0 0 0 4px rgba(76, 141, 255, 0.25), 0 0 12px rgba(76, 141, 255, 0.8);
-}
-
 .mini-check {
   display: grid;
   gap: 12px;
@@ -4905,16 +4263,6 @@ button.rc-item:hover {
   margin-top: 22px;
 }
 
-.dossier-brain .brain-box {
-  height: 560px;
-  border-radius: var(--r-md);
-  overflow: hidden;
-}
-
-.dossier-brain .note {
-  margin-top: 12px;
-}
-
 .pattern-head .person-controls,
 .pattern-head .person-hint {
   display: none;
@@ -5040,26 +4388,8 @@ button.rc-item:hover {
   font: 600 11px var(--sans);
 }
 
-.decision-title {
-  font: 600 34px/1.18 var(--sans);
-  letter-spacing: -0.025em;
-  text-wrap: balance;
-}
-
-.talk .decision-title {
-  font-size: 32px;
-}
-
 .option-pill {
   border-radius: var(--r-sm);
-}
-
-.talk-side > * {
-  padding: 18px;
-  border-radius: var(--r-md);
-  background: var(--card);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: var(--card-shadow);
 }
 
 .sheet {
@@ -5226,7 +4556,6 @@ button.rc-item:hover {
   .chip-input {
     min-width: 0;
   }
-
 
   .block {
     padding-top: 100px;
@@ -5749,49 +5078,8 @@ button.rc-item:hover {
 
 /* the decision: the current element's work behind the title, and the pattern it holds */
 
-.decision-head {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  align-items: flex-end;
-  min-height: 250px;
-  margin-top: 24px;
-  padding: 40px 32px 28px;
-  overflow: hidden;
-  border-radius: var(--r-xl);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: #0a0b0d;
-}
-
-.decision-head > .stage-art {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-}
-
-.decision-head::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, rgba(7, 8, 10, 0.94) 0%, rgba(7, 8, 10, 0.72) 50%, rgba(7, 8, 10, 0.2) 100%),
-    linear-gradient(0deg, rgba(7, 8, 10, 0.75), rgba(7, 8, 10, 0) 65%);
-}
-
-.decision-head-text {
-  position: relative;
-  max-width: 640px;
-}
-
 .talk {
   padding-top: 0;
-}
-
-.talk-side {
-  top: calc(var(--header) + 76px);
-  margin-top: 24px;
 }
 
 .turn-meta .for-pattern {
@@ -5814,26 +5102,6 @@ button.rc-item:hover {
   align-items: center;
   gap: 8px;
   font: 400 13.5px var(--sans);
-}
-
-.held-mark {
-  display: grid;
-  place-items: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 5px;
-  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.25);
-  color: #fff;
-  font: 700 10px/1 var(--sans);
-}
-
-.held li.asked .held-mark {
-  background: var(--blue);
-  box-shadow: none;
-}
-
-.held-name {
-  color: var(--fg);
 }
 
 .held-state {
@@ -5889,14 +5157,9 @@ button.rc-item:hover {
     grid-column: 1 / -1;
   }
 
-
   .pattern-notes li {
     grid-template-columns: minmax(0, 1fr);
     gap: 2px;
-  }
-
-  .decision-head {
-    padding: 28px 18px 20px;
   }
 }
 
@@ -6107,11 +5370,6 @@ button.rc-item:hover {
   font: 500 13.5px var(--sans);
 }
 
-.passage-label .numeral {
-  color: var(--blue-2);
-  font: 400 22px var(--display);
-}
-
 /* biases: the battle of gods and titans, dissolved behind the window */
 
 .biases-stage {
@@ -6229,7 +5487,637 @@ button.rc-item:hover {
   }
 }
 
-
 .quote-band blockquote {
   margin: 0;
+}
+
+/* ======================================================================================
+   The decision room. The dialogue sits at the centre in the same window as the home page's
+   composer; you are on its left (your leanings and the working notes), the minds you can bring
+   to the table on its right. The stage's work dissolves behind the title, as on the home page.
+   ====================================================================================== */
+
+.decision-page.container {
+  max-width: 1400px;
+}
+
+.room-head {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-height: 300px;
+  padding: 56px 0 24px;
+}
+
+.room-head > .band-art {
+  --fade-x: linear-gradient(90deg, transparent 0%, #000 55%);
+  --fade-y: linear-gradient(180deg, transparent 0%, #000 30%, #000 60%, transparent 100%);
+  width: 62%;
+}
+
+.room-head-text {
+  position: relative;
+  max-width: 760px;
+}
+
+.room-title {
+  max-width: 24ch;
+  margin-top: 10px;
+  color: #fff;
+  font: 400 clamp(34px, 4.2vw, 56px)/1.04 var(--display);
+  letter-spacing: -0.8px;
+  text-wrap: balance;
+}
+
+.room-head .options-row {
+  margin-top: 16px;
+}
+
+.room-head .stage-rail {
+  margin: 18px 0 0;
+}
+
+.room {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) 320px;
+  grid-template-areas: "you talk minds";
+  gap: 28px;
+  align-items: start;
+  padding-top: 18px;
+}
+
+.room-you {
+  grid-area: you;
+}
+
+.room-talk {
+  grid-area: talk;
+  min-width: 0;
+}
+
+.room-minds {
+  grid-area: minds;
+}
+
+.room-you,
+.room-minds {
+  position: sticky;
+  top: calc(var(--header) + 76px);
+  display: grid;
+  gap: 16px;
+  max-height: calc(100vh - var(--header) - 96px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+/* the dialogue window */
+
+.room-window {
+  overflow: clip;
+}
+
+.room-window-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 52px;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--fg-3);
+  font: 500 13px var(--sans);
+}
+
+.room-window-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.room-window-body {
+  padding: 8px 26px 0;
+}
+
+.room-window-body > .conclusion {
+  margin: 18px 0 8px;
+}
+
+.room-window .dialogue {
+  padding-bottom: 0;
+}
+
+.room-window .thread {
+  padding-top: 18px;
+}
+
+.room-window .answer-box {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin: 18px -26px 0;
+  padding: 14px 26px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  background: rgba(14, 15, 17, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 -18px 40px rgba(7, 8, 10, 0.6);
+}
+
+.room-window .answer-box textarea {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 6px 0;
+  font-size: 16px;
+}
+
+.room-window .answer-box textarea:focus {
+  box-shadow: none;
+}
+
+.room-window .start-dialogue {
+  padding: 28px 0 30px;
+}
+
+.room-window .transcript {
+  margin: 6px 0 22px;
+}
+
+/* rails */
+
+.rail-card,
+.minds-rail {
+  padding: 16px;
+  border-radius: var(--r-md);
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--card-shadow);
+}
+
+.room-you .notes {
+  border-radius: var(--r-md);
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--card-shadow);
+}
+
+.rail-head h3 {
+  color: var(--fg);
+  font: 600 14px var(--sans);
+}
+
+.rail-head p {
+  margin-top: 4px;
+  color: var(--fg-3);
+  font: 400 12.5px/1.5 var(--sans);
+}
+
+.you-card .held {
+  margin-top: 12px;
+}
+
+.you-card .held li {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.you-card .held li.asked .held-state {
+  color: var(--blue-2);
+}
+
+.you-card .text-button {
+  margin-top: 10px;
+}
+
+/* attitudes: a mind's pronounced leanings, as quiet chips */
+
+.attitudes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.attitude {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: var(--fg-2);
+  font: 500 11.5px var(--sans);
+  white-space: nowrap;
+}
+
+.attitude.clear {
+  background: rgba(76, 141, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(76, 141, 255, 0.3);
+  color: var(--blue-3);
+}
+
+.attitude.none {
+  color: var(--fg-4);
+}
+
+/* the minds at the table */
+
+.mind-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.mind {
+  padding: 8px 8px 10px;
+  border-radius: var(--r);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mind:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.mind.on {
+  background: rgba(76, 141, 255, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(76, 141, 255, 0.35);
+}
+
+.mind-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mind-pick {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mind-pick:disabled {
+  cursor: default;
+}
+
+.mind-face {
+  position: relative;
+  flex: none;
+  border-radius: 50%;
+}
+
+.mind-face.busy::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--blue-2);
+  animation: spin 0.9s linear infinite;
+}
+
+.mind-face.done::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--green);
+}
+
+.mind-id {
+  min-width: 0;
+  display: grid;
+  line-height: 1.3;
+}
+
+.mind-id strong {
+  overflow: hidden;
+  color: var(--fg);
+  font: 600 13.5px var(--sans);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mind-id small {
+  overflow: hidden;
+  color: var(--fg-4);
+  font: 400 12px var(--sans);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mind-check {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.22);
+}
+
+.mind.on .mind-check {
+  background: var(--blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat;
+  box-shadow: none;
+}
+
+.mind-more {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--fg-4);
+  font: 500 16px/1 var(--sans);
+  cursor: pointer;
+}
+
+.mind-more:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--fg);
+}
+
+.mind .attitudes {
+  margin: 8px 0 0 50px;
+}
+
+.mind-take {
+  margin: 10px 0 0 50px;
+  color: var(--fg-2);
+  font: 400 12.5px/1.5 var(--sans);
+}
+
+.take-choice {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--blue-3);
+  font-weight: 600;
+}
+
+.mind-detail {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0 50px;
+  color: var(--fg-3);
+  font: 400 12.5px/1.5 var(--sans);
+}
+
+.mind-detail .kicker {
+  display: block;
+  color: var(--fg-4);
+  font: 600 10.5px/1.6 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rail-foot {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.button.block {
+  width: 100%;
+  justify-content: center;
+}
+
+.rail-foot .fine {
+  color: var(--fg-4);
+  font: 400 11.5px/1.5 var(--sans);
+}
+
+.bias-list {
+  display: grid;
+  gap: 2px;
+  margin: 10px 0 8px;
+}
+
+.bias-list button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 6px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--fg);
+  font: 500 13px var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+
+.bias-list button:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.bias-list .rc-tag {
+  margin-left: auto;
+}
+
+/* the minds on the home page: their attitudes in full, beside the person */
+
+.dossier-side .attitudes {
+  margin: 4px 0 10px;
+}
+
+.dossier-attitudes {
+  display: grid;
+  gap: 26px;
+  align-content: start;
+}
+
+.dossier-attitudes .label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.dossier-attitudes .values-list {
+  margin-top: 12px;
+}
+
+/* the brain atlas: a reference, apart from the dialogue */
+
+.atlas-page {
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+.atlas-head {
+  max-width: 760px;
+}
+
+.atlas-head h1 {
+  margin-top: 18px;
+  color: #fff;
+  font: 400 clamp(44px, 6vw, 72px)/1 var(--display);
+  letter-spacing: -1px;
+}
+
+.atlas-head p {
+  margin-top: 16px;
+  color: var(--fg-3);
+  font: 400 16px/1.6 var(--sans);
+}
+
+.atlas-grid {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 36px;
+}
+
+.atlas-pick {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.atlas-pick .eyebrow + .chips {
+  margin-bottom: 14px;
+}
+
+.atlas-pick .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.atlas-pick .chip {
+  height: 28px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: var(--fg-2);
+  font: 500 12.5px var(--sans);
+  cursor: pointer;
+}
+
+.atlas-pick .chip.on {
+  background: rgba(76, 141, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(76, 141, 255, 0.4);
+  color: var(--blue-3);
+}
+
+.atlas-brain {
+  min-height: 620px;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.atlas-brain .specimen {
+  height: 640px;
+}
+
+.site-foot .text-button.quiet {
+  color: var(--fg-4);
+}
+
+@media (max-width: 1180px) {
+  .room {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-areas:
+      "talk minds"
+      "you minds";
+  }
+
+  .room-you {
+    position: static;
+    max-height: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 860px) {
+  .room {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "talk"
+      "minds"
+      "you";
+  }
+
+  .room-minds,
+  .room-you {
+    position: static;
+    max-height: none;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .room-head {
+    min-height: 0;
+    padding-top: 220px;
+  }
+
+  .room-head > .band-art {
+    width: 100%;
+    height: 280px;
+    bottom: auto;
+    --fade-x: linear-gradient(#000, #000);
+    --fade-y: linear-gradient(180deg, transparent 0%, #000 20%, #000 50%, transparent 100%);
+  }
+
+  .room-window-body {
+    padding: 4px 16px 0;
+  }
+
+  .room-window .answer-box {
+    margin: 18px -16px 0;
+    padding: 12px 16px 14px;
+  }
+
+  .atlas-grid,
+  .dossier-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .atlas-brain .specimen {
+    height: 460px;
+  }
+}
+
+/* the room uses the full width; inside its window the decision lies flat, in the serif */
+
+.decision-page .workspace {
+  max-width: none;
+}
+
+.room-head > .band-art {
+  --fade-x: linear-gradient(90deg, transparent 0%, #000 45%, #000 78%, transparent 100%);
+}
+
+.room-window .conclusion {
+  margin: 14px 0 8px;
+  padding: 18px 0 8px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.room-window .conclusion .statement {
+  max-width: 26ch;
+  color: #fff;
+  font: 400 clamp(28px, 2.6vw, 38px)/1.12 var(--display);
+  letter-spacing: -0.4px;
+}
+
+.room-window .conclusion-grid {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 22px 28px;
 }

@@ -1,77 +1,32 @@
 import { useState } from "react";
 import { api } from "../api";
-import type { Atlas } from "../atlas/load";
-import { emphasisOverlay, useConstructMaps } from "../brain/emphasis";
-import type { BrainRenderer } from "../brain/renderer";
 import { AvatarBuilder, blankAvatar } from "../components/AvatarBuilder";
+import { Attitudes } from "../components/decision/Minds";
 import { displayName, Face } from "../components/Face";
 import { Glyph } from "../components/Glyph";
 import { ScaleRow } from "../components/ScaleRow";
-import { SourceSwitch } from "../components/SourceSwitch";
-import { Specimen, type OverlaySpec } from "../components/Specimen";
 import { SHORT } from "../format";
 import { PersonViewer } from "../people/PersonViewer";
-import type { Avatar, Science, Source } from "../types";
+import type { Avatar, Science } from "../types";
 
 interface Props {
-  atlas: Atlas;
   science: Science;
-  renderer: BrainRenderer;
   avatars: Avatar[];
   onAvatars: (avatars: Avatar[]) => void;
+  onAtlas: () => void;
 }
 
-/** Cognitive patterns: simulated decision-makers, each defined by eight tendencies. */
-export function Patterns({ atlas, science, renderer, avatars, onAvatars }: Props) {
+/** Other minds: simulated decision-makers, each a whole set of attitudes. */
+export function Patterns({ science, avatars, onAvatars, onAtlas }: Props) {
   const [selectedId, setSelectedId] = useState<string>(avatars[0]?.id ?? "");
   const [draft, setDraft] = useState<Avatar | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [source, setSource] = useState<Source>("neuroquery");
-  const [threshold, setThreshold] = useState(3.1);
-  const [focus, setFocus] = useState<string | null>(null); // a dimension whose construct map is shown
-  const maps = useConstructMaps(atlas, science, source);
 
   const selected = avatars.find((a) => a.id === selectedId) ?? avatars[0];
-  const shown = draft ?? selected;
-
-  let overlay: OverlaySpec | null = null;
-  if (maps && shown) {
-    if (focus && maps[focus]) {
-      const d = science.dimensions.find((x) => x.id === focus)!;
-      const entry = atlas.catalogue.maps.find((m) => m.id === `construct.${focus}`)!;
-      overlay = {
-        id: `construct.${focus}.${source}`,
-        values: maps[focus],
-        max: entry.sources[source]?.display_max ?? 8,
-        title: `Construct · ${d.name}`,
-        source: `${source === "neuroquery" ? "NeuroQuery" : "Neurosynth"} map of “${source === "neuroquery" ? d.construct_map.query : d.construct_map.neurosynth.join(", ")}”`,
-        unit: "z",
-        fire: 0,
-      };
-    } else {
-      overlay = emphasisOverlay(science, shown, maps, source, threshold);
-    }
-  }
-
-  const brain = (bare: boolean) => (
-    <Specimen
-      bare={bare}
-      renderer={renderer}
-      atlas={atlas}
-      networks={science.networks}
-      layer="plain"
-      overlay={overlay}
-      threshold={threshold}
-      onThreshold={setThreshold}
-      compact
-      legendExtra={<SourceSwitch value={source} onChange={(c) => c !== "both" && setSource(c)} available={{ neuroquery: true, neurosynth: true }} both={false} />}
-    />
-  );
 
   const pick = (a: Avatar) => {
     setDraft(null);
-    setFocus(null);
     setSelectedId(a.id);
   };
 
@@ -110,7 +65,7 @@ export function Patterns({ atlas, science, renderer, avatars, onAvatars }: Props
             {a.origin === "user" && <span className="rc-tag">Yours</span>}
           </button>
         ))}
-        <button className={`pattern-chip add ${draft?.id === "new" ? "on" : ""}`} onClick={() => { setFocus(null); setDraft(blankAvatar(science)); }}>
+        <button className={`pattern-chip add ${draft?.id === "new" ? "on" : ""}`} onClick={() => setDraft(blankAvatar(science))}>
           <span className="plus">+</span>
           <span>Build your own</span>
         </button>
@@ -118,14 +73,12 @@ export function Patterns({ atlas, science, renderer, avatars, onAvatars }: Props
 
       <div className="card pattern-card">
         {draft ? (
-          <AvatarBuilder science={science} draft={draft} onChange={setDraft} onSave={save} onCancel={() => setDraft(null)} saving={saving} error={error} brain={brain(true)} />
+          <AvatarBuilder science={science} draft={draft} onChange={setDraft} onSave={save} onCancel={() => setDraft(null)} saving={saving} error={error} />
         ) : selected ? (
           <Dossier
             science={science}
             avatar={selected}
-            brain={brain(false)}
-            focus={focus}
-            onFocus={setFocus}
+            onAtlas={onAtlas}
             onEdit={() =>
               setDraft(
                 selected.origin === "user"
@@ -141,17 +94,14 @@ export function Patterns({ atlas, science, renderer, avatars, onAvatars }: Props
   );
 }
 
-function Dossier({ science, avatar, brain, focus, onFocus, onEdit, onDelete }: {
+function Dossier({ science, avatar, onAtlas, onEdit, onDelete }: {
   science: Science;
   avatar: Avatar;
-  brain: React.ReactNode;
-  focus: string | null;
-  onFocus: (id: string | null) => void;
+  onAtlas: () => void;
   onEdit: () => void;
   onDelete: (() => void) | null;
 }) {
   const values = new Map(science.personality.values.map((v) => [v.id, v]));
-  const focused = science.dimensions.find((d) => d.id === focus);
   return (
     <div className="dossier-grid">
       <div className="dossier-side">
@@ -164,76 +114,12 @@ function Dossier({ science, avatar, brain, focus, onFocus, onEdit, onDelete }: {
           </div>
         </header>
         <p className="summary">{avatar.summary}</p>
-
+        <div className="attitudes">
+          <Attitudes science={science} avatar={avatar} limit={8} />
+        </div>
         <div className="profile-row">
           <Glyph scores={science.dimensions.map((d) => avatar.dimensions[d.id].value)} size={150} rings={5} labels={science.dimensions.map((d) => SHORT[d.id] ?? d.name)} />
         </div>
-        <h4 className="label">Eight tendencies · 0–10 · click one to see its brain map</h4>
-        <div className="scales">
-          {science.dimensions.map((d) => (
-            <ScaleRow
-              key={d.id}
-              name={d.name}
-              value={avatar.dimensions[d.id].value}
-              low={d.low_pole}
-              high={d.high_pole}
-              title={d.definition}
-              active={focus === d.id}
-              onClick={() => onFocus(focus === d.id ? null : d.id)}
-            />
-          ))}
-        </div>
-
-        {(avatar.personality || avatar.context || avatar.voice) && (
-          <details className="more">
-            <summary>Personality, values and situation</summary>
-            {avatar.personality && (
-              <>
-                <div className="scales">
-                  {science.personality.traits.map((t) => (
-                    <ScaleRow key={t.id} name={t.name} value={avatar.personality!.traits[t.id].value} low={t.low_pole} high={t.high_pole} title={t.definition} />
-                  ))}
-                </div>
-                {avatar.personality.values.length > 0 && (
-                  <div className="values-list">
-                    {avatar.personality.values.map((v) => (
-                      <span key={v} className="value-chip" title={values.get(v)?.definition}>
-                        {values.get(v)?.name}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-            <dl className="facts-list situation">
-              {avatar.context?.goals.length ? (
-                <>
-                  <dt>Goals</dt>
-                  <dd>{avatar.context.goals.join("; ")}</dd>
-                </>
-              ) : null}
-              {avatar.context?.constraints.length ? (
-                <>
-                  <dt>Constraints</dt>
-                  <dd>{avatar.context.constraints.join("; ")}</dd>
-                </>
-              ) : null}
-              {avatar.priorities.length ? (
-                <>
-                  <dt>Priorities</dt>
-                  <dd>{avatar.priorities.join(", ")}</dd>
-                </>
-              ) : null}
-              {avatar.voice && (
-                <>
-                  <dt>Voice</dt>
-                  <dd>{avatar.voice}</dd>
-                </>
-              )}
-            </dl>
-          </details>
-        )}
-
         <div className="pattern-actions">
           <button className="button" onClick={onEdit}>
             {avatar.origin === "user" ? "Edit" : "Make a variant"}
@@ -246,19 +132,73 @@ function Dossier({ science, avatar, brain, focus, onFocus, onEdit, onDelete }: {
         </div>
       </div>
 
-      <div className="dossier-brain">
-        <div className="brain-box">{brain}</div>
+      <div className="dossier-attitudes">
+        <section>
+          <h4 className="label">How this mind decides · 0–10</h4>
+          <div className="scales">
+            {science.dimensions.map((d) => (
+              <ScaleRow key={d.id} name={d.name} value={avatar.dimensions[d.id].value} low={d.low_pole} high={d.high_pole} title={d.definition} />
+            ))}
+          </div>
+        </section>
+
+        {avatar.personality && (
+          <section>
+            <h4 className="label">Personality · Big Five, 5 = average</h4>
+            <div className="scales">
+              {science.personality.traits.map((t) => (
+                <ScaleRow key={t.id} name={t.name} value={avatar.personality!.traits[t.id].value} low={t.low_pole} high={t.high_pole} title={t.definition} />
+              ))}
+            </div>
+            {avatar.personality.values.length > 0 && (
+              <div className="values-list">
+                {avatar.personality.values.map((v) => (
+                  <span key={v} className="value-chip" title={values.get(v)?.definition}>
+                    {values.get(v)?.name}
+                  </span>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {(avatar.context?.goals.length || avatar.context?.constraints.length || avatar.priorities.length || avatar.voice) ? (
+          <section>
+            <h4 className="label">Situation</h4>
+            <dl className="facts-list situation">
+              {avatar.context?.goals.length ? (
+                <>
+                  <dt>Wants</dt>
+                  <dd>{avatar.context.goals.join("; ")}</dd>
+                </>
+              ) : null}
+              {avatar.context?.constraints.length ? (
+                <>
+                  <dt>Bound by</dt>
+                  <dd>{avatar.context.constraints.join("; ")}</dd>
+                </>
+              ) : null}
+              {avatar.priorities.length ? (
+                <>
+                  <dt>Puts first</dt>
+                  <dd>{avatar.priorities.join(", ")}</dd>
+                </>
+              ) : null}
+              {avatar.voice && (
+                <>
+                  <dt>Voice</dt>
+                  <dd>{avatar.voice}</dd>
+                </>
+              )}
+            </dl>
+          </section>
+        ) : null}
+
         <p className="note">
-          {focused ? (
-            <>
-              <strong>{focused.name}.</strong> {focused.construct_map.note} Click it again for the whole pattern.
-            </>
-          ) : (
-            <>
-              <strong>Where this pattern's tendencies are studied.</strong> Published brain maps of the eight tendencies, weighted by how far
-              this pattern departs from average. It shows research on the average brain, not this person's brain.
-            </>
-          )}
+          Attitudes are set by hand, from the decision research behind each tendency; the mind is simulated by Claude and predicts no real person.{" "}
+          <button className="text-button" onClick={onAtlas}>
+            Where research studies these tendencies: the brain atlas
+          </button>
         </p>
       </div>
     </div>

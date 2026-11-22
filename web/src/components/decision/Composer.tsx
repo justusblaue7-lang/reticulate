@@ -189,7 +189,7 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
         <div className="selfcheck-panel">
           <header>
             <h3>Rate it yourself</h3>
-            <p>Answer for your decision as you see it. You get the biases and brain research that match, with no AI involved.</p>
+            <p>Answer for your decision as you see it. You get the documented biases that match, with no AI involved.</p>
           </header>
           <SelfCheck science={science} levels={levels} onChange={(id, l) => setLevels({ ...levels, [id]: l })} />
           <div className="selfcheck-foot">

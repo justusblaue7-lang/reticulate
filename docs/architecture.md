@@ -70,7 +70,7 @@ analyse (1 call): frame (options, facts, unknowns, factors) + anatomy (18 featur
 signature (deterministic): composite maps per source, agreement, structures, networks,
 dimension relevance, decoding, mechanisms, findings
      ▼
-panel: perspective(avatar) × replicates with the neural context ─▶ compare ─▶ synthesis
+panel: perspective(avatar) × replicates with the research context ─▶ compare ─▶ synthesis
      ▼
 tipping points: sensitivity(avatar, dimension or trait, levels) on the same frame
 ```
@@ -116,19 +116,21 @@ rendered into a prompt; the simulation sees the role (`name`) only.
   either the home or an open decision (`#decide/<id>[/<tab>]`). `views/Home.tsx` is the
   home: the command window (`Composer`: the decision, options, details, recent decisions,
   examples), how it works, biases with countermoves, and `views/Patterns.tsx` (the cognitive
-  patterns, formerly the Avatars mode: a strip of minds, one dossier with its brain map, the
-  builder). The standalone Brain-atlas mode was removed in 0.6; the brain stays in the
-  decision's "In the brain" tab and in each pattern. An open decision has
-  four tabs: Dialogue (stage rail, thread, answer box, working notes, the conclusion; other
-  minds and biases at the side), Biases (watch-outs, what's at play), Other minds (panel,
-  what would flip it) and In the brain.
+  patterns: a strip of minds, one dossier with all its attitudes, the builder). An open
+  decision is a room in three columns: you (your leanings and whether each came up, the
+  working notes), the dialogue in the command window (stage rail, thread, a pinned answer
+  bar, the conclusion), and the minds at the table (`Minds`: each with its attitudes,
+  pickable, its take once asked) with the biases in brief. Two more tabs: Biases (watch-outs,
+  what's at play) and Their reasoning (the panel in full).
+- `views/AtlasView.tsx` (`#atlas`, from the footer, ⌘K or a mind's dossier): the brain atlas
+  of the research literature, loaded only when opened. Since 0.9 no decision, mind or prompt
+  uses brain maps.
 - `components/decision/`: `Dialogue`, `Notes`, `Conclusion`, `Composer`, `SelfCheck`,
-  `WatchOuts`, `AtPlay`, `Panel`, `Tipping`, `Brain`; `model.ts` holds the shared arithmetic
-  (verdict, cost estimates, the suggested panel).
+  `WatchOuts`, `AtPlay`, `Minds`, `Panel`; `model.ts` holds the shared arithmetic (cost
+  estimates, the suggested table).
 - `people/`: `PersonViewer` (3D), `Bake` (/?people-bake); `components/Face.tsx` shows a
   person's still, `PersonModal.tsx` one person in 3D over the page.
-- `brain/renderer.ts`: imperative three.js renderer for the atlas; one instance serves all
-  views.
+- `brain/renderer.ts`: imperative three.js renderer for the atlas view.
 - The art: `tools/art/build.py` turns `socratic art/` into `web/public/art/<slug>.webp` and
   `-sm.webp`; `src/art.ts` lists each work (alt text, credit, crop, and the work of each
   element of decision quality); `components/Art.tsx` shows one, tinted into the palette.
@@ -161,7 +163,7 @@ rendered into a prompt; the simulation sees the role (`name`) only.
 | GET | `/api/decisions/{id}/progress` | calls done of planned while a panel or tipping run is in flight; else null |
 | PUT | `/api/decisions/{id}/anatomy` | re-rate; recomputes the signature |
 | POST | `/api/decisions/{id}/panel` | `{profiles[1–8], replicates[1–5], neural_context}` |
-| POST | `/api/decisions/{id}/tipping` | `{profile, keys[1–3], values, replicates}` |
+| POST | `/api/decisions/{id}/tipping` | `{profile, keys[1–3], values, replicates}`; research use only, not in the interface |
 
 Without a key, the dialogue, analysis, panel and tipping answer 503 and point to "Connect
 Claude"; the self-rated anatomy, watch-outs, signature, avatars and atlas work without it.

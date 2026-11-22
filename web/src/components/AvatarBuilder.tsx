@@ -1,8 +1,7 @@
 // Build or edit an avatar: who it is shown as (a 3D person and a name), its role and
-// situation, personality (Big Five and values) and the eight decision dimensions (with their
-// brain map).
+// situation, personality (Big Five and values) and the eight decision dimensions.
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { loadCatalogue, type PersonAsset } from "../people/model";
 import { PersonViewer } from "../people/PersonViewer";
 import { portraitUrl } from "../people/model";
@@ -120,10 +119,9 @@ interface Props {
   onCancel: () => void;
   saving: boolean;
   error: string | null;
-  brain: ReactNode; // the live construct-emphasis map
 }
 
-export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, saving, error, brain }: Props) {
+export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, saving, error }: Props) {
   const personality = draft.personality ?? blankAvatar(science).personality!;
   const context = draft.context ?? { goals: [], constraints: [], notes: "" };
   const person = draft.person ?? { name: "", look: "" };
@@ -142,7 +140,6 @@ export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, savi
       <div className="builder-preview">
         <PersonViewer look={person.look || null} name={person.name || draft.name} className="builder-person" />
         <Glyph scores={science.dimensions.map((d) => draft.dimensions[d.id].value)} size={150} rings={5} labels={science.dimensions.map((d) => SHORT[d.id] ?? d.name)} />
-        <div className="brain-box">{brain}</div>
         <div className="builder-actions">
           <button className="button primary" disabled={saving || draft.name.trim().length < 2} onClick={() => onSave()}>
             {saving ? "Saving…" : "Save pattern"}
@@ -202,7 +199,7 @@ export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, savi
 
         <fieldset className="control-group">
           <legend>Personality</legend>
-          <p className="note">Big Five traits, 5 = population average; measurable with the BFI-2 (Soto &amp; John, 2017). No brain map: structural brain–personality associations do not replicate in large samples (Avinun et al., 2020).</p>
+          <p className="note">Big Five traits, 5 = population average; measurable with the BFI-2 (Soto &amp; John, 2017).</p>
           <div className="controls-grid">
             {science.personality.traits.map((t) => (
               <Slider key={t.id} label={t.name} value={personality.traits[t.id].value} low={t.low_pole} high={t.high_pole} onChange={(v) => setTrait(t.id, v)} />
@@ -222,7 +219,7 @@ export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, savi
 
         <fieldset className="control-group">
           <legend>Decision profile</legend>
-          <p className="note">Eight decision tendencies, 5 = no leaning. The brain map beside the person follows them.</p>
+          <p className="note">Eight decision tendencies, 5 = no leaning. The outline beside the person follows them.</p>
           <div className="controls-grid">
             {science.dimensions.map((d) => (
               <Slider key={d.id} label={d.name} value={draft.dimensions[d.id].value} low={d.low_pole} high={d.high_pole} onChange={(v) => setDim(d.id, v)} />

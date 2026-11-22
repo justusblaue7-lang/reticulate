@@ -109,8 +109,9 @@ effect shows a monotone, replicable change in the theoretically expected factor 
 unrelated factors stay flat. Report slopes with standard errors and replicate counts; report
 the model, effort and prompt version from the run log.
 
-The neural context is background, not ground truth: it tells the simulated decision-maker which
-mechanisms research documents for this kind of decision. Whether it changes the reasoning, and
+The research context (stored as `neural_context` for older records) is background, not ground
+truth: it tells the simulated decision-maker which mechanisms behavioural research documents
+for this kind of decision. Since 0.9 it carries no brain regions. Whether it changes the reasoning, and
 whether that makes the simulation more faithful to people, is open; each panel records whether
 the context was on, so the two conditions can be compared.
 
@@ -132,3 +133,19 @@ Decisions, dialogues and runs are stored locally in `data/` and are not committe
 Files under `engine/reticulate/data/` are science. Changes need review, and the loader's
 cross-reference checks and the tests must pass. When in doubt, rate evidence or map quality
 lower.
+
+## No brain in the decision (0.9)
+
+Brain maps describe where published studies report activity on average, across people. They
+cannot say how a particular person decides or why, and reading a decision's "neural signature"
+from them invited exactly that reading. Since 0.9:
+
+- No decision, mind, dialogue or prompt uses brain maps. The decision's brain tab, each mind's
+  brain map, the brain regions in the panel's briefing and the avatar "construct emphasis"
+  are gone.
+- The brain atlas stays as a separate reference (`#atlas`), labelled as the research
+  literature on the average brain.
+- Simulated minds are perspectives, not a sample: their choices are not counted into a
+  verdict, their self-reported confidence is not shown, and "what would flip it" (re-running
+  a mind with one tendency changed) is no longer offered in the interface. It remains a
+  research tool for the profile-fidelity study.

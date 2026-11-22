@@ -4,14 +4,14 @@ import { usd } from "../../format";
 import type { Avatar, Decision, Progress, Science } from "../../types";
 import { displayName, Face } from "../Face";
 import { PersonModal } from "../PersonModal";
-import { clock, engagedDimensions, estimate, observedPerCall, panelCalls, suggestPanel, tendencyNames, verdict } from "./model";
+import { clock, engagedDimensions, estimate, observedPerCall, panelCalls, suggestPanel, tendencyNames } from "./model";
 
 interface SetupProps {
   science: Science;
   decision: Decision;
   avatars: Avatar[];
   configured: boolean;
-  onConvene: (avatars: Avatar[], replicates: number, neural: boolean) => void;
+  onConvene: (avatars: Avatar[], replicates: number) => void;
   onConnect: () => void;
   again?: boolean;
 }
@@ -22,7 +22,6 @@ export function PanelSetup({ science, decision, avatars, configured, onConvene, 
   const [ids, setIds] = useState<string[]>(decision.panel?.profiles.map((p) => p.id) ?? suggested);
   const [picking, setPicking] = useState(false);
   const [replicates, setReplicates] = useState(decision.panel?.meta.replicates ?? 3);
-  const [neural, setNeural] = useState(true);
   const chosen = ids.map((id) => avatars.find((a) => a.id === id)).filter((a): a is Avatar => !!a);
   const cost = estimate(panelCalls(decision, chosen.length, replicates), observedPerCall(decision));
   const dims = new Map(science.dimensions.map((d) => [d.id, d.name.toLowerCase()]));
@@ -99,16 +98,12 @@ export function PanelSetup({ science, decision, avatars, configured, onConvene, 
           </span>
           <small>Several runs show how stable each answer is.</small>
         </label>
-        <label className="check" title="The panel sees which features the decision has and which mechanisms research documents for them, and judges how strongly each applies to the avatar.">
-          <input type="checkbox" checked={neural} onChange={(e) => setNeural(e.target.checked)} />
-          Brief the panel on the research behind the watch-outs
-        </label>
         <div className="go-row">
           <span className="estimate">
             {cost.calls} Claude calls · about {usd(cost.usd)} · about {cost.minutes} min
           </span>
           {configured ? (
-            <button className="button primary large" disabled={!chosen.length} onClick={() => onConvene(chosen, replicates, neural)}>
+            <button className="button primary large" disabled={!chosen.length} onClick={() => onConvene(chosen, replicates)}>
               {again ? "Ask this panel" : "Ask the panel"}
             </button>
           ) : (
@@ -161,41 +156,20 @@ export function PanelProgress({ progress, members, replicates, since }: { progre
   );
 }
 
-/** The panel's answer: verdict, voices, disagreements and the weights behind them. */
+/** What the minds said: their voices, where they disagree, and the weights behind it. Not a vote:
+ * simulated minds are perspectives to question, so their choices are not counted up. */
 export function PanelResult({ science, decision }: { science: Science; decision: Decision }) {
   const panel = decision.panel!;
   const [run, setRun] = useState(0);
   const [meet, setMeet] = useState<Avatar | null>(null);
   const n = panel.meta.replicates;
   const profiles = new Map(panel.profiles.map((p) => [p.id, p]));
-  const v = verdict(panel);
   const names = tendencyNames(science);
   const factorName = new Map(panel.space.factors.map((f) => [f.factor_id, f.name]));
 
   return (
     <div className="panel-result">
-      <div className="verdict-block">
-        <p className="verdict-line">{v.statement}</p>
-        <ul className="support">
-          {v.ranked.map((r) => (
-            <li key={r.option} className={r === v.lead && !v.tie ? "lead" : ""}>
-              <span className="option">{r.option}</span>
-              <span className="track">
-                <span style={{ width: `${(r.ids.length / v.total) * 100}%` }} />
-              </span>
-              <span className="who">
-                {r.ids.map((id) => (
-                  <Face key={id} avatar={profiles.get(id)!} size={28} />
-                ))}
-              </span>
-              <span className="mono tally">
-                {r.ids.length}/{v.total}
-              </span>
-            </li>
-          ))}
-        </ul>
-        {panel.synthesis && <p className="synthesis-overview">{panel.synthesis.overview}</p>}
-      </div>
+      {panel.synthesis && <p className="synthesis-overview">{panel.synthesis.overview}</p>}
 
       <div className="voices-head">
         <h3 className="subhead">In their words</h3>
@@ -230,12 +204,11 @@ export function PanelResult({ science, decision }: { science: Science; decision:
                 </div>
               </header>
               <p className="quote">“{view.summary}”</p>
-              <div className="voice-meta">
-                <span title="Confidence the mind reports">
-                  Confidence <span className="meter"><span style={{ width: `${view.confidence * 10}%` }} /></span> {view.confidence}/10
-                </span>
-                {n > 1 && <span title="How many runs chose this option">{stable}/{n} runs agree</span>}
-              </div>
+              {n > 1 && (
+                <div className="voice-meta">
+                  <span title="How many runs chose this option">{stable}/{n} runs agree</span>
+                </div>
+              )}
               {view.conditions.length > 0 && (
                 <p className="conditions">
                   <span className="kicker">On condition that</span>

@@ -48,6 +48,12 @@
 - [x] The dialogue holds a snapshot of the pattern from its start. For each clear leaning it asks one counterweight question where the decision touches it, gives priority to the mechanisms the leaning makes likelier, names departures from the usual leaning, asks in the person's style, and never shows scores or labels. Each question records the leaning it counterweighs; the conclusion says how the leanings showed (Claude's reading)
 - [x] The art: the works of `socratic art/`, prepared by tools/art/build.py and gathered into one passage through the Socratic method: a framed work held still while the questions pass ("I know that I don't know", then one question per element of decision quality), the current work slowly regaining its colour; *The Death of Socrates* closes it. Two framed plates with museum labels elsewhere; each element's work heads the open decision as the dialogue moves; credits on the home page
 
+**0.9 Attitudes, not brains; one room for the decision**
+- [x] Removed every brain model from the decision and the minds: the "In the brain" tab, each mind's brain map, the regions in the panel's briefing, construct emphasis. The atlas is a separate reference (#atlas), loaded only when opened
+- [x] Removed what reads as evidence but is not: the panel's vote tally, self-reported confidence, and tipping points in the interface
+- [x] The decision is a room: you on the left, the dialogue in the command window with a pinned answer bar, the minds at the table on the right, each with its attitudes and pickable; their takes appear on their cards
+- [x] Each mind's dossier shows all its attitudes: tendencies, personality, values, wants, constraints, priorities and voice
+
 ## Next, for the thesis
 
 0. **Dialogue study.** Does the dialogue improve decisions, and does holding it with the
@@ -66,8 +72,7 @@
    discounting) rate the same factors, and compare their weights with the simulated ones.
 5. **Personal profiles.** Licensed questionnaires and browser tasks produce `measured` scores
    with reliability estimates.
-6. **Fitted brain model.** HCP-based brain–behaviour models that yield `inferred`
-   characteristics with uncertainty.
+6. ~~Fitted brain model.~~ Dropped in 0.9: Reticulate does not infer attitudes from brain data.
 7. **Neural-context ablation.** Run the fidelity study with and without the neural context and
    test whether the context makes profile effects larger, more specific or more human-like.
 8. **Anatomy reliability.** Compare Claude's anatomy ratings with ratings by trained humans on

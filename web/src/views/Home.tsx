@@ -1,7 +1,5 @@
 import { forwardRef, type ReactNode } from "react";
 import { credit, type ArtSlug } from "../art";
-import type { Atlas } from "../atlas/load";
-import type { BrainRenderer } from "../brain/renderer";
 import { Art } from "../components/Art";
 import { Composer, type ComposerHandle } from "../components/decision/Composer";
 import { Kbd, MOD } from "../components/Mark";
@@ -11,9 +9,7 @@ import { Passage } from "./Passage";
 import { Patterns } from "./Patterns";
 
 interface Props {
-  atlas: Atlas;
   science: Science;
-  renderer: BrainRenderer;
   avatars: Avatar[];
   onAvatars: (avatars: Avatar[]) => void;
   pattern: PersonalPattern | null;
@@ -29,6 +25,7 @@ interface Props {
   onConnect: () => void;
   onFocus: () => void;
   onSection: (id: string) => void;
+  onAtlas: () => void;
 }
 
 /**
@@ -175,11 +172,11 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
         <header className="block-head rise">
           <h2>Minds that decide differently.</h2>
           <p>
-            Simulated decision-makers, each set by {science.dimensions.length} tendencies from decision research. Ask them about your decision;
-            what they weigh differently comes back to you as a question.
+            Each mind is a whole set of attitudes: {science.dimensions.length} decision tendencies, a personality, values, goals and constraints.
+            They sit beside your dialogue; pick who should weigh in, and what they weigh differently comes back to you as a question.
           </p>
         </header>
-        <Patterns atlas={props.atlas} science={science} renderer={props.renderer} avatars={props.avatars} onAvatars={props.onAvatars} />
+        <Patterns science={science} avatars={props.avatars} onAvatars={props.onAvatars} onAtlas={props.onAtlas} />
       </section>
 
       <section className="closing" aria-label="Socrates">

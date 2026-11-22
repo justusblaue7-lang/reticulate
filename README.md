@@ -3,11 +3,12 @@
 A decision tool built on decision science. You bring a decision; Reticulate questions it in a
 **Socratic dialogue**, one question at a time, until you know what matters to you, what you
 choose and what you will do first. Beside the dialogue it shows the documented biases that
-could pull on the decision (each with a countermove), how simulated decision-makers with
-different temperaments would weigh it, and what brain-imaging research reports for
-decisions like it.
+could pull on the decision (each with a countermove) and the minds you can bring to the
+table: simulated decision-makers, each a whole set of attitudes, whose different weighing comes
+back to you as a question. Reticulate reads nothing from brain activity; a brain atlas of the
+research literature is there to look up, apart from the dialogue.
 
-> Build 0.7. Read [docs/epistemics.md](docs/epistemics.md) before showing results to
+> Build 0.9. Read [docs/epistemics.md](docs/epistemics.md) before showing results to
 > anyone: it states what each part may and may not be taken to mean.
 
 ## Open it
@@ -19,7 +20,7 @@ opens <http://localhost:5173>. Close the Terminal window to stop.
 The dialogue, the analysis and the panel use Claude with your own Anthropic API key: click
 **Connect Claude** at the top right and paste it. Reticulate checks the key with Anthropic and
 keeps it in `engine/.env` on this computer. Without a key you can rate a decision yourself
-(18 questions) and see its biases and brain map.
+(18 questions) and see the biases that could pull on it.
 
 ## How a decision goes
 
@@ -38,12 +39,12 @@ keeps it in `engine/.env` on this computer. Without a key you can rate a decisio
 3. **Your decision.** In your own words: the choice, why, what you give up, when to look
    again, the first step as an if–then plan, the open questions to settle (a checklist),
    and how well the dialogue covered each element of decision quality.
-4. **Other minds** (optional). Five simulated decision-makers, fictional people you can turn
-   around in 3D, reason it through. What they weigh differently comes back into your
-   dialogue as a question; "What would flip it" re-runs one of them with a single tendency
-   changed.
-5. **Biases** and **In the brain** fill in by themselves: Claude's analysis runs in the
-   background while you talk.
+4. **Minds at the table** (optional), beside the dialogue. Each mind shows the attitudes it
+   reasons from (its pronounced leanings; open it for priorities, values, goals and
+   constraints). Pick who should weigh in and ask them; each one's take appears on its card,
+   and what they weigh differently comes back into your dialogue as a question. Their full
+   reasoning is under "Their reasoning". They are perspectives to question, not votes.
+5. **Biases** fill in by themselves: Claude's analysis runs in the background while you talk.
 
 Every step is saved at once. A dialogue costs about $0.04 a question (usually under $0.60 in
 total); the app states the cost before every paid step.
@@ -58,7 +59,7 @@ engine/                 Python: science data, the dialogue, decision engine, atl
   reticulate/data/      curated science (YAML): dialogue stages and moves, mechanisms,
                         decision features, dimensions, personality, regions, references
   reticulate/dialogue/  the Socratic dialogue: prompts, turns, conclusion
-  reticulate/decision/  analysis, neural signature, panel, tipping points
+  reticulate/decision/  analysis, biases from the anatomy, panel
   reticulate/library/   the eleven fictional people (personas)
   tests/                pytest suite
 web/                    React + three.js interface
@@ -114,5 +115,5 @@ References: `engine/reticulate/data/references.yaml`.
 
 - [docs/architecture.md](docs/architecture.md): components, data flow, API, storage, extension points
 - [docs/science.md](docs/science.md): the dialogue, mechanisms, avatars, the atlas, both literatures
-- [docs/epistemics.md](docs/epistemics.md): what the dialogue, the panel and the brain views may claim
+- [docs/epistemics.md](docs/epistemics.md): what the dialogue, the minds and the atlas may claim
 - [docs/roadmap.md](docs/roadmap.md): next steps toward the thesis
