@@ -203,6 +203,7 @@ export interface Status {
   claude: { configured: boolean; model: string; effort: string; dialogue_effort: string; key_hint: string | null };
   literature: boolean;
   data_dir: string;
+  trial?: { decisions: number; days: number } | null; // reticulate.space: free decisions on Reticulate's key
 }
 
 export interface Problem {
@@ -435,6 +436,7 @@ export interface Decision {
   usage: Usage;
   meta: { app_version: string; science_version: string; prompt_version: string; model: string | null; effort: string | null };
   notice: string;
+  trial_grant?: string | null; // reticulate.space: a free decision on Reticulate's key, signed with its expiry
 }
 
 export interface DecisionSummary {

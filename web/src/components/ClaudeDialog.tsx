@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { PUBLIC, api } from "../api";
+import { PUBLIC, api, freeLeft, freeOffer } from "../api";
 import type { Status } from "../types";
 
 interface Props {
@@ -46,6 +46,13 @@ export function ClaudeDialog({ status, onStatus, onClose }: Props) {
           Reticulate uses Claude ({status?.claude.model ?? "claude-haiku-5-5"}) to read your decision and to let the panel reason
           about it. You pay Anthropic directly, and Reticulate shows what every step costs.
         </p>
+        {!connected && freeOffer() && (
+          <p className="dialog-text free-note">
+            {freeLeft()
+              ? `Your first ${freeOffer()!.decisions} decisions run free on Reticulate's key: ${freeLeft()} left. After that, or to skip the limit, add your own key.`
+              : `Your ${freeOffer()!.decisions} free decisions are used. Add your own key to keep going; a decision costs a few cents on Claude Haiku.`}
+          </p>
+        )}
         {connected ? (
           <>
             <p className="dialog-text">

@@ -2,6 +2,7 @@
 
 Stateless: it stores nothing. Each visitor brings their own Anthropic key, sent with every
 request in the `x-anthropic-key` header and used for that request only, never logged or kept.
+A visitor without one gets a few free decisions on the house key (reticulate.trial).
 Their decisions, pattern and avatars live in their own browser; a request carries the
 decision it works on and gets the updated decision back, with its summary for the list.
 
@@ -17,7 +18,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from reticulate import __version__, decision, dialogue, runs
+from reticulate import __version__, decision, dialogue, runs, trial
 from reticulate import pattern as personal
 from reticulate.api import (
     AnatomyRequest,
@@ -42,16 +43,63 @@ app.add_exception_handler(EngineError, _engine_error)
 app.add_exception_handler(anthropic.APIError, _anthropic_error)
 
 NO_KEY = "Connect Claude first: add your own Anthropic API key under “Connect Claude” at the top right."
+TRIAL_USED = (
+    "Your free decisions are used up. To keep going, add your own Anthropic API key under “Connect Claude”: "
+    "it runs on your account, at a few cents a decision."
+)
+TRIAL_EXPIRED = "This free decision is past its {days} days. To go on with it, add your own Anthropic API key under “Connect Claude”."
+TRIAL_BUSY = "Too many free requests from your network just now. Wait a while, or add your own Anthropic API key under “Connect Claude”."
 
 
-def get_engine(x_anthropic_key: str | None = Header(default=None)) -> ReasoningEngine:
-    key = (x_anthropic_key or "").strip()
-    if not key.startswith("sk-ant-"):
-        raise HTTPException(401, NO_KEY)
+def make_engine(key: str) -> ReasoningEngine:
     config = settings()
     # max_retries: a visitor waits on this request, so fail fast and let them retry.
     client = anthropic.AsyncAnthropic(api_key=key, max_retries=2)
     return ClaudeEngine(model=config.model, effort=config.effort, dialogue_effort=config.dialogue_effort, client=client)
+
+
+class Claude:
+    """Which key a request runs on: the visitor's own, or the house key for a free decision."""
+
+    def __init__(self, key: str | None, ip: str):
+        key = (key or "").strip()
+        self.own = key if key.startswith("sk-ant-") else None
+        self.ip = ip
+
+    def _house(self) -> ReasoningEngine:
+        house = trial.house_key()
+        if house is None:
+            raise HTTPException(401, NO_KEY)
+        if not trial.allow(self.ip):
+            raise HTTPException(429, TRIAL_BUSY)
+        return make_engine(house)
+
+    def for_decision(self, d: Decision) -> ReasoningEngine:
+        """The visitor's key, or the house key while the decision's free grant holds."""
+        if self.own:
+            return make_engine(self.own)
+        held = trial.granted(d.id, d.trial_grant) if trial.offered() else None
+        if held is None:
+            raise HTTPException(401, NO_KEY)
+        if not held:
+            raise HTTPException(402, TRIAL_EXPIRED.format(days=trial.days()))
+        return self._house()
+
+    def for_new(self, token: str | None) -> tuple[ReasoningEngine, trial.Pass | None]:
+        """The engine for a new decision and, on the house key, the visitor's pass with it spent."""
+        if self.own:
+            return make_engine(self.own), None
+        if not trial.offered():
+            raise HTTPException(401, NO_KEY)
+        current = trial.read_pass(token)
+        if current.left <= 0:
+            raise HTTPException(402, TRIAL_USED)
+        return self._house(), trial.spend(current)
+
+
+def get_claude(request: Request, x_anthropic_key: str | None = Header(default=None)) -> Claude:
+    forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+    return Claude(x_anthropic_key, forwarded or (request.client.host if request.client else "unknown"))
 
 
 _LIBRARY = Library.load()  # the built-in personas only; a visitor's own avatars come inline
@@ -64,14 +112,22 @@ def _resolve(ref: str | CognitiveProfile) -> CognitiveProfile:
         raise HTTPException(404, f"unknown avatar '{ref}'") from None
 
 
+class TrialPass(BaseModel):
+    token: str
+    used: int
+    left: int
+
+
 class Result(BaseModel):
     decision: Decision
     summary: runs.RunSummary
+    trial: TrialPass | None = None  # the visitor's pass, when this spent a free decision
 
 
-def _result(d: Decision) -> Result:
+def _result(d: Decision, spent: trial.Pass | None = None) -> Result:
     data = d.model_dump(mode="json")
-    return Result(decision=d, summary=runs._summary(settings().data_dir / f"{d.id}.json", data))
+    p = TrialPass(token=spent.token, used=spent.used, left=spent.left) if spent else None
+    return Result(decision=d, summary=runs._summary(settings().data_dir / f"{d.id}.json", data), trial=p)
 
 
 def _apply(d: Decision, change) -> Decision:
@@ -100,6 +156,7 @@ def status() -> dict:
         },
         "literature": False,
         "data_dir": "this browser",
+        "trial": trial.offered(),
     }
 
 
@@ -191,15 +248,20 @@ class PanelOn(PanelRequest):
 
 
 @app.post("/api/decision/new")
-def new_decision(request: NewRequest, x_anthropic_key: str | None = Header(default=None)) -> Result:
+def new_decision(
+    request: NewRequest, claude: Claude = Depends(get_claude), x_reticulate_trial: str | None = Header(default=None)
+) -> Result:
     """A new decision. Rated by hand it needs no Claude; otherwise the browser asks for the
-    analysis (…/analyse) and the first question (…/reply) next."""
-    engine = get_engine(x_anthropic_key) if request.anatomy is None else None
-    held = personal.snapshot(request.pattern) if request.anatomy is None else None
-    created = decision.create(request.problem, engine, request.anatomy, held)
-    if request.anatomy is None:
-        created = created.model_copy(update={"analysis": "pending"})
-    return _result(created)
+    analysis (…/analyse) and the first question (…/reply) next. Without a key of the visitor's
+    own it is one of their free decisions, if any are left."""
+    if request.anatomy is not None:
+        return _result(decision.create(request.problem, None, request.anatomy, None))
+    engine, spent = claude.for_new(x_reticulate_trial)
+    created = decision.create(request.problem, engine, None, personal.snapshot(request.pattern))
+    update: dict = {"analysis": "pending"}
+    if spent:
+        update["trial_grant"] = trial.grant(created.id)
+    return _result(created.model_copy(update=update), spent)
 
 
 class Analysed(BaseModel):
@@ -208,10 +270,11 @@ class Analysed(BaseModel):
 
 
 @app.post("/api/decision/analyse")
-async def analyse(request: On, engine: ReasoningEngine = Depends(get_engine)) -> Analysed:
+async def analyse(request: On, claude: Claude = Depends(get_claude)) -> Analysed:
     """Claude's reading of the decision. It takes a while, and the dialogue goes on meanwhile,
     so it comes back on its own; the browser applies it to the decision as it is by then
     (…/apply-analysis). A failure comes back as words to show, as in the local app."""
+    engine = claude.for_decision(request.decision)
     try:
         return Analysed(analysis=await decision.analyse(request.decision.problem, engine))
     except Exception as exc:  # noqa: BLE001
@@ -231,7 +294,9 @@ def apply_analysis(request: ApplyAnalysis) -> Result:
 
 
 @app.post("/api/decision/reply")
-async def reply(request: ReplyOn, engine: ReasoningEngine = Depends(get_engine)) -> Result:
+async def reply(request: ReplyOn, claude: Claude = Depends(get_claude)) -> Result:
+    engine = claude.for_decision(request.decision)
+
     def answered(d: Decision) -> Decision:
         if d.dialogue is None:
             d = d.model_copy(update={"dialogue": dialogue.new_dialogue(engine, personal.snapshot(request.pattern))})
@@ -253,7 +318,9 @@ async def reply(request: ReplyOn, engine: ReasoningEngine = Depends(get_engine))
 
 
 @app.post("/api/decision/conclude")
-async def conclude(request: ConcludeOn, engine: ReasoningEngine = Depends(get_engine)) -> Result:
+async def conclude(request: ConcludeOn, claude: Claude = Depends(get_claude)) -> Result:
+    engine = claude.for_decision(request.decision)
+
     def answered(d: Decision) -> Decision:
         if d.dialogue is None or not d.dialogue.exchanges:
             raise ValueError("there is nothing to conclude yet")
@@ -289,11 +356,20 @@ def anatomy(request: AnatomyOn) -> Result:
 
 
 @app.post("/api/decision/panel")
-async def panel(request: PanelOn, engine: ReasoningEngine = Depends(get_engine)) -> Result:
+async def panel(request: PanelOn, claude: Claude = Depends(get_claude)) -> Result:
+    engine = claude.for_decision(request.decision)
     profiles = [_resolve(ref) for ref in request.profiles]
+    # On the house key: each mind once, and at most six of them.
+    free = claude.own is None
+    if free and len(profiles) > 6:
+        raise HTTPException(422, "A free decision can ask up to six minds at once.")
     try:
         result = await decision.run_panel(
-            request.decision, profiles, engine, replicates=request.replicates, neural_context=request.neural_context
+            request.decision,
+            profiles,
+            engine,
+            replicates=1 if free else request.replicates,
+            neural_context=request.neural_context,
         )
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from None

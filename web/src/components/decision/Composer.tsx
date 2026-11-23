@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
+import { freeLeft } from "../../api";
 import { leanings } from "../../pattern";
 import type { DecisionSummary, PersonalPattern, Problem, Rating, Science } from "../../types";
 import { Kbd, MOD, Mark } from "../Mark";
@@ -241,6 +242,14 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
               {selfCheck ? "Close self-check" : "Rate it myself"}
             </button>
             <span className="rc-divider" />
+            {(() => {
+              const left = freeLeft();
+              return left ? (
+                <span className="rc-free" title="Free on Reticulate's key. After that, the dialogue runs on your own Anthropic key.">
+                  {left} free {left === 1 ? "decision" : "decisions"} left
+                </span>
+              ) : null;
+            })()}
             <button className="rc-action primary" disabled={!ready} onClick={submit}>
               {configured ? "Start dialogue" : "Connect Claude"}
               <Kbd>{MOD}</Kbd>

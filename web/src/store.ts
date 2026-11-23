@@ -37,6 +37,27 @@ export const local = {
 
 const KEY = "reticulate.anthropic-key";
 
+const TRIAL = "reticulate.trial";
+
+/** The visitor's pass for free decisions on Reticulate's key: signed by the server, counted there. */
+export const trialPass = {
+  get: (): { token: string; used: number } | null => {
+    try {
+      const raw = localStorage.getItem(TRIAL);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  },
+  set: (value: { token: string; used: number }) => {
+    try {
+      localStorage.setItem(TRIAL, JSON.stringify(value));
+    } catch {
+      /* storage blocked: the pass lasts for this page only */
+    }
+  },
+};
+
 export const key = {
   get: (): string | null => {
     try {

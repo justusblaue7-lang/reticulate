@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { weightCSS, weightInk } from "../../colors";
+import { onFreeDecision } from "../../api";
 import { roughly } from "../../format";
 import type { Avatar, Decision, Progress, Science } from "../../types";
 import { displayName, Face } from "../Face";
@@ -100,7 +101,7 @@ export function PanelSetup({ science, decision, avatars, configured, onConvene, 
         </label>
         <div className="go-row">
           <span className="estimate">
-            {cost.calls} Claude calls · {roughly(cost.usd)} · about {cost.minutes} min
+            {cost.calls} Claude calls · {onFreeDecision(decision) ? "free" : roughly(cost.usd)} · about {cost.minutes} min
           </span>
           {configured ? (
             <button className="button primary large" disabled={!chosen.length} onClick={() => onConvene(chosen, replicates)}>

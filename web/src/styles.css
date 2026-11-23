@@ -3782,6 +3782,17 @@ button.rc-item:hover {
   cursor: not-allowed;
 }
 
+.rc-free {
+  font-size: 12px;
+  color: var(--green);
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.free-note {
+  color: var(--green);
+}
+
 .rc-divider {
   width: 1px;
   height: 14px;

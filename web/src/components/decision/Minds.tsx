@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { onFreeDecision } from "../../api";
 import { roughly } from "../../format";
 import { leanings } from "../../pattern";
 import type { Avatar, Decision, Progress, Science } from "../../types";
@@ -133,7 +134,7 @@ export function Minds({ science, decision, avatars, configured, running, disable
           </p>
         ) : configured ? (
           <button className="button primary block" disabled={disabled || !chosen.length} onClick={() => onAsk(chosen)}>
-            {panel ? "Ask again" : "Ask them"} · {chosen.length} {chosen.length === 1 ? "mind" : "minds"} · {roughly(cost.usd)}
+            {panel ? "Ask again" : "Ask them"} · {chosen.length} {chosen.length === 1 ? "mind" : "minds"} · {onFreeDecision(decision) ? "free" : roughly(cost.usd)}
           </button>
         ) : (
           <button className="button block" onClick={onConnect}>

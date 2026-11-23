@@ -55,6 +55,7 @@
 - [x] Each mind's dossier shows all its attitudes: tendencies, personality, values, wants, constraints, priorities and voice
 - [x] Runs on Claude Haiku 5.5 by default (about 40 times cheaper than Opus 5.5); `RETICULATE_MODEL` switches it
 - [x] "Download PDF" replaces printing: the whole decision as a document to keep, with a page for the review
+- [x] Free decisions on reticulate.space: three per visitor on the house key (`reticulate.trial`), then their own key
 
 ## Next, for the thesis
 

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { PUBLIC, api, ref } from "../api";
+import { PUBLIC, api, freeLeft, onFreeDecision, ref } from "../api";
 import { AtPlay } from "../components/decision/AtPlay";
 import type { ComposerHandle } from "../components/decision/Composer";
 import { Conclusion } from "../components/decision/Conclusion";
@@ -73,7 +73,11 @@ export function Site({ science, status, avatars, onAvatars, pattern, onPattern, 
   const [panelRun, setPanelRun] = useState<{ members: Avatar[]; replicates: number } | null>(null);
   const [tab, setTab] = useState<Tab>(route().tab);
   const current = useRef<Decision | null>(null);
-  const configured = !!status?.claude.configured;
+  // Claude can be used with the visitor's own key, or free on Reticulate's key: a new decision
+  // while free ones are left, an open one while its free grant holds.
+  const ownKey = !!status?.claude.configured;
+  const free = freeLeft();
+  const configured = ownKey || (free ?? 0) > 0;
   current.current = decision;
 
   const refresh = useCallback(() => api.decisions().then(setArchive).catch(() => undefined), []);
@@ -344,7 +348,7 @@ export function Site({ science, status, avatars, onAvatars, pattern, onPattern, 
             )}
             <button className={`button ${connected ? "dark" : "light"} claude`} onClick={onConnect} disabled={!status}>
               {connected && <span className="dot on" />}
-              {!status ? "Engine offline" : connected ? "Claude" : "Connect Claude"}
+              {!status ? "Engine offline" : connected ? "Claude" : free ? `${free} free ${free === 1 ? "decision" : "decisions"}` : "Connect Claude"}
             </button>
           </div>
         </div>
@@ -395,7 +399,7 @@ export function Site({ science, status, avatars, onAvatars, pattern, onPattern, 
           <Workspace
             science={science}
             avatars={avatars}
-            configured={configured}
+            configured={ownKey || onFreeDecision(decision)}
             decision={decision}
             tab={tab}
             work={work}
@@ -698,7 +702,7 @@ function Workspace(props: WorkspaceProps) {
                   </span>
                   <span className="room-window-meta">
                     {questions ? `${questions} question${questions === 1 ? "" : "s"}` : "Not started"}
-                    {usage.calls ? ` · ${usd(usage.cost_usd)}` : ""}
+                    {onFreeDecision(decision) ? " · free" : usage.calls ? ` · ${usd(usage.cost_usd)}` : ""}
                   </span>
                 </div>
                 <div className="room-window-body">

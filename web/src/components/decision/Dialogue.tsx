@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { onFreeDecision } from "../../api";
 import { roughly, usd } from "../../format";
 import type { Decision, Exchange, Science } from "../../types";
 import { leaningOf } from "../../pattern";
@@ -253,7 +254,7 @@ export function DialogueThread({ science, decision, busy, error, configured, onA
           />
           <div className="answer-foot">
             <span className="mono muted">
-              {configured ? `↵ to answer · ${roughly(TURN_USD)} a question${spent ? ` · ${usd(spent)} so far` : ""}` : "The dialogue uses Claude with your API key"}
+              {configured ? `↵ to answer · ${onFreeDecision(decision) ? "free decision" : `${roughly(TURN_USD)} a question${spent ? ` · ${usd(spent)} so far` : ""}`}` : "The dialogue uses Claude with your API key"}
             </span>
             <button className="text-button" disabled={!!busy} onClick={onSkip}>
               Skip

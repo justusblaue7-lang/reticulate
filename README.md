@@ -100,8 +100,19 @@ engine/.venv/bin/python tools/people/bake.py    # re-render their portraits (app
 Settings live in `engine/.env` (see `engine/.env.example`): `ANTHROPIC_API_KEY`,
 `RETICULATE_MODEL` (default `claude-haiku-5-5`), `RETICULATE_EFFORT` (panel, default `high`),
 `RETICULATE_DIALOGUE_EFFORT` (dialogue, default `medium`), `RETICULATE_CONCURRENCY`,
-`RETICULATE_DATA_DIR` (default `data/`). Claude calls opt into server-side refusal fallback;
-the dialogue's system prompt and conversation are prompt-cached.
+`RETICULATE_DATA_DIR` (default `data/`). Claude calls opt into server-side refusal fallback
+(on models that have it); the dialogue's system prompt and conversation are prompt-cached.
+
+### reticulate.space
+
+The public site (`VITE_PUBLIC=1`, engine `reticulate.public`, deployed on Vercel) stores
+nothing: decisions live in the visitor's browser, and Claude runs on the visitor's own key.
+Visitors without one get free decisions on the house key, set in Vercel's environment:
+`RETICULATE_HOUSE_KEY` (no free decisions without it), `RETICULATE_TRIAL_DECISIONS`
+(default 3 per visitor) and `RETICULATE_TRIAL_DAYS` (how long a free decision can be worked
+on, default 14). The visitor's count and each free decision carry a signature, so neither can
+be forged; a visitor can still clear their browser and start over, which a per-network limit
+slows down. The real cap is the spend limit on that key in the Claude Console.
 
 ## Data sources
 

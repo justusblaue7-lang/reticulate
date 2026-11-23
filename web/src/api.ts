@@ -1,4 +1,4 @@
-import { key, local } from "./store";
+import { key, local, trialPass } from "./store";
 import type { Avatar, Decision, DecisionSummary, PersonalPattern, Problem, Progress, Rating, Science, Status } from "./types";
 
 type AvatarRef = string | Avatar;
@@ -60,7 +60,24 @@ const localApi = {
 
 // ---- the public site: a stateless engine, the records in this browser ---------------------
 
-type Result = { decision: Decision; summary: DecisionSummary };
+type Result = { decision: Decision; summary: DecisionSummary; trial?: { token: string; used: number; left: number } | null };
+
+/** What the site offers for free on Reticulate's key, as the last status said. */
+let offer: { decisions: number; days: number } | null = null;
+
+/** Free decisions this visitor has left, or null when there is no free offer or they use their own key. */
+export function freeLeft(): number | null {
+  if (!PUBLIC || !offer || key.get()) return null;
+  return Math.max(0, offer.decisions - (trialPass.get()?.used ?? 0));
+}
+
+export const freeOffer = () => (PUBLIC ? offer : null);
+
+/** Whether this decision runs free on Reticulate's key: started free, still within its days, no own key since. */
+export function onFreeDecision(d: Decision | null): boolean {
+  if (!PUBLIC || !d?.trial_grant || key.get()) return false;
+  return Number(d.trial_grant.split(".")[0]) * 1000 > Date.now();
+}
 
 const keep = async ({ decision, summary }: Result) => {
   await local.put("decisions", decision.id, decision);
@@ -104,7 +121,11 @@ const download = (name: string, text: string, type: string) => {
 };
 
 const publicApi: typeof localApi = {
-  status: async () => withKey(await request<Status>("/api/status")),
+  status: async () => {
+    const status = await request<Status>("/api/status");
+    offer = status.trial ?? null;
+    return withKey(status);
+  },
   connectClaude: async (api_key: string) => {
     await send("POST", "/api/key", { api_key });
     key.set(api_key.trim());
@@ -145,7 +166,15 @@ const publicApi: typeof localApi = {
   },
   progress: async () => null,
   createDecision: async (problem, anatomy) => {
-    const d = await keep(await send<Result>("POST", "/api/decision/new", { problem, anatomy, pattern: await pattern() }));
+    // Without a key of their own, a new dialogue is one of the visitor's free decisions.
+    const pass = !anatomy && !key.get() ? trialPass.get() : null;
+    const result = await request<Result>("/api/decision/new", {
+      method: "POST",
+      body: JSON.stringify({ problem, anatomy, pattern: await pattern() }),
+      headers: pass ? { "x-reticulate-trial": pass.token } : {},
+    });
+    if (result.trial) trialPass.set({ token: result.trial.token, used: result.trial.used });
+    const d = await keep(result);
     if (!anatomy) void analyseInBackground(d.id);
     return d;
   },

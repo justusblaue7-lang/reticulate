@@ -109,3 +109,4 @@ class Decision(BaseModel):
     usage: Usage = Usage()
     meta: DecisionMeta
     notice: str = SIMULATION_NOTICE
+    trial_grant: str | None = None  # reticulate.space: a free decision on the house key (see reticulate.trial)
