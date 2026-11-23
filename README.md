@@ -98,7 +98,7 @@ engine/.venv/bin/python tools/people/bake.py    # re-render their portraits (app
 ```
 
 Settings live in `engine/.env` (see `engine/.env.example`): `ANTHROPIC_API_KEY`,
-`RETICULATE_MODEL` (default `claude-opus-5-5`), `RETICULATE_EFFORT` (panel, default `high`),
+`RETICULATE_MODEL` (default `claude-haiku-5-5`), `RETICULATE_EFFORT` (panel, default `high`),
 `RETICULATE_DIALOGUE_EFFORT` (dialogue, default `medium`), `RETICULATE_CONCURRENCY`,
 `RETICULATE_DATA_DIR` (default `data/`). Claude calls opt into server-side refusal fallback;
 the dialogue's system prompt and conversation are prompt-cached.

@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Protocol, TypeVar
 import anthropic
 from pydantic import BaseModel
 
-from reticulate.config import PRICES
+from reticulate.config import LONG_PROMPT_PRICES, PRICES
 from reticulate.profile import CognitiveProfile
 from reticulate.simulation import prompts
 from reticulate.simulation.schemas import (
@@ -111,6 +111,10 @@ def _price(model: str, usage) -> Usage:
     )
     if model in PRICES:
         p_in, p_out, p_read, p_write = PRICES[model]
+        if model in LONG_PROMPT_PRICES:
+            threshold, long_card = LONG_PROMPT_PRICES[model]
+            if usage.input_tokens + read + write > threshold:
+                p_in, p_out, p_read, p_write = long_card
         cost = (usage.input_tokens * p_in + usage.output_tokens * p_out + read * p_read + write * p_write) / 1e6
         out.cost_usd = round(cost, 4)
     return out
@@ -148,14 +152,15 @@ class ClaudeEngine:
             if person:
                 system_param.append({"type": "text", "text": person, "cache_control": {"type": "ephemeral"}})
             extra["cache_control"] = {"type": "ephemeral"}
+        if not self.model.startswith("claude-haiku"):
+            # On a safety decline, re-run on Anthropic's recommended fallback model.
+            # Haiku has no server-side fallback, so a decline there is reported as it is.
+            extra |= {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
         response = await self.client.beta.messages.parse(
             model=self.model,
             max_tokens=16000,
             thinking={"type": "adaptive"},
             output_config={"effort": effort},
-            # On a safety decline, re-run on Anthropic's recommended fallback model.
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",
             system=system_param,
             messages=messages,
             output_format=schema,

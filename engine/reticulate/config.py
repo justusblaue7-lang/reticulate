@@ -47,12 +47,18 @@ def _list(name: str, default: str) -> list[str]:
 
 
 # List prices in USD per million tokens: input, output, cache read, cache write (5-minute TTL).
-PRICES = {"claude-opus-5-5": (4.0, 20.0, 0.20, 5.0)}
+PRICES = {
+    "claude-haiku-5-5": (0.10, 0.50, 0.01, 0.125),
+    "claude-sonnet-5-5": (2.0, 10.0, 0.10, 2.50),
+    "claude-opus-5-5": (4.0, 20.0, 0.20, 5.0),
+}
+# Haiku 5.5 has a second rate card for prompts over 100K tokens: (threshold, prices).
+LONG_PROMPT_PRICES = {"claude-haiku-5-5": (100_000, (0.50, 2.50, 0.05, 0.625))}
 
 
 @dataclass(frozen=True)
 class Settings:
-    model: str = field(default_factory=lambda: os.getenv("RETICULATE_MODEL", "claude-opus-5-5"))
+    model: str = field(default_factory=lambda: os.getenv("RETICULATE_MODEL", "claude-haiku-5-5"))
     effort: str = field(default_factory=lambda: os.getenv("RETICULATE_EFFORT", "high"))
     dialogue_effort: str = field(default_factory=lambda: os.getenv("RETICULATE_DIALOGUE_EFFORT", "medium"))
     concurrency: int = field(default_factory=lambda: int(os.getenv("RETICULATE_CONCURRENCY", "6")))

@@ -53,6 +53,9 @@ export const signed = (x: number, digits = 2) => `${x >= 0 ? "+" : "−"}${Math.
 
 export const usd = (x: number | null | undefined) => (x == null ? "–" : x < 0.01 ? "< $0.01" : `$${x.toFixed(2)}`);
 
+/** An estimate in words: "about $0.12", or "under a cent". */
+export const roughly = (x: number) => (x < 0.01 ? "under a cent" : `about ${usd(x)}`);
+
 /** "rh.insula" → "Insula, right". */
 export function structureName(science: Science, key: string): string {
   const [hemi, id] = key.includes(".") ? key.split(".") : [null, key];

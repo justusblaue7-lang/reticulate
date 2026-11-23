@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { usd } from "../../format";
+import { roughly } from "../../format";
 import { leanings } from "../../pattern";
 import type { Avatar, Decision, Progress, Science } from "../../types";
 import { displayName, Face } from "../Face";
@@ -133,7 +133,7 @@ export function Minds({ science, decision, avatars, configured, running, disable
           </p>
         ) : configured ? (
           <button className="button primary block" disabled={disabled || !chosen.length} onClick={() => onAsk(chosen)}>
-            {panel ? "Ask again" : "Ask them"} · {chosen.length} {chosen.length === 1 ? "mind" : "minds"} · about {usd(cost.usd)}
+            {panel ? "Ask again" : "Ask them"} · {chosen.length} {chosen.length === 1 ? "mind" : "minds"} · {roughly(cost.usd)}
           </button>
         ) : (
           <button className="button block" onClick={onConnect}>

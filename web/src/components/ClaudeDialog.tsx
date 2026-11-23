@@ -43,7 +43,7 @@ export function ClaudeDialog({ status, onStatus, onClose }: Props) {
           {connected ? "Claude is connected" : "Connect Claude"}
         </h2>
         <p className="dialog-text">
-          Reticulate uses Claude ({status?.claude.model ?? "claude-opus-5-5"}) to read your decision and to let the panel reason
+          Reticulate uses Claude ({status?.claude.model ?? "claude-haiku-5-5"}) to read your decision and to let the panel reason
           about it. You pay Anthropic directly, and Reticulate shows what every step costs.
         </p>
         {connected ? (

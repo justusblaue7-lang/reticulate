@@ -46,11 +46,11 @@ export const LEVEL_NAME = ["absent", "minor", "present", "central"] as const;
 /** How strongly a mechanism is engaged, from the highest level among its features. */
 export const PULL = ["", "Possible", "Likely", "Strong pull"] as const;
 
-/** List-price estimates per call on Claude Opus 5.5 (rough; the record shows the real cost). */
-export const ANALYSIS_USD = 0.08;
-export const CALL_USD = 0.1;
+/** List-price estimates per call on Claude Haiku 5.5 (rough; the record shows the real cost). */
+export const ANALYSIS_USD = 0.002;
+export const CALL_USD = 0.0025;
 /** One question of the dialogue: the cached conversation plus a short structured answer. */
-export const TURN_USD = 0.04;
+export const TURN_USD = 0.001;
 const SECONDS_PER_CALL = 45;
 const CONCURRENCY = 6;
 

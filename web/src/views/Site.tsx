@@ -5,7 +5,6 @@ import type { ComposerHandle } from "../components/decision/Composer";
 import { Conclusion } from "../components/decision/Conclusion";
 import { DialogueThread, StageRail, type DialogueBusy } from "../components/decision/Dialogue";
 import { Minds } from "../components/decision/Minds";
-import { TURN_USD } from "../components/decision/model";
 import { Notes } from "../components/decision/Notes";
 import { PanelProgress, PanelResult, PanelSetup } from "../components/decision/Panel";
 import { WatchOuts } from "../components/decision/WatchOuts";
@@ -735,7 +734,7 @@ function Workspace(props: WorkspaceProps) {
                     <div className="start-dialogue">
                       <p>
                         Think this decision through in a Socratic dialogue: one question at a time, until your decision and your first step are
-                        clear. About {usd(TURN_USD)} a question.
+                        clear. Under a cent a question with Claude Haiku.
                       </p>
                       {configured ? (
                         <button className="button primary" disabled={!!talk} onClick={props.onNext}>
