@@ -13,6 +13,7 @@ import { Palette } from "../components/Palette";
 import { usd } from "../format";
 import { STAGE_ART } from "../art";
 import { Art } from "../components/Art";
+import { PdfButton } from "../record/PdfButton";
 import { leanings, leaningOf } from "../pattern";
 import type { Avatar, Decision, DecisionSummary, PersonalPattern, Problem, Progress, Rating, Science, Status } from "../types";
 import { Home } from "./Home";
@@ -614,15 +615,6 @@ function Workspace(props: WorkspaceProps) {
   const usage = decision.usage;
   const model = decision.dialogue?.meta.model ?? decision.meta.model;
 
-  const download = () => {
-    const blob = new Blob([JSON.stringify(decision, null, 2)], { type: "application/json" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `reticulate-decision-${decision.created_at.slice(0, 10)}-${decision.id.slice(0, 6)}.json`;
-    link.click();
-    URL.revokeObjectURL(link.href);
-  };
-
   const stageNow = science.socratic.stages.find(
     (s) => s.id === (dialogue?.conclusion ? "commitment" : dialogue?.exchanges.at(-1)?.turn.stage ?? "frame"),
   );
@@ -812,17 +804,10 @@ function Workspace(props: WorkspaceProps) {
 
       <footer className="record">
         <div className="record-actions no-print">
-          <button className="button dark" onClick={props.onReveal}>
-            {PUBLIC ? "Download" : "Show in folder"}
+          <PdfButton science={science} decision={decision} className="button dark" />
+          <button className="button dark" onClick={props.onReveal} title={PUBLIC ? "The record as data (JSON), to keep or to open in another browser" : undefined}>
+            {PUBLIC ? "Export data" : "Show in folder"}
           </button>
-          <button className="button dark" onClick={() => window.print()}>
-            Print or PDF
-          </button>
-          {!PUBLIC && (
-            <button className="button dark" onClick={download}>
-              Download
-            </button>
-          )}
           <button className="button dark danger" onClick={props.onDelete}>
             Delete
           </button>

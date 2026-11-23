@@ -3167,6 +3167,12 @@ body {
   color: #ff6363;
 }
 
+.pdf-error {
+  flex-basis: 100%;
+  font-size: 13px;
+  color: #ff6363;
+}
+
 .button.dark.danger:hover:not(:disabled) {
   background: #2c1617;
   box-shadow: inset 0 1px 0 rgba(255, 127, 127, 0.11), 0 0 0 1px #833637;

@@ -138,8 +138,12 @@ rendered into a prompt; the simulation sees the role (`name`) only.
 - `styles.css`: black and blue. Tokens at `:root` (greys, white at stepped opacities for
   text and borders, one blue accent); Inter, JetBrains Mono, and Instrument Serif for the
   hero line. Windows (`.rc-window`: search bar, list, action bar), cards with a faint top
-  highlight, key caps (`.kbd`). Print styles turn a decision into a paper document with
-  everything unfolded.
+  highlight, key caps (`.kbd`).
+- `record/pdf.ts`: "Download PDF" builds the whole decision as a PDF in the browser (pdfmake,
+  loaded on the first click; Roboto, and Instrument Serif from `public/fonts` under the OFL):
+  the decision and why, a page for the review (when, what would reopen it, decision quality,
+  questions with lines to write on), the full dialogue, the working notes, the biases at play
+  and the minds' takes. On reticulate.space nothing leaves the browser to make it.
 
 ## HTTP API
 

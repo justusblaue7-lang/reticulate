@@ -53,6 +53,8 @@
 - [x] Removed what reads as evidence but is not: the panel's vote tally, self-reported confidence, and tipping points in the interface
 - [x] The decision is a room: you on the left, the dialogue in the command window with a pinned answer bar, the minds at the table on the right, each with its attitudes and pickable; their takes appear on their cards
 - [x] Each mind's dossier shows all its attitudes: tendencies, personality, values, wants, constraints, priorities and voice
+- [x] Runs on Claude Haiku 5.5 by default (about 40 times cheaper than Opus 5.5); `RETICULATE_MODEL` switches it
+- [x] "Download PDF" replaces printing: the whole decision as a document to keep, with a page for the review
 
 ## Next, for the thesis
 

@@ -1,4 +1,5 @@
 import { PUBLIC } from "../../api";
+import { PdfButton } from "../../record/PdfButton";
 import type { Decision, Science } from "../../types";
 
 const LEVEL = { strong: "Strong", partial: "Partial", weak: "Weak" } as const;
@@ -139,11 +140,9 @@ export function Conclusion({ science, decision, busy, onSettle, onReopen, onPane
         <button className="button" onClick={onPanel}>
           {decision.panel ? "See what the panel said" : "Hear other minds"}
         </button>
-        <button className="button quiet" onClick={() => window.print()}>
-          Print or save as PDF
-        </button>
-        <button className="button quiet" onClick={onReveal}>
-          {PUBLIC ? "Download" : "Show in folder"}
+        <PdfButton science={science} decision={decision} className="button primary" />
+        <button className="button quiet" onClick={onReveal} title={PUBLIC ? "The record as data (JSON), to keep or to open in another browser" : undefined}>
+          {PUBLIC ? "Export data" : "Show in folder"}
         </button>
       </div>
     </section>
