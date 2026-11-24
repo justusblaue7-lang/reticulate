@@ -13,9 +13,10 @@ const initials = (text: string) =>
     .map((w) => w[0])
     .join("") || "?";
 
-/** An avatar's face: a still of its 3D person, in a round frame. */
+/** An avatar's face: a still of its 3D person (as changed, if it was), in a round frame. */
 export function Face({ avatar, size = 34, kind = "face" }: { avatar: Avatar; size?: number; kind?: "face" | "portrait" }) {
   const look = avatar.person?.look;
+  const stills = avatar.person?.stills;
   const [failed, setFailed] = useState<string | null>(null);
   const name = displayName(avatar);
   if (!look || failed === look) {
@@ -28,7 +29,7 @@ export function Face({ avatar, size = 34, kind = "face" }: { avatar: Avatar; siz
   return (
     <img
       className={`face ${kind}`}
-      src={portraitUrl(look, kind)}
+      src={stills ? stills[kind] : portraitUrl(look, kind)}
       width={size}
       height={kind === "portrait" ? Math.round(size * 1.25) : size}
       alt={name}

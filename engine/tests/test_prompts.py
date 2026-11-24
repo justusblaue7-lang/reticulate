@@ -30,6 +30,13 @@ def test_personality_is_rendered_and_appearance_never_is(library):
     assert "Personality, Big Five" in text and "- neuroticism: 3/10" in text and "Achievement" in text
     for leak in ("coily", "skin", "phenotype", "glasses", "58"):
         assert leak not in text.lower()
+    # A look changed in the builder stays out of the prompt as well.
+    from reticulate.profile import Person, PersonStyle
+
+    changed = profile.model_copy(update={"person": Person(name="Ada", look="male_adult_01", style=PersonStyle(skin="#66442f", top="#1f2d4d", height=1.05))})
+    text = render_profile(changed)
+    for leak in ("#66442f", "#1f2d4d", "ada", "male_adult", "1.05"):
+        assert leak not in text.lower()
 
 
 def test_neural_context_lists_anatomy_mechanisms_and_signature():

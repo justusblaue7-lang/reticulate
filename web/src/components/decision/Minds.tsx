@@ -3,6 +3,7 @@ import { onFreeDecision } from "../../api";
 import { roughly } from "../../format";
 import { leanings } from "../../pattern";
 import type { Avatar, Decision, Progress, Science } from "../../types";
+import { MindDialog, variantOf } from "../AvatarBuilder";
 import { displayName, Face } from "../Face";
 import { estimate, observedPerCall, panelCalls, suggestPanel } from "./model";
 
@@ -30,6 +31,7 @@ interface Props {
   science: Science;
   decision: Decision;
   avatars: Avatar[];
+  onAvatars: (avatars: Avatar[]) => void;
   configured: boolean;
   running: { members: Avatar[]; progress: Progress | null } | null;
   disabled: boolean;
@@ -42,17 +44,26 @@ interface Props {
  * The minds at the table, beside the dialogue: each with the attitudes it reasons from.
  * Pick who should weigh in; their reasons come back into the dialogue as a question.
  */
-export function Minds({ science, decision, avatars, configured, running, disabled, onAsk, onConnect, onReasoning }: Props) {
+export function Minds({ science, decision, avatars, onAvatars, configured, running, disabled, onAsk, onConnect, onReasoning }: Props) {
   const suggested = useMemo(() => suggestPanel(avatars, decision, science, 3), [avatars, decision, science]);
   const panel = decision.panel;
   const [picked, setPicked] = useState<string[]>(panel?.profiles.map((p) => p.id) ?? suggested);
   const [open, setOpen] = useState<string | null>(null);
+  const [building, setBuilding] = useState<{ start: Avatar | null } | null>(null);
   const order = [...avatars].sort((a, b) => Number(picked.includes(b.id)) - Number(picked.includes(a.id)));
   const chosen = picked.map((id) => avatars.find((a) => a.id === id)).filter((a): a is Avatar => !!a);
   const cost = estimate(panelCalls(decision, chosen.length, 1), observedPerCall(decision));
   const toggle = (id: string) => setPicked(picked.includes(id) ? picked.filter((x) => x !== id) : picked.length < MAX ? [...picked, id] : picked);
   const heard = (id: string) => panel?.perspectives[id]?.[0];
   const answered = (id: string) => (running?.progress?.labels[id] ?? 0) >= 1;
+
+  // A mind built or changed here joins the list and, if there is room, the table.
+  const saved = (avatar: Avatar) => {
+    onAvatars(avatars.some((a) => a.id === avatar.id) ? avatars.map((a) => (a.id === avatar.id ? avatar : a)) : [...avatars, avatar]);
+    if (!running && !picked.includes(avatar.id)) setPicked((p) => (p.length < MAX ? [...p, avatar.id] : p));
+    setOpen(avatar.id);
+    setBuilding(null);
+  };
 
   return (
     <section className="minds-rail" aria-label="Minds at the table">
@@ -119,12 +130,27 @@ export function Minds({ science, decision, avatars, configured, running, disable
                       {a.context.constraints.join("; ")}
                     </p>
                   ) : null}
+                  <button className="text-button" onClick={() => setBuilding({ start: variantOf(a) })}>
+                    {a.origin === "user" ? "Edit this mind" : "Make a variant of this mind"}
+                  </button>
                 </div>
               )}
             </li>
           );
         })}
       </ul>
+
+      <button className="mind-build" onClick={() => setBuilding({ start: null })}>
+        <span className="plus" aria-hidden>
+          +
+        </span>
+        <span>
+          <strong>Build your own mind</strong>
+          <small>Look, personality, values and attitudes, all yours to set</small>
+        </span>
+      </button>
+
+      {building && <MindDialog science={science} start={building.start} onSaved={saved} onClose={() => setBuilding(null)} />}
 
       <footer className="rail-foot">
         {running ? (

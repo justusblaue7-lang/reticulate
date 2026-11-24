@@ -4,7 +4,8 @@
 
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { disposePerson, loadPerson, type Person, type PersonAsset } from "./model";
+import type { PersonStyle } from "../types";
+import { applyStyle, disposePerson, loadPerson, type Person, type PersonAsset } from "./model";
 
 /** 0 = the full figure, 1 = the face. */
 export const FRAMES = { full: 0, bust: 0.62, face: 1 } as const;
@@ -38,6 +39,7 @@ export class PersonStage {
   private idle: boolean;
   private loading = 0;
   private disposed = false;
+  private style: PersonStyle | null = null;
 
   constructor(private holder: HTMLElement, options: Options = {}) {
     this.zoom = this.zoomShown = options.zoom ?? FRAMES.full;
@@ -90,13 +92,15 @@ export class PersonStage {
   }
 
   /** Show a person; resolves when the person stands on the stage. */
-  async show(asset: PersonAsset): Promise<void> {
+  async show(asset: PersonAsset, style?: PersonStyle | null): Promise<void> {
     const ticket = ++this.loading;
+    if (style !== undefined) this.style = style;
     const person = await loadPerson(asset);
     if (ticket !== this.loading || this.disposed) {
       disposePerson(person);
       return;
     }
+    applyStyle(person, this.style);
     if (this.person) {
       this.turntable.remove(this.person.root);
       disposePerson(this.person);
@@ -106,6 +110,19 @@ export class PersonStage {
     this.zoomShown = this.zoom;
     this.render();
     this.loop();
+  }
+
+  /** The person's height as built, in metres (before a style), once they stand on the stage. */
+  get builtHeight(): number | null {
+    return this.person?.base.height ?? null;
+  }
+
+  /** Change the look of the person on the stage (and of anyone shown later). */
+  restyle(style: PersonStyle | null) {
+    this.style = style;
+    if (!this.person) return;
+    applyStyle(this.person, style);
+    this.render();
   }
 
   setZoom(zoom: number) {
@@ -120,7 +137,7 @@ export class PersonStage {
   }
 
   /** A still of the current person, e.g. for a portrait. */
-  snapshot(width: number, height: number, zoom: number, yaw: number): string {
+  snapshot(width: number, height: number, zoom: number, yaw: number, type = "image/png", quality?: number): string {
     const size = this.renderer.getSize(new THREE.Vector2());
     const ratio = this.renderer.getPixelRatio();
     this.renderer.setPixelRatio(1);
@@ -131,7 +148,7 @@ export class PersonStage {
     this.pose(0);
     this.frame();
     this.renderer.render(this.scene, this.camera);
-    const url = this.canvas.toDataURL("image/png");
+    const url = this.canvas.toDataURL(type, quality);
     this.renderer.setPixelRatio(ratio);
     this.renderer.setSize(size.x, size.y, false);
     this.resize();

@@ -8,7 +8,7 @@ how people are called or how they look; the simulation sees the role (`name`) on
 """
 
 from enum import StrEnum
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -102,11 +102,36 @@ Hair = Literal["bald", "buzz", "short", "swept", "wavy", "long", "curly", "coily
 HairColor = Literal["black", "dark_brown", "brown", "auburn", "blond", "grey", "white"]
 
 
+Hex = Annotated[str, Field(pattern=r"^#[0-9a-fA-F]{6}$")]
+Still = Annotated[str, Field(max_length=400_000, pattern=r"^data:image/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$")]
+
+
+class PersonStyle(BaseModel):
+    """How the chosen 3D person is changed. Colours as hex (None keeps the person's own); height and
+    build as factors of the person as built."""
+
+    skin: Hex | None = None
+    hair: Hex | None = None
+    top: Hex | None = None
+    bottom: Hex | None = None
+    height: float = Field(default=1.0, ge=0.92, le=1.08)
+    build: float = Field(default=1.0, ge=0.9, le=1.15)
+
+
+class Stills(BaseModel):
+    """Pictures of the changed person, rendered in the browser when the avatar is saved."""
+
+    face: Still
+    portrait: Still
+
+
 class Person(BaseModel):
     """Who the avatar is shown as. Never part of a prompt."""
 
     name: str = Field(default="", max_length=80, description="A fictional person's name, shown in the interface")
     look: str = Field(default="", pattern=r"^[a-z0-9_]*$", description="id of a 3D person in web/public/people")
+    style: PersonStyle | None = Field(default=None, description="skin, hair, clothes, height and build, changed from the look")
+    stills: Stills | None = None
 
 
 class Phenotype(BaseModel):

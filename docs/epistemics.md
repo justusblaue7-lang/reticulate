@@ -131,7 +131,8 @@ intervention"), and Claude's watch-outs are labelled as applying them to this de
 ## Names, looks and stereotypes
 
 Avatars are shown as fictional people, with a name and a realistic 3D look (Microsoft
-Rocketbox library), so that people can recognise and relate to them. Name and look are
+Rocketbox library), so that people can recognise and relate to them. Your own minds can be
+given any look: skin tone, hair, clothes, height and build. Name and look, changed or not, are
 excluded from every prompt (tested): the simulation sees the role only. Personas' looks are
 spread across gender, age and skin tone without tracking their roles. Including appearance
 or names in a prompt would invite the model to apply stereotypes; if that is ever studied,

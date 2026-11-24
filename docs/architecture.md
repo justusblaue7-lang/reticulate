@@ -96,7 +96,7 @@ and read back before the old copy is removed. Tests use a temporary data folder
 
 ## The 3D people
 
-`tools/people/cast.yaml` lists the people: eleven personas and a cast for the user's own
+`tools/people/cast.yaml` lists the people: the personas' looks and a cast for the user's own
 avatars, all from the Microsoft Rocketbox library (MIT). `tools/people/build.py` downloads
 each FBX model and its 2048 px TGA textures, keeps the model as it is and converts the
 textures to WebP (colour, normal, roughness from the specular map; hair and lash colour bled
@@ -107,8 +107,23 @@ shadows, cool rim, contact shadow) with drag to turn, scroll or buttons from the
 to the face, and breathing and small head movements. `tools/people/bake.py` renders each
 person's stills (`face.webp`, `portrait.webp`) with the same stage in headless Chrome.
 
-A profile's `person` (a fictional name and a `look`) is shown in the interface and never
-rendered into a prompt; the simulation sees the role (`name`) only.
+A profile's `person` (a fictional name, a `look` and an optional `style`) is shown in the
+interface and never rendered into a prompt; the simulation sees the role (`name`) only.
+
+**Your own look.** In the builder a look starts from one of the 32 people and is then changed:
+skin tone, hair colour, the colours of top and bottom, height and build (`person.style`;
+palettes in `people/style.ts`). `model.ts` applies a style in the shader, so changes show at
+once and the textures stay shared: skin is found by colour (near the face's skin, and on the
+body near the hands' skin, in chromaticity and lightness) and scaled to the chosen tone; hair
+cards and clothes keep their light and shade and take the chosen colour, rolled off and
+pulled to grey rather than clipped. Top and bottom are told apart by the bones each vertex
+follows, decided per garment piece (UV island), so a jacket's hem keeps the jacket's colour.
+Hair painted on the scalp follows the hair colour only where hair and skin differ clearly.
+Height scales the person; build widens the body and leaves the head as it is. On saving,
+`people/stills.ts` renders the changed person's face and portrait in the browser
+(`person.stills`, WebP data URLs; PNG where the browser cannot encode WebP), so lists and
+chips show them as changed without loading 3D. Limits: faces and hair styles are those of the
+32 people; a garment in a skin-like colour can be read as skin.
 
 ## Interface (`web/src`)
 

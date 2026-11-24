@@ -32,7 +32,8 @@
 - [x] The Socratic dialogue as the way into every decision: one question at a time along the six elements of decision quality, twelve moves (five tested), countermoves to biases asked as questions, working notes, skip, change an earlier answer, conclude when ready
 - [x] The conclusion: the decision in the person's words, reasons, trade-offs, signals to revisit, an if–then first step, a review date, open questions as a checklist saved with the decision, and decision quality per element
 - [x] Claude's analysis runs in the background; the panel's result goes back into the dialogue as a perspective to question; one lock per decision so nothing overwrites anything
-- [x] Real people in 3D: 32 fictional people from the Microsoft Rocketbox library (MIT), posed, studio-lit and spinnable, with names; looks chosen from the cast in the builder; names and looks never enter a prompt
+- [x] Real people in 3D: 32 fictional people from the Microsoft Rocketbox library (MIT), posed, studio-lit and spinnable, with names; names and looks never enter a prompt
+- [x] Your own look: start from any of the 32, then set skin tone, hair colour, top and bottom colours, height and build with a live 3D preview; build or change a mind from inside a decision
 - [x] A data folder in the project: one folder per decision with the record and a readable Markdown copy; avatars and research runs beside it; records of earlier builds moved in automatically
 - [x] Version history: the project is a git repository; personal data stays out of it
 

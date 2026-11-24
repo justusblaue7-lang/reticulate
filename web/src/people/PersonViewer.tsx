@@ -27,7 +27,7 @@ export function PersonViewer(props: ViewerProps) {
   const poster = (
     <div ref={holder} className={`person-viewer ${props.className ?? ""} loading`}>
       <div className="person-stage" />
-      {props.look && <img className="person-poster" src={`/people/${props.look}/portrait.webp`} alt="" aria-hidden />}
+      {props.look && <img className="person-poster" src={props.poster ?? `/people/${props.look}/portrait.webp`} alt="" aria-hidden />}
       {lean && props.look && !wanted && (
         <button className="person-load" onClick={() => setWanted(true)}>
           View in 3D · about 2 MB

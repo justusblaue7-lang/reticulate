@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api } from "../api";
-import { AvatarBuilder, blankAvatar } from "../components/AvatarBuilder";
+import { AvatarBuilder, blankAvatar, saveMind, variantOf } from "../components/AvatarBuilder";
 import { Attitudes } from "../components/decision/Minds";
 import { displayName, Face } from "../components/Face";
 import { Glyph } from "../components/Glyph";
@@ -34,9 +34,8 @@ export function Patterns({ science, avatars, onAvatars, onAtlas }: Props) {
     if (!draft) return;
     setSaving(true);
     setError(null);
-    const person = draft.person && (draft.person.look || draft.person.name.trim()) ? { ...draft.person, name: draft.person.name.trim() } : null;
     try {
-      const saved = await api.saveAvatar({ ...draft, person });
+      const saved = await saveMind(draft);
       onAvatars(avatars.some((a) => a.id === saved.id) ? avatars.map((a) => (a.id === saved.id ? saved : a)) : [...avatars, saved]);
       setSelectedId(saved.id);
       setDraft(null);
@@ -79,13 +78,7 @@ export function Patterns({ science, avatars, onAvatars, onAtlas }: Props) {
             science={science}
             avatar={selected}
             onAtlas={onAtlas}
-            onEdit={() =>
-              setDraft(
-                selected.origin === "user"
-                  ? { ...selected }
-                  : { ...selected, id: "new", origin: "user", name: `${selected.name} (variant)`, person: selected.person ? { ...selected.person, name: "" } : null },
-              )
-            }
+            onEdit={() => setDraft(variantOf(selected))}
             onDelete={selected.origin === "user" ? () => void remove(selected) : null}
           />
         ) : null}
@@ -106,7 +99,7 @@ function Dossier({ science, avatar, onAtlas, onEdit, onDelete }: {
     <div className="dossier-grid">
       <div className="dossier-side">
         <header className="pattern-head">
-          <PersonViewer look={avatar.person?.look} name={displayName(avatar)} className="dossier-person" />
+          <PersonViewer look={avatar.person?.look} style={avatar.person?.style} poster={avatar.person?.stills?.portrait} name={displayName(avatar)} className="dossier-person" />
           <div>
             <span className="rc-tag">{avatar.origin === "library" ? "Fictional" : "Yours"} · simulated</span>
             <h3>{displayName(avatar)}</h3>

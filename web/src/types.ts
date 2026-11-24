@@ -178,7 +178,19 @@ export interface Score {
 /** Who an avatar is shown as: a fictional name and a 3D person. Never part of a prompt. */
 export interface Person {
   name: string;
-  look: string; // id of a 3D person in web/public/people
+  look: string; // id of a 3D person in web/public/people: the face, hair style and clothes to start from
+  style?: PersonStyle | null; // how that person is changed
+  stills?: { face: string; portrait: string } | null; // pictures of the changed person, as data URLs
+}
+
+/** Colours as "#rrggbb" (null keeps the built person's own); height and build as factors, 1 = as built. */
+export interface PersonStyle {
+  skin: string | null;
+  hair: string | null;
+  top: string | null;
+  bottom: string | null;
+  height: number;
+  build: number;
 }
 
 export interface Avatar {

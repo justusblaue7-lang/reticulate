@@ -1,20 +1,26 @@
 import { useEffect, useRef, useState } from "react";
+import type { PersonStyle } from "../types";
 import { loadCatalogue } from "./catalogue";
 import { FRAMES, PersonStage, type Framing } from "./stage";
 
 export interface ViewerProps {
   look: string | null | undefined;
+  style?: PersonStyle | null; // how the person is changed; updates live
+  poster?: string | null; // a still to show until the 3D is ready (else the built portrait)
   name?: string;
   framing?: Framing;
   className?: string;
   controls?: boolean;
+  onMeasure?: (height: number) => void; // the person's built height, in metres
 }
 
 /** A person in 3D: drag to turn them, scroll or use the buttons to come closer. Loaded on demand
  * by PersonViewer, which shows the portrait until then. */
-export default function PersonViewer3D({ look, name, framing = "full", className = "", controls = true }: ViewerProps) {
+export default function PersonViewer3D({ look, style, poster, name, framing = "full", className = "", controls = true, onMeasure }: ViewerProps) {
   const holder = useRef<HTMLDivElement>(null);
   const stage = useRef<PersonStage | null>(null);
+  const latest = useRef({ style, onMeasure });
+  latest.current = { style, onMeasure };
   const [state, setState] = useState<"loading" | "ready" | "missing">("loading");
   const [frame, setFrame] = useState<Framing>(framing);
 
@@ -41,14 +47,23 @@ export default function PersonViewer3D({ look, name, framing = "full", className
       .then((people) => {
         const asset = people.find((p) => p.look === look);
         if (!asset) throw new Error("not built");
-        return stage.current?.show(asset);
+        return stage.current?.show(asset, latest.current.style ?? null);
       })
-      .then(() => !cancelled && setState("ready"))
+      .then(() => {
+        if (cancelled) return;
+        setState("ready");
+        const height = stage.current?.builtHeight;
+        if (height) latest.current.onMeasure?.(height);
+      })
       .catch(() => !cancelled && setState("missing"));
     return () => {
       cancelled = true;
     };
   }, [look]);
+
+  useEffect(() => {
+    stage.current?.restyle(style ?? null);
+  }, [style]);
 
   const go = (f: Framing) => {
     setFrame(f);
@@ -58,7 +73,7 @@ export default function PersonViewer3D({ look, name, framing = "full", className
   return (
     <div className={`person-viewer ${className} ${state}`}>
       <div className="person-stage" ref={holder} title={state === "ready" ? "Drag to turn, scroll to come closer" : undefined} />
-      {state === "loading" && look && <img className="person-poster" src={`/people/${look}/portrait.webp`} alt="" aria-hidden />}
+      {state === "loading" && look && <img className="person-poster" src={poster ?? `/people/${look}/portrait.webp`} alt="" aria-hidden />}
       {state === "loading" && <span className="person-wait">Loading {name ?? "this person"}…</span>}
       {state === "missing" && (
         <span className="person-wait">

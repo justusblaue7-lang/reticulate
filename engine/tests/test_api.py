@@ -130,6 +130,21 @@ def test_user_avatars_can_be_saved_and_deleted_but_personas_cannot(client):
     assert client.delete("/api/avatars/my_investor").status_code == 200
 
 
+def test_a_changed_look_is_kept_and_checked(client):
+    persona = next(a for a in client.get("/api/avatars").json() if a["id"] == "software_founder")
+    style = {"skin": "#66442f", "hair": "#8e8b86", "top": "#1f2d4d", "bottom": None, "height": 1.04, "build": 0.95}
+    stills = {"face": "data:image/webp;base64,UklGRg==", "portrait": "data:image/png;base64,iVBORw0KGgo="}
+    person = {**persona["person"], "name": "Ada", "style": style, "stills": stills}
+    saved = client.post("/api/avatars", json={**persona, "name": "My mentor", "person": person}).json()
+    again = next(a for a in client.get("/api/avatars").json() if a["id"] == saved["id"])
+    assert again["person"]["style"] == style and again["person"]["stills"] == stills
+    bad = {**person, "style": {**style, "skin": "red"}}
+    assert client.post("/api/avatars", json={**persona, "name": "Bad", "person": bad}).status_code == 422
+    unsafe = {**person, "stills": {"face": "javascript:alert(1)", "portrait": stills["portrait"]}}
+    assert client.post("/api/avatars", json={**persona, "name": "Bad", "person": unsafe}).status_code == 422
+    client.delete(f"/api/avatars/{saved['id']}")
+
+
 class _Models:
     def __init__(self, error):
         self.error = error

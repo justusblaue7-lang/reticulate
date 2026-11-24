@@ -116,6 +116,11 @@ def test_pattern_and_avatars():
     assert personas
     copy = c.post("/api/avatar", json={"profile": personas[0]}).json()
     assert copy["id"] != personas[0]["id"] and copy["origin"] == "user"
+    look = {"skin": "#462d1e", "hair": None, "top": "#6e2433", "bottom": None, "height": 0.95, "build": 1.1}
+    still = "data:image/webp;base64,UklGRg=="
+    person = {"name": "Ada", "look": "male_adult_01", "style": look, "stills": {"face": still, "portrait": still}}
+    styled = c.post("/api/avatar", json={"profile": {**personas[0], "person": person}}).json()
+    assert styled["person"]["style"] == look and styled["person"]["stills"]["face"] == still
     science = c.get("/api/science").json()
     answers = {i["id"]: 5 for i in science["pattern"]["items"]}
     p = c.post("/api/pattern", json={"answers": answers}).json()

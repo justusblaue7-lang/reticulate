@@ -420,6 +420,7 @@ export function Site({ science, status, avatars, onAvatars, pattern, onPattern, 
           <Workspace
             science={science}
             avatars={avatars}
+            onAvatars={onAvatars}
             configured={ownKey || onFreeDecision(decision)}
             decision={decision}
             tab={tab}
@@ -486,6 +487,7 @@ export function Site({ science, status, avatars, onAvatars, pattern, onPattern, 
 interface WorkspaceProps {
   science: Science;
   avatars: Avatar[];
+  onAvatars: (avatars: Avatar[]) => void;
   configured: boolean;
   decision: Decision;
   tab: Tab;
@@ -851,6 +853,7 @@ function Workspace(props: WorkspaceProps) {
                 science={science}
                 decision={decision}
                 avatars={avatars}
+                onAvatars={props.onAvatars}
                 configured={configured}
                 running={panelBusy ? { members: panelRun?.members ?? [], progress } : null}
                 disabled={!!work}
