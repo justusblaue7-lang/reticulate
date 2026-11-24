@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { portraitUrl } from "../people/model";
+import { portraitUrl } from "../people/catalogue";
 import type { Avatar } from "../types";
 
 /** What an avatar is called in the interface: the person's name, else the role. */

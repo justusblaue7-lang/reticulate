@@ -32,13 +32,17 @@ export function PatternCheck({ science, pattern, onPattern }: Props) {
     if (pattern && mode === "check" && !Object.keys(answers).length) setAnswers(pattern.answers);
   }, [pattern, mode, answers]);
 
+  // Functional updates, so that quick taps in a row never overwrite each other.
   const answer = (index: number, value: number, advance = true) => {
-    const next = { ...answers, [items[index].id]: Math.max(0, Math.min(10, value)) };
-    setAnswers(next);
-    if (!advance) return;
-    const after = items.findIndex((it, i) => i > index && !(it.id in next));
-    const before = items.findIndex((it) => !(it.id in next));
-    setActive(after >= 0 ? after : before >= 0 ? before : index);
+    setAnswers((prev) => {
+      const next = { ...prev, [items[index].id]: Math.max(0, Math.min(10, value)) };
+      if (advance) {
+        const after = items.findIndex((it, i) => i > index && !(it.id in next));
+        const before = items.findIndex((it) => !(it.id in next));
+        setActive(after >= 0 ? after : before >= 0 ? before : index);
+      }
+      return next;
+    });
   };
 
   const save = async () => {

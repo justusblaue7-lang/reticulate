@@ -75,7 +75,7 @@ export default function AtlasView({ science, onClose }: { science: Science; onCl
   );
 
   return (
-    <main className="container atlas-page">
+    <main className="container atlas-page" id="content">
       <header className="atlas-head">
         <button className="text-button" onClick={onClose}>
           ← Back to Reticulate

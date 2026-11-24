@@ -49,7 +49,7 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
   const shown = featured.map((id) => science.mechanisms.find((m) => m.id === id)).filter((m): m is Mechanism => !!m);
 
   return (
-    <main className="home">
+    <main className="home" id="content">
       <section className="hero">
         <div className="hero-glow" aria-hidden="true" />
         <h1 className="hero-title">Think it through.</h1>

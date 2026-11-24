@@ -32,6 +32,27 @@ def _coerce_scores(value: object) -> object:
     return value
 
 
+# Profiles saved before science 1.0 rated eight hypothetical tendencies. Where one of them asked
+# about the same attitude as a survey question, its value carries over; the rest start at the
+# middle of the scale. Both are marked, so the person can see and change them.
+LEGACY_DIMENSIONS = {"risk_tolerance": "risk_taking", "time_horizon": "patience", "social_orientation": "altruism"}
+NEW_DIMENSIONS = ("risk_taking", "patience", "altruism", "trust", "positive_reciprocity", "negative_reciprocity")
+
+
+def migrate_dimensions(value: object) -> object:
+    """Dimensions of a profile saved before 1.0, as the six attitudes of 1.0; others unchanged."""
+    if not isinstance(value, dict) or not set(value) & {"exploration", "analytical_style", "risk_tolerance"}:
+        return value
+    out: dict = {}
+    for old, new in LEGACY_DIMENSIONS.items():
+        if old in value:
+            score = value[old] if isinstance(value[old], dict) else {"value": value[old]}
+            out[new] = {**score, "source": f"carried over from '{old}' (before 1.0)"}
+    for new in NEW_DIMENSIONS:
+        out.setdefault(new, {"value": 5, "source": "not set before 1.0; the middle of the scale"})
+    return out
+
+
 class ProfileKind(StrEnum):
     PERSONA = "persona"  # authored vignette of a kind of decision-maker (avatar library)
     ARCHETYPE = "archetype"  # abstract thinking-style archetype
@@ -123,7 +144,7 @@ class CognitiveProfile(BaseModel):
     @field_validator("dimensions", mode="before")
     @classmethod
     def _coerce_numbers(cls, value: object) -> object:
-        return _coerce_scores(value)
+        return _coerce_scores(migrate_dimensions(value))
 
     @model_validator(mode="after")
     def _check(self) -> "CognitiveProfile":

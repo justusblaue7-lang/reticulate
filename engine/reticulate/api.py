@@ -16,6 +16,7 @@ from functools import cache
 import anthropic
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -49,6 +50,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="Reticulate", version=__version__, lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=settings().cors_origins, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(GZipMiddleware, minimum_size=1024)
 
 
 class NotConfigured(RuntimeError):

@@ -2,9 +2,9 @@
 // situation, personality (Big Five and values) and the six attitudes of the Global Preferences Survey.
 
 import { useEffect, useState } from "react";
-import { loadCatalogue, type PersonAsset } from "../people/model";
+import { loadCatalogue, type PersonAsset } from "../people/catalogue";
 import { PersonViewer } from "../people/PersonViewer";
-import { portraitUrl } from "../people/model";
+import { portraitUrl } from "../people/catalogue";
 import type { Avatar, Science } from "../types";
 import { SHORT } from "../format";
 import { Glyph } from "./Glyph";

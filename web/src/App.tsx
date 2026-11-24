@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "./api";
+import { boot } from "./api";
 import { ClaudeDialog } from "./components/ClaudeDialog";
 import { Mark } from "./components/Mark";
 import { current } from "./pattern";
@@ -15,7 +15,7 @@ export function App() {
   const [connecting, setConnecting] = useState(false);
 
   useEffect(() => {
-    Promise.all([api.science(), api.avatars(), api.status(), api.pattern()])
+    boot()
       .then(([s, a, st, p]) => {
         setScience(s);
         setAvatars(a);

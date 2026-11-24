@@ -1,78 +1,40 @@
-import { useEffect, useRef, useState } from "react";
-import { loadCatalogue } from "./model";
-import { FRAMES, PersonStage, type Framing } from "./stage";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import type { ViewerProps } from "./PersonViewer3D";
 
-interface Props {
-  look: string | null | undefined;
-  name?: string;
-  framing?: Framing;
-  className?: string;
-  controls?: boolean;
-}
+// three.js and a person's model (about 2 MB) load only when the person comes into view, and on
+// a slow or data-saving connection only when asked for; the portrait stands in until then.
+const PersonViewer3D = lazy(() => import("./PersonViewer3D"));
 
-/** A person in 3D: drag to turn them, scroll or use the buttons to come closer. */
-export function PersonViewer({ look, name, framing = "full", className = "", controls = true }: Props) {
+type Connection = { saveData?: boolean; effectiveType?: string };
+const slow = () => {
+  const c = (navigator as Navigator & { connection?: Connection }).connection;
+  return !!c && (c.saveData === true || ["slow-2g", "2g", "3g"].includes(c.effectiveType ?? ""));
+};
+
+/** A person: the portrait at once, the 3D figure once it is in view (or tapped on a slow connection). */
+export function PersonViewer(props: ViewerProps) {
   const holder = useRef<HTMLDivElement>(null);
-  const stage = useRef<PersonStage | null>(null);
-  const [state, setState] = useState<"loading" | "ready" | "missing">("loading");
-  const [frame, setFrame] = useState<Framing>(framing);
+  const [wanted, setWanted] = useState(false);
+  const [lean] = useState(slow);
 
   useEffect(() => {
-    if (!holder.current) return;
-    const s = new PersonStage(holder.current, { zoom: FRAMES[framing] });
-    stage.current = s;
-    return () => {
-      s.dispose();
-      stage.current = null;
-    };
-    // The stage lives as long as the viewer; framing changes go through setZoom.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (wanted || lean || !holder.current) return;
+    const seen = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && setWanted(true), { rootMargin: "200px" });
+    seen.observe(holder.current);
+    return () => seen.disconnect();
+  }, [wanted, lean]);
 
-  useEffect(() => {
-    let cancelled = false;
-    setState("loading");
-    if (!look) {
-      setState("missing");
-      return;
-    }
-    loadCatalogue()
-      .then((people) => {
-        const asset = people.find((p) => p.look === look);
-        if (!asset) throw new Error("not built");
-        return stage.current?.show(asset);
-      })
-      .then(() => !cancelled && setState("ready"))
-      .catch(() => !cancelled && setState("missing"));
-    return () => {
-      cancelled = true;
-    };
-  }, [look]);
-
-  const go = (f: Framing) => {
-    setFrame(f);
-    stage.current?.setZoom(FRAMES[f]);
-  };
-
-  return (
-    <div className={`person-viewer ${className} ${state}`}>
-      <div className="person-stage" ref={holder} title={state === "ready" ? "Drag to turn, scroll to come closer" : undefined} />
-      {state === "loading" && <span className="person-wait">Loading {name ?? "this person"}…</span>}
-      {state === "missing" && (
-        <span className="person-wait">
-          {look ? "This person's 3D model is not built yet (tools/people/build.py)." : "No look chosen yet."}
-        </span>
-      )}
-      {controls && state === "ready" && (
-        <div className="person-controls" role="group" aria-label="View">
-          {(["full", "bust", "face"] as Framing[]).map((f) => (
-            <button key={f} className={frame === f ? "on" : ""} onClick={() => go(f)}>
-              {f === "full" ? "Figure" : f === "bust" ? "Bust" : "Face"}
-            </button>
-          ))}
-          <span className="person-hint">Drag to turn</span>
-        </div>
+  const poster = (
+    <div ref={holder} className={`person-viewer ${props.className ?? ""} loading`}>
+      <div className="person-stage" />
+      {props.look && <img className="person-poster" src={`/people/${props.look}/portrait.webp`} alt="" aria-hidden />}
+      {lean && props.look && !wanted && (
+        <button className="person-load" onClick={() => setWanted(true)}>
+          View in 3D · about 2 MB
+        </button>
       )}
     </div>
   );
+
+  return wanted ? <Suspense fallback={poster}>{<PersonViewer3D {...props} />}</Suspense> : poster;
 }

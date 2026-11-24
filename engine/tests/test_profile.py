@@ -44,3 +44,16 @@ def test_counterfactual_variant(library):
     assert variant.id == "insurance_claims_clerk~risk_taking=8"
     assert variant.value("risk_taking") == 8 and base.value("risk_taking") == 1
     assert variant.dimensions["risk_taking"].source == "counterfactual"
+
+
+def test_a_profile_saved_before_1_0_opens_with_its_attitudes_carried_over():
+    from reticulate.profile import CognitiveProfile
+
+    old = {
+        "id": "my_cfo", "name": "CFO", "kind": "custom", "summary": "x",
+        "dimensions": {"risk_tolerance": 3, "exploration": 7, "time_horizon": 8, "analytical_style": 9,
+                       "experimentation": 4, "social_orientation": 2, "uncertainty_tolerance": 5, "cognitive_flexibility": 6},
+    }
+    p = CognitiveProfile.model_validate(old)
+    assert p.value("risk_taking") == 3 and p.value("patience") == 8 and p.value("altruism") == 2
+    assert p.value("trust") == 5 and "before 1.0" in p.dimensions["trust"].source

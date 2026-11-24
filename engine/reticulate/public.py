@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import anthropic
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -39,6 +40,7 @@ from reticulate.science import science
 from reticulate.simulation import ClaudeEngine, EngineError, Problem, ReasoningEngine
 
 app = FastAPI(title="Reticulate (public)", version=__version__, docs_url=None, redoc_url=None)
+app.add_middleware(GZipMiddleware, minimum_size=1024)
 app.add_exception_handler(EngineError, _engine_error)
 app.add_exception_handler(anthropic.APIError, _anthropic_error)
 

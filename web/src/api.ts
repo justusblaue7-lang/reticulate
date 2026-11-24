@@ -6,12 +6,19 @@ type AvatarRef = string | Avatar;
 /** Built for reticulate.space: the visitor's own key, everything kept in their browser. */
 export const PUBLIC = import.meta.env.VITE_PUBLIC === "1";
 
+const OFFLINE = "No connection. Nothing is lost; try again when you are back online.";
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const k = PUBLIC ? key.get() : null;
-  const response = await fetch(path, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...(k ? { "x-anthropic-key": k } : {}), ...init?.headers },
-  });
+  let response: Response;
+  try {
+    response = await fetch(path, {
+      ...init,
+      headers: { "Content-Type": "application/json", ...(k ? { "x-anthropic-key": k } : {}), ...init?.headers },
+    });
+  } catch {
+    throw new Error(OFFLINE);
+  }
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     const detail = typeof body?.detail === "string" ? body.detail : body?.detail ? JSON.stringify(body.detail) : publicFailure(response.status);
@@ -21,7 +28,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 const publicFailure = (status: number) =>
-  status === 504 ? "Claude took too long to answer. Try again; long panels work better with fewer replicates." : `The engine answered ${status}.`;
+  status === 504
+    ? "Claude took too long to answer. Nothing is lost; try again."
+    : status >= 500
+      ? "Reticulate could not be reached just now. Nothing is lost; try again in a moment."
+      : `The engine answered ${status}.`;
 
 const send = <T>(method: string, path: string, body?: unknown) =>
   request<T>(path, { method, body: body === undefined ? undefined : JSON.stringify(body) });
@@ -108,6 +119,19 @@ const analyseInBackground = async (id: string) => {
   await on(id, "apply-analysis", analysed).catch(() => undefined);
 };
 
+/** A visitor's own mind saved before 1.0, with the six attitudes of 1.0 (as reticulate/profile.py does). */
+const LEGACY: Record<string, string> = { risk_tolerance: "risk_taking", time_horizon: "patience", social_orientation: "altruism" };
+const NEW = ["risk_taking", "patience", "altruism", "trust", "positive_reciprocity", "negative_reciprocity"];
+function migrate(a: Avatar): Avatar {
+  if (!("risk_tolerance" in a.dimensions || "exploration" in a.dimensions)) return a;
+  const dimensions: Avatar["dimensions"] = {};
+  for (const [old, now] of Object.entries(LEGACY)) {
+    if (a.dimensions[old]) dimensions[now] = { ...a.dimensions[old], source: `carried over from '${old}' (before 1.0)` };
+  }
+  for (const d of NEW) dimensions[d] ??= { value: 5, provenance: "authored", uncertainty: null, source: "not set before 1.0; the middle of the scale" };
+  return { ...a, dimensions };
+}
+
 const withKey = (status: Status): Status => {
   const k = key.get();
   return { ...status, claude: { ...status.claude, configured: !!k, key_hint: k ? `…${k.slice(-4)}` : null } };
@@ -146,7 +170,7 @@ const publicApi: typeof localApi = {
     await local.remove("meta", "pattern");
     return { deleted: true };
   },
-  avatars: async () => [...(await request<Avatar[]>("/api/avatars")), ...(await local.all<Avatar>("avatars"))],
+  avatars: async () => [...(await request<Avatar[]>("/api/avatars")), ...(await local.all<Avatar>("avatars")).map(migrate)],
   saveAvatar: async (avatar) => {
     const known = avatar.origin === "user" && (await local.get<Avatar>("avatars", avatar.id));
     const checked = known ? { ...avatar, kind: "persona" as Avatar["kind"] } : await send<Avatar>("POST", "/api/avatar", { profile: avatar });
@@ -201,3 +225,7 @@ const publicApi: typeof localApi = {
 };
 
 export const api = PUBLIC ? publicApi : localApi;
+
+/** What the app needs before it can show anything, requested once, as early as possible. */
+let booting: Promise<[Science, Avatar[], Status, PersonalPattern | null]> | null = null;
+export const boot = () => (booting ??= Promise.all([api.science(), api.avatars(), api.status(), api.pattern()]));

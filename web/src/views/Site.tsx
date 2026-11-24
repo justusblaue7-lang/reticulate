@@ -41,10 +41,10 @@ const SECTIONS = [
 type Work = { kind: "start" | "open" | "save" | "panel" | "self"; label: string; since: number; id?: string };
 type Tab = "dialogue" | "biases" | "panel";
 
-const TABS: { id: Tab; label: string }[] = [
+const TABS: { id: Tab; label: string; short?: string }[] = [
   { id: "dialogue", label: "Dialogue" },
   { id: "biases", label: "Biases" },
-  { id: "panel", label: "Their reasoning" },
+  { id: "panel", label: "Their reasoning", short: "Reasoning" },
 ];
 
 const EMPTY: Problem = { question: "", context: "", options: [] };
@@ -61,6 +61,7 @@ const newer = (a: Decision, b: Decision | null) => !b || b.id !== a.id || a.upda
 
 export function Site({ science, status, avatars, onAvatars, pattern, onPattern, onConnect }: Props) {
   const [palette, setPalette] = useState(false);
+  const [menu, setMenu] = useState(false);
   const [atlas, setAtlas] = useState(location.hash === "#atlas");
   const composer = useRef<ComposerHandle>(null);
   const [archive, setArchive] = useState<DecisionSummary[]>([]);
@@ -323,6 +324,9 @@ export function Site({ science, status, avatars, onAvatars, pattern, onPattern, 
 
   return (
     <div className="site">
+      <a className="skip-link" href="#content">
+        Skip to content
+      </a>
       <header className="nav no-print">
         <div className="nav-inner">
           <button className="brand" onClick={() => fresh()} title="Home">
@@ -343,7 +347,7 @@ export function Site({ science, status, avatars, onAvatars, pattern, onPattern, 
               <Kbd>K</Kbd>
             </button>
             {decision && (
-              <button className="button dark" onClick={() => fresh()}>
+              <button className="button dark new" onClick={() => fresh()}>
                 New
               </button>
             )}
@@ -351,9 +355,25 @@ export function Site({ science, status, avatars, onAvatars, pattern, onPattern, 
               {connected && <span className="dot on" />}
               {!status ? "Engine offline" : connected ? "Claude" : free ? `${free} free ${free === 1 ? "decision" : "decisions"}` : "Connect Claude"}
             </button>
+            <button className="button dark menu-button" aria-expanded={menu} aria-controls="site-menu" onClick={() => setMenu(!menu)}>
+              {menu ? "Close" : "Menu"}
+            </button>
           </div>
         </div>
       </header>
+
+      {menu && (
+        <MobileMenu
+          onClose={() => setMenu(false)}
+          items={[
+            { label: "Decisions", hint: archive.length ? `${archive.length}` : undefined, run: () => setPalette(true) },
+            { label: "New decision", run: () => fresh() },
+            ...SECTIONS.map((s) => ({ label: s.label, run: () => toSection(s.id) })),
+            { label: "Brain atlas", run: openAtlas },
+            { label: connected ? "Claude is connected" : free ? `Claude · ${free} free ${free === 1 ? "decision" : "decisions"}` : "Connect Claude", run: onConnect },
+          ]}
+        />
+      )}
 
       {error && (
         <p className="banner error container" role="alert">
@@ -396,7 +416,7 @@ export function Site({ science, status, avatars, onAvatars, pattern, onPattern, 
           onAtlas={openAtlas}
         />
       ) : (
-        <main className="container decision-page">
+        <main className="container decision-page" id="content">
           <Workspace
             science={science}
             avatars={avatars}
@@ -532,6 +552,38 @@ function Waiting({ decision, onAnalyse, configured, onConnect }: { decision: Dec
   );
 }
 
+/** The site's navigation as a list, for narrow screens: the same items as the header, each one tap. */
+function MobileMenu({ items, onClose }: { items: { label: string; hint?: string; run: () => void }[]; onClose: () => void }) {
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", key);
+    document.body.classList.add("locked");
+    return () => {
+      window.removeEventListener("keydown", key);
+      document.body.classList.remove("locked");
+    };
+  }, [onClose]);
+  return (
+    <nav className="site-menu" id="site-menu" aria-label="Menu">
+      <ul>
+        {items.map((item) => (
+          <li key={item.label}>
+            <button
+              onClick={() => {
+                onClose();
+                item.run();
+              }}
+            >
+              <span>{item.label}</span>
+              {item.hint && <span className="site-menu-hint">{item.hint}</span>}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
 /** You, in this decision: your clear leanings, and whether the dialogue asked how each bears on it. */
 function YouCard({ science, decision, onPatternSetup }: { science: Science; decision: Decision; onPatternSetup: () => void }) {
   const dialogue = decision.dialogue;
@@ -627,9 +679,26 @@ function Workspace(props: WorkspaceProps) {
     (s) => s.id === (dialogue?.conclusion ? "commitment" : dialogue?.exchanges.at(-1)?.turn.stage ?? "frame"),
   );
   const questions = dialogue?.exchanges.length ?? 0;
+  // On phones the two rails are sheets over the dialogue, one tap from the bar.
+  const [drawer, setDrawer] = useState<"you" | "minds" | null>(null);
+  useEffect(() => {
+    if (!drawer) return;
+    const key = (e: KeyboardEvent) => e.key === "Escape" && setDrawer(null);
+    window.addEventListener("keydown", key);
+    document.body.classList.add("locked");
+    return () => {
+      window.removeEventListener("keydown", key);
+      document.body.classList.remove("locked");
+    };
+  }, [drawer]);
+  const openDrawer = (which: "you" | "minds") => {
+    onTab("dialogue");
+    setDrawer(drawer === which ? null : which);
+  };
 
   const thread = dialogue && (
     <DialogueThread
+      key={decision.id}
       science={science}
       decision={decision}
       busy={talk}
@@ -653,13 +722,28 @@ function Workspace(props: WorkspaceProps) {
         <nav className="dbar-nav" aria-label="Sections">
           {TABS.map((t) => (
             <button key={t.id} className={tab === t.id ? "on" : ""} onClick={() => onTab(t.id)}>
-              {t.label}
+              {t.short ? (
+                <>
+                  <span className="label-long">{t.label}</span>
+                  <span className="label-short">{t.short}</span>
+                </>
+              ) : (
+                t.label
+              )}
               {t.id === "biases" && decision.analysis === "pending" && <span className="spinner tiny" />}
               {t.id === "biases" && decision.analysis !== "pending" && biases > 0 && <span className="count">{biases}</span>}
               {t.id === "panel" && panelBusy && <span className="spinner tiny" />}
             </button>
           ))}
         </nav>
+        <div className="dbar-drawers">
+          <button className={drawer === "you" ? "on" : ""} aria-expanded={drawer === "you"} onClick={() => openDrawer("you")}>
+            You
+          </button>
+          <button className={drawer === "minds" ? "on" : ""} aria-expanded={drawer === "minds"} onClick={() => openDrawer("minds")}>
+            Minds{panelBusy && <span className="spinner tiny" />}
+          </button>
+        </div>
         {work && (work.kind === "save" || work.kind === "open") && (
           <span className="dbar-status">
             <span className="spinner tiny" /> {work.label}
@@ -691,8 +775,15 @@ function Workspace(props: WorkspaceProps) {
             </div>
           </header>
 
-          <div className="room">
-            <aside className="room-you no-print">
+          <div className={`room ${drawer ? `drawer-${drawer}` : ""}`}>
+            {drawer && <button className="drawer-scrim" aria-label="Close" onClick={() => setDrawer(null)} />}
+            <aside className="room-you no-print" aria-label="You">
+              <div className="drawer-head">
+                <strong>You</strong>
+                <button className="text-button" onClick={() => setDrawer(null)}>
+                  Done
+                </button>
+              </div>
               <YouCard science={science} decision={decision} onPatternSetup={props.onPatternSetup} />
               <Notes notes={dialogue?.exchanges.at(-1)?.turn.notes} />
             </aside>
@@ -749,7 +840,13 @@ function Workspace(props: WorkspaceProps) {
               </div>
             </section>
 
-            <aside className="room-minds no-print">
+            <aside className="room-minds no-print" aria-label="Minds at the table">
+              <div className="drawer-head">
+                <strong>Minds at the table</strong>
+                <button className="text-button" onClick={() => setDrawer(null)}>
+                  Done
+                </button>
+              </div>
               <Minds
                 science={science}
                 decision={decision}

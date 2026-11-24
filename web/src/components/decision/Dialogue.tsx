@@ -136,11 +136,31 @@ function Answer({ exchange, onChange, disabled }: { exchange: Exchange; onChange
 }
 
 /** The thread of questions and answers, and the box to answer the open question. */
+// An unsent answer is kept per decision in this browser, so a lost connection, a switch to
+// another app or a reload never costs what was typed.
+const draftKey = (id: string) => `reticulate.draft.${id}`;
+const readDraft = (id: string) => {
+  try {
+    return localStorage.getItem(draftKey(id)) ?? "";
+  } catch {
+    return "";
+  }
+};
+const writeDraft = (id: string, text: string) => {
+  try {
+    if (text.trim()) localStorage.setItem(draftKey(id), text);
+    else localStorage.removeItem(draftKey(id));
+  } catch {
+    /* storage blocked: the draft lives as long as the page */
+  }
+};
+
 export function DialogueThread({ science, decision, busy, error, configured, onAnswer, onSkip, onConclude, onRevise, onRetry, onConnect }: Props) {
   const dialogue = decision.dialogue!;
   const exchanges = dialogue.exchanges;
   const open = exchanges.at(-1)?.answer == null && !exchanges.at(-1)?.skipped ? exchanges.at(-1) : undefined;
-  const [text, setText] = useState("");
+  const [text, setText] = useState(() => readDraft(decision.id));
+  const sent = useRef<string | null>(null);
   const box = useRef<HTMLTextAreaElement>(null);
   const end = useRef<HTMLDivElement>(null);
   const elapsed = useElapsed(busy?.since);
@@ -161,9 +181,29 @@ export function DialogueThread({ science, decision, busy, error, configured, onA
     if (open && !busy) box.current?.focus({ preventScroll: true });
   }, [exchanges.length, busy?.kind, open]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const answered = exchanges.filter((e) => e.answer != null || e.skipped).length;
+
+  // Once the answer is on record, the draft has done its job.
+  useEffect(() => {
+    if (sent.current === null) return;
+    sent.current = null;
+    writeDraft(decision.id, "");
+  }, [answered]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // If sending failed, the answer comes back into the box.
+  useEffect(() => {
+    if (error && sent.current && !text) setText(sent.current);
+  }, [error]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const type = (value: string) => {
+    setText(value);
+    writeDraft(decision.id, value);
+  };
+
   const send = () => {
     const answer = text.trim();
     if (!answer || busy) return;
+    sent.current = answer;
     onAnswer(answer);
     setText("");
   };
@@ -172,7 +212,7 @@ export function DialogueThread({ science, decision, busy, error, configured, onA
     const previous = exchanges[index];
     const later = exchanges.length - 1 - index;
     if (later > 0 && !confirm(`Answer question ${index + 1} again? The ${later} question${later === 1 ? "" : "s"} after it will be dropped.`)) return;
-    setText(previous.answer ?? "");
+    type(previous.answer ?? "");
     onRevise(index, previous.answer ?? "");
   };
 
@@ -226,7 +266,7 @@ export function DialogueThread({ science, decision, busy, error, configured, onA
                   disabled={!!busy}
                   className={text.startsWith(`${n}/10`) ? "on" : ""}
                   onClick={() => {
-                    setText(`${n}/10${text.replace(/^\d+\/10/, "")}`);
+                    type(`${n}/10${text.replace(/^\d+\/10/, "")}`);
                     box.current?.focus();
                   }}
                 >
@@ -242,7 +282,7 @@ export function DialogueThread({ science, decision, busy, error, configured, onA
             disabled={!!busy}
             placeholder={busy ? "" : "Your answer"}
             aria-label="Your answer"
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => type(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault();
@@ -252,7 +292,14 @@ export function DialogueThread({ science, decision, busy, error, configured, onA
           />
           <div className="answer-foot">
             <span className="mono muted">
-              {configured ? `↵ to answer · ${onFreeDecision(decision) ? "free decision" : `${roughly(TURN_USD)} a question${spent ? ` · ${usd(spent)} so far` : ""}`}` : "The dialogue uses Claude with your API key"}
+              {configured ? (
+                <>
+                  <span className="touch-hide">↵ to answer · </span>
+                  {onFreeDecision(decision) ? "free decision" : `${roughly(TURN_USD)} a question${spent ? ` · ${usd(spent)} so far` : ""}`}
+                </>
+              ) : (
+                "The dialogue uses Claude with your API key"
+              )}
             </span>
             <button className="text-button" disabled={!!busy} onClick={onSkip}>
               Skip

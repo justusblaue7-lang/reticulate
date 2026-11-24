@@ -5,24 +5,8 @@
 import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 
-export interface PersonAsset {
-  look: string;
-  source: string;
-  parts: Record<string, string[]>; // part (head, body, opacity …) -> maps: color, normal, rough
-}
-
-let catalogue: Promise<PersonAsset[]> | null = null;
-
-/** Every 3D person the app has, in the order of tools/people/cast.yaml. */
-export function loadCatalogue(): Promise<PersonAsset[]> {
-  catalogue ??= fetch("/people/index.json")
-    .then((r) => (r.ok ? r.json() : { people: [] }))
-    .then((data: { people: PersonAsset[] }) => data.people)
-    .catch(() => []);
-  return catalogue;
-}
-
-export const portraitUrl = (look: string, kind: "face" | "portrait" = "face") => `/people/${look}/${kind}.webp`;
+export { loadCatalogue, portraitUrl, type PersonAsset } from "./catalogue";
+import type { PersonAsset } from "./catalogue";
 
 // A relaxed standing pose instead of the library's A-pose: upper arms down beside the
 // body, elbows slightly bent. Angles were measured on the skeleton (Biped rig, local axes).
