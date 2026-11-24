@@ -1,4 +1,4 @@
-// The avatar of a cognitive profile: a reticulum whose outline is the eight dimension
+// The avatar of a cognitive profile: a reticulum whose outline is the six attitude
 // scores (clockwise from the top, in the order of the science layer). The dashed ring
 // marks the midpoint (5); parts of the outline beyond it are above-midpoint leanings.
 

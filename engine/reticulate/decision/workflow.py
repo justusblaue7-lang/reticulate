@@ -70,12 +70,13 @@ def normalise_anatomy(ratings: list[FeatureRating | Rating], source: str) -> lis
 
 
 def normalise_watch_outs(notes: list[WatchOut]) -> list[WatchOut]:
-    """One watch-out per known mechanism, in the order Claude wrote them."""
-    known = {m.id for m in science().mechanisms}
+    """One watch-out per known mechanism, in the order Claude wrote them; a check only where the
+    mechanism has a proven remedy."""
+    remedies = {m.id: m.countermove is not None for m in science().mechanisms}
     seen: dict[str, WatchOut] = {}
     for note in notes:
-        if note.mechanism_id in known and note.mechanism_id not in seen:
-            seen[note.mechanism_id] = note
+        if note.mechanism_id in remedies and note.mechanism_id not in seen:
+            seen[note.mechanism_id] = note if remedies[note.mechanism_id] else note.model_copy(update={"check": ""})
     return list(seen.values())
 
 

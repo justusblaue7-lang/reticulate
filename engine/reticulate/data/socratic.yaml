@@ -1,127 +1,99 @@
-# The Socratic dialogue: how Reticulate questions a decision.
+# The dialogue: how Reticulate questions a decision.
 #
-# The dialogue walks through the six elements of decision quality: a decision is only as
-# good as its weakest element (Howard, 1988; Spetzler, Winter & Meyer, 2016). Every turn makes
-# one Socratic move. Like countermoves, moves carry their basis: `tested` when a study shows
-# that the move improves judgement or decisions (`finding` says what was shown), `derived`
-# when it follows from research or established practice but has not been tested on its own.
-# The interface labels the two differently, and the prompt is compiled from this file.
+# Its structure is that of patient decision aids, the format with the strongest trial
+# evidence for helping people make informed decisions that fit what matters to them
+# (stacey2017: a Cochrane review of 105 randomised trials with 31,043 people): the decision,
+# the options, their outcomes and how likely they are, what matters to the person, and how
+# the options compare on it. It ends with an if-then plan (gollwitzer2006).
+#
+# A move is a kind of question. A move carries a `finding` only when the bar of
+# docs/epistemics.md holds for it (a meta-analysis or a systematic review of trials); the
+# others are plain questions and claim nothing.
 #
 # Changes to this file are science changes: they need review (docs/epistemics.md).
 
-version: 0.5.0
+version: 1.0.0
 
 method:
   summary: >-
-    Guided discovery: the person reaches their own decision through short, open questions,
-    reflections of their own words and summaries, not through advice (Padesky, 1993;
-    Overholser, 1993). In cognitive therapy for depression, more Socratic questioning in a
-    session predicted greater symptom improvement by the next session (Braun et al., 2015).
-  refs: [padesky1993, overholser1993, braun2015, paul2006]
+    One question at a time, in the person's own words, through the parts of a decision aid:
+    the decision, the options, what is likely to happen with each, what matters to the
+    person and how the options compare on it, then a first step as an if-then plan. In
+    randomised trials, decision aids with these parts improved people's knowledge of their
+    options, made their sense of the chances more accurate and led to choices that fit their
+    values better (Cochrane review of 105 trials, 31,043 people).
+  refs: [stacey2017, gollwitzer2006]
 
 stages:
   - id: frame
-    name: Frame
+    name: The decision
     aim: What exactly is being decided, by when, and what is fixed.
-    refs: [howard1988, spetzler2016]
-  - id: goals
-    name: What matters
-    aim: The objectives the decision should serve, most important first.
-    note: >-
-      Asked for their objectives, people named only about half of those they later
-      recognised as important to them.
-    refs: [bond2008]
+    refs: [stacey2017]
   - id: options
     name: Options
-    aim: Real alternatives instead of a single yes or no.
-    note: >-
-      Organisational decisions framed as whether-or-not failed more often than decisions
-      that weighed several alternatives.
-    refs: [nutt1999]
+    aim: Every real option, including waiting or doing nothing.
+    refs: [stacey2017]
   - id: evidence
-    name: Evidence
-    aim: What is known, what is assumed, and what would change the decision.
-    refs: [howard1988, spetzler2016]
+    name: Outcomes
+    aim: What is likely to happen with each option, and how likely, as plainly as the person can say it.
+    refs: [stacey2017, mcdowell2017]
+  - id: goals
+    name: What matters
+    aim: What the person cares about in this decision, most important first.
+    refs: [stacey2017]
   - id: tradeoffs
-    name: Trade-offs
-    aim: What each option costs, and whether the person accepts the cost.
-    refs: [spetzler2016]
+    name: Weighing
+    aim: How the options compare on what matters, and what each one costs.
+    refs: [stacey2017]
   - id: commitment
     name: Commitment
-    aim: The choice in the person's own words, and a first step.
-    refs: [spetzler2016, gollwitzer2006]
+    aim: The choice in the person's own words, and a first step as an if-then plan.
+    refs: [gollwitzer2006]
 
 moves:
   - id: clarify
     name: Clarify
-    question: What exactly do you mean by …?
-    basis: derived
-    refs: [paul2006]
-  - id: goal
+    question: What exactly are you deciding, and by when?
+    refs: []
+  - id: options
+    name: Options
+    question: What else could you do, including waiting or doing nothing?
+    finding: >-
+      Decision aids that set out every option with its outcomes improved people's knowledge
+      of their options and lowered their indecision (Cochrane review of 105 trials).
+    refs: [stacey2017]
+  - id: outcomes
+    name: Outcomes and chances
+    question: Out of 100 people in your place who choose this, how many would you expect to end up where you hope?
+    finding: >-
+      People judged chances more accurately when they came as frequencies than as percentages
+      (meta-analysis), and decision aids that gave the chances of outcomes made people's risk
+      estimates more accurate (Cochrane review).
+    refs: [mcdowell2017, stacey2017]
+  - id: values
     name: What matters
-    question: What would a good outcome look like a year from now? What else matters to you?
-    basis: derived
-    refs: [bond2008]
-  - id: assumption
-    name: Assumption
-    question: What are you taking for granted here?
-    basis: derived
-    refs: [paul2006]
-  - id: evidence
-    name: Evidence
-    question: How do you know? What would show you that you are wrong?
-    basis: derived
-    refs: [paul2006]
-  - id: alternative
-    name: Another option
-    question: If neither option were available, what would you do?
-    basis: tested
+    question: Of everything at stake here, what matters most to you, and why?
     finding: >-
-      Prompting people with their own objectives, one at a time, led them to create more
-      alternatives than they generated unprompted.
-    refs: [siebert2015]
-  - id: perspective
-    name: Distance
-    question: What would you tell a good friend in exactly your position?
-    basis: tested
-    finding: >-
-      People reasoned more wisely about other people's dilemmas than about their own;
-      taking a distanced, third-person view of their own dilemma removed the difference.
-    refs: [grossmann2014]
-  - id: consequence
-    name: Consequences
-    question: If you chose this, what would follow, for you and for others, a year from now?
-    basis: derived
-    refs: [paul2006]
-  - id: opposite
-    name: The other side
-    question: What is the strongest reason against the option you lean toward?
-    basis: tested
-    finding: >-
-      Considering the opposite reduced biased judgement more than an instruction to be
-      fair and unbiased.
-    refs: [lord1984]
-  - id: premortem
-    name: Premortem
-    question: Imagine it is a year from now and this went badly. What happened?
-    basis: tested
-    finding: Imagining that a plan had failed lowered overconfidence in it more than listing pros and cons.
-    refs: [veinott2010]
-  - id: tradeoff
-    name: Trade-off
-    question: What are you willing to give up for this?
-    basis: derived
-    refs: [spetzler2016]
+      Decision aids that ask people what matters to them led to choices more consistent with
+      their values and left them less unclear about what they value (Cochrane review of 105
+      trials).
+    refs: [stacey2017]
+  - id: check
+    name: Check
+    question: How do you know? What would change your mind?
+    refs: []
+  - id: bias
+    name: A documented bias
+    question: Asks about a bias from the list that fits what the person said, using its remedy where one is proven.
+    refs: []
   - id: perspectives
     name: Other minds
-    question: Simulated decision-makers weighed this differently. What do you make of their reasons?
-    basis: derived
-    refs: [grossmann2014]
+    question: One of the minds at the table weighed this differently. What do you make of their reason?
+    refs: []
   - id: commitment
-    name: Commitment
-    question: What will you do first, and when?
-    basis: tested
+    name: If-then plan
+    question: When exactly will you take the first step, and what will you do if something gets in the way?
     finding: >-
-      If–then plans for when and how to act had a medium-to-large effect on reaching goals
-      across 94 independent tests.
+      If-then plans for when, where and how to act had a medium-to-large effect on reaching
+      goals across 94 tests with more than 8,000 participants (meta-analysis).
     refs: [gollwitzer2006]

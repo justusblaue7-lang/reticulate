@@ -21,20 +21,20 @@ from reticulate.simulation.schemas import (
 GO, STAY = "Go ahead", "Keep the status quo"
 ANATOMY = {"possible_loss": 3, "upside": 2, "delayed_outcomes": 2, "default_option": 1}
 FACTORS = [
-    ("downside_risk", "Downside risk", STAY, "risk_tolerance", -1),
-    ("upside_potential", "Upside potential", GO, "risk_tolerance", 1),
-    ("long_term_position", "Long-term positioning", GO, "time_horizon", 1),
-    ("effect_on_others", "Effect on other people", GO, "social_orientation", 1),
+    ("downside_risk", "Downside risk", STAY, "risk_taking", -1),
+    ("upside_potential", "Upside potential", GO, "risk_taking", 1),
+    ("long_term_position", "Long-term positioning", GO, "patience", 1),
+    ("effect_on_others", "Effect on other people", GO, "altruism", 1),
 ]
 
 
 # The guide's path through a dialogue: (stage, move, mechanism) per turn.
 PATH = [
     ("frame", "clarify", "none"),
-    ("goals", "goal", "none"),
-    ("options", "alternative", "status_quo_bias"),
-    ("evidence", "evidence", "none"),
-    ("tradeoffs", "opposite", "loss_aversion"),
+    ("goals", "values", "none"),
+    ("options", "options", "status_quo_bias"),
+    ("evidence", "outcomes", "none"),
+    ("tradeoffs", "bias", "loss_aversion"),
     ("commitment", "commitment", "none"),
 ]
 
@@ -70,7 +70,7 @@ class FakeEngine:
             stage=stage,
             mechanism_id=mechanism if mechanism != "none" else "telepathy" if len(exchanges) == 1 else "none",
             # turn 3 counterweighs a leaning; turn 2 names a dimension with no leaning (dropped)
-            pattern="risk_tolerance" if len(exchanges) == 2 else "exploration" if len(exchanges) == 1 else "none",
+            pattern="risk_taking" if len(exchanges) == 2 else "trust" if len(exchanges) == 1 else "none",
             why="test",
             scale=stage == "commitment",
             notes=notes,
@@ -94,7 +94,7 @@ class FakeEngine:
             # out of order and incomplete on purpose: the workflow orders them
             quality=[QualityCheck(stage="options", level="partial", note="test"), QualityCheck(stage="frame", level="strong", note="test")],
             pattern_notes=[
-                PatternNote(dimension="risk_tolerance", note="My caution made staying feel safe."),
+                PatternNote(dimension="risk_taking", note="My caution made staying feel safe."),
                 PatternNote(dimension="telepathy", note="dropped: not a dimension"),
             ],
         )
@@ -120,7 +120,7 @@ class FakeEngine:
         pull = weight["upside_potential"] - weight["downside_risk"]  # decides on risk alone
         return Perspective(recommendation=GO if pull > 0 else STAY, conditions=[], summary="", reasoning="",
                            assessments=assessments, added_factors=[], key_questions=[], would_change_mind=[],
-                           confidence=5, dimension_drivers=[DimensionDriver(dimension_id="risk_tolerance", effect="")])
+                           confidence=5, dimension_drivers=[DimensionDriver(dimension_id="risk_taking", effect="")])
 
     async def synthesize(self, problem, frame, profiles, perspectives, space, context=None) -> Synthesis:
         return Synthesis(overview="test", divergences=[Divergence(factor_id=f.factor_id, explanation="")

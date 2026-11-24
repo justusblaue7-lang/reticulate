@@ -48,7 +48,7 @@ def test_status_and_science(client):
     status = client.get("/api/status").json()
     assert {"claude", "literature", "version"} <= set(status)
     body = client.get("/api/science").json()
-    assert len(body["dimensions"]) == 8 and len(body["stimuli"]) > 20
+    assert len(body["dimensions"]) == 6 and len(body["stimuli"]) > 20
     assert len(body["features"]) > 10 and len(body["mechanisms"]) > 10 and len(body["personality"]["traits"]) == 5
 
 
@@ -64,7 +64,7 @@ def test_hand_set_anatomy_works_without_claude(unconfigured):
     body = response.json()
     assert body["frame"] is None and body["anatomy"][0]["source"] == "user"
     assert [m["mechanism_id"] for m in body["signature"]["mechanisms"]][:1] == ["loss_aversion"]
-    panel = unconfigured.post(f"/api/decisions/{body['id']}/panel", json={"profiles": ["venture_capitalist"]})
+    panel = unconfigured.post(f"/api/decisions/{body['id']}/panel", json={"profiles": ["software_founder"]})
     assert panel.status_code == 503
 
 
@@ -72,22 +72,22 @@ def test_decision_flow_is_saved(configured):
     created = configured.post("/api/decisions", json={"problem": QUESTION}).json()
     assert created["analysis"] == "pending" and created["dialogue"]["exchanges"] == []
     created = analysed(configured, created["id"])
-    assert created["frame"]["options"] and created["signature"]["dimensions"][0]["dimension_id"] == "risk_tolerance"
+    assert created["frame"]["options"] and created["signature"]["dimensions"][0]["dimension_id"] == "risk_taking"
     panel = configured.post(
         f"/api/decisions/{created['id']}/panel",
-        json={"profiles": ["venture_capitalist", "municipal_treasurer"], "replicates": 2},
+        json={"profiles": ["software_founder", "secondary_teacher"], "replicates": 2},
     ).json()
     assert panel["panel"]["meta"]["replicates"] == 2 and panel["panel"]["meta"]["neural_context"]
     tipping = configured.post(
         f"/api/decisions/{created['id']}/tipping",
-        json={"profile": "municipal_treasurer", "keys": ["risk_tolerance", "neuroticism"], "values": [2, 8]},
+        json={"profile": "secondary_teacher", "keys": ["risk_taking", "neuroticism"], "values": [2, 8]},
     ).json()
-    assert [t["dimension"] for t in tipping["tipping"]] == ["risk_tolerance", "neuroticism"]
+    assert [t["dimension"] for t in tipping["tipping"]] == ["risk_taking", "neuroticism"]
     again = configured.post(
         f"/api/decisions/{created['id']}/tipping",
-        json={"profile": "municipal_treasurer", "keys": ["risk_tolerance"], "values": [5, 9]},
+        json={"profile": "secondary_teacher", "keys": ["risk_taking"], "values": [5, 9]},
     ).json()
-    assert [(t["dimension"], t["values"]) for t in again["tipping"]] == [("neuroticism", [2, 8]), ("risk_tolerance", [5, 9])]
+    assert [(t["dimension"], t["values"]) for t in again["tipping"]] == [("neuroticism", [2, 8]), ("risk_taking", [5, 9])]
     assert configured.get(f"/api/decisions/{created['id']}/progress").json() is None
     listed = configured.get("/api/decisions").json()
     assert listed[0]["id"] == created["id"] and listed[0]["steps"] == ["analysis", "panel", "tipping"]
@@ -106,7 +106,7 @@ def test_analysis_keeps_watch_outs_for_known_mechanisms(configured):
 def test_tipping_rejects_unknown_keys(configured):
     created = configured.post("/api/decisions", json={"problem": QUESTION}).json()
     response = configured.post(
-        f"/api/decisions/{created['id']}/tipping", json={"profile": "venture_capitalist", "keys": ["charisma"]}
+        f"/api/decisions/{created['id']}/tipping", json={"profile": "software_founder", "keys": ["charisma"]}
     )
     assert response.status_code == 422
 
@@ -114,19 +114,19 @@ def test_tipping_rejects_unknown_keys(configured):
 def test_reanalysis_drops_a_panel_that_saw_the_old_context(configured):
     created = configured.post("/api/decisions", json={"problem": QUESTION}).json()
     analysed(configured, created["id"])
-    configured.post(f"/api/decisions/{created['id']}/panel", json={"profiles": ["venture_capitalist"], "replicates": 1})
+    configured.post(f"/api/decisions/{created['id']}/panel", json={"profiles": ["software_founder"], "replicates": 1})
     updated = configured.put(
-        f"/api/decisions/{created['id']}/anatomy", json={"anatomy": [{"feature_id": "threat", "level": 3, "source": "user"}]}
+        f"/api/decisions/{created['id']}/anatomy", json={"anatomy": [{"feature_id": "prior_investment", "level": 3, "source": "user"}]}
     ).json()
-    assert updated["panel"] is None and updated["signature"]["mechanisms"][0]["mechanism_id"] == "threat_and_anxiety"
+    assert updated["panel"] is None and updated["signature"]["mechanisms"][0]["mechanism_id"] == "sunk_cost"
 
 
 def test_user_avatars_can_be_saved_and_deleted_but_personas_cannot(client):
-    persona = next(a for a in client.get("/api/avatars").json() if a["id"] == "venture_capitalist")
+    persona = next(a for a in client.get("/api/avatars").json() if a["id"] == "software_founder")
     copy = client.post("/api/avatars", json={**persona, "name": "My investor"}).json()
-    assert copy["id"] == "my_investor" and copy["origin"] == "user" and copy["person"]["look"] == "male_adult_12"
+    assert copy["id"] == "my_investor" and copy["origin"] == "user" and copy["person"]["look"] == "business_female_01"
     assert any(a["id"] == "my_investor" for a in client.get("/api/avatars").json())
-    assert client.delete("/api/avatars/venture_capitalist").status_code == 422
+    assert client.delete("/api/avatars/software_founder").status_code == 422
     assert client.delete("/api/avatars/my_investor").status_code == 200
 
 

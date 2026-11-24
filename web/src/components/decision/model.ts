@@ -46,6 +46,10 @@ export const LEVEL_NAME = ["absent", "minor", "present", "central"] as const;
 /** How strongly a mechanism is engaged, from the highest level among its features. */
 export const PULL = ["", "Possible", "Likely", "Strong pull"] as const;
 
+/** The biases a decision engages that the current science still lists (older records may name others). */
+export const engagedBiases = (science: Science, decision: Decision) =>
+  decision.signature.mechanisms.filter((m) => science.mechanisms.some((x) => x.id === m.mechanism_id));
+
 /** List-price estimates per call on Claude Haiku 5.5 (rough; the record shows the real cost). */
 export const ANALYSIS_USD = 0.002;
 export const CALL_USD = 0.0025;

@@ -6,15 +6,16 @@ import { Conclusion } from "../components/decision/Conclusion";
 import { DialogueThread, StageRail, type DialogueBusy } from "../components/decision/Dialogue";
 import { Minds } from "../components/decision/Minds";
 import { Notes } from "../components/decision/Notes";
-import { PanelProgress, PanelResult, PanelSetup } from "../components/decision/Panel";
+import { PanelProgress, PanelResult } from "../components/decision/Panel";
 import { WatchOuts } from "../components/decision/WatchOuts";
 import { Kbd, MOD, Mark } from "../components/Mark";
 import { Palette } from "../components/Palette";
 import { usd } from "../format";
 import { STAGE_ART } from "../art";
 import { Art } from "../components/Art";
+import { engagedBiases } from "../components/decision/model";
 import { PdfButton } from "../record/PdfButton";
-import { leanings, leaningOf } from "../pattern";
+import { current, leanings, leaningOf } from "../pattern";
 import type { Avatar, Decision, DecisionSummary, PersonalPattern, Problem, Progress, Rating, Science, Status } from "../types";
 import { Home } from "./Home";
 
@@ -531,7 +532,7 @@ function Waiting({ decision, onAnalyse, configured, onConnect }: { decision: Dec
   );
 }
 
-/** You, in this decision: the leanings the questions counterweigh, and whether each came up. */
+/** You, in this decision: your clear leanings, and whether the dialogue asked how each bears on it. */
 function YouCard({ science, decision, onPatternSetup }: { science: Science; decision: Decision; onPatternSetup: () => void }) {
   const dialogue = decision.dialogue;
   const held = leanings(science, dialogue?.pattern);
@@ -543,9 +544,11 @@ function YouCard({ science, decision, onPatternSetup }: { science: Science; deci
         <p>
           {!dialogue?.pattern
             ? "This dialogue runs without your pattern."
-            : held.length
-              ? "The questions bring in what your leanings tend to leave out."
-              : "No pronounced leaning: the questions go where this decision needs them."}
+            : !current(science, dialogue.pattern)
+              ? "This dialogue began with the questions of an earlier version of Reticulate."
+              : held.length
+                ? "The dialogue asks how your clear leanings bear on this decision."
+                : "Your answers are near the middle: the questions go where this decision needs them."}
         </p>
       </header>
       {dialogue?.pattern && held.length > 0 && (
@@ -560,7 +563,7 @@ function YouCard({ science, decision, onPatternSetup }: { science: Science; deci
       )}
       {!dialogue?.pattern && (
         <button className="text-button" onClick={onPatternSetup}>
-          Add your pattern for the next decision
+          Answer six questions for the next decision
         </button>
       )}
     </section>
@@ -569,7 +572,7 @@ function YouCard({ science, decision, onPatternSetup }: { science: Science; deci
 
 /** The documented biases that could pull on this decision, in brief. */
 function BiasCard({ science, decision, onOpen }: { science: Science; decision: Decision; onOpen: () => void }) {
-  const engaged = decision.signature.mechanisms.slice(0, 4);
+  const engaged = engagedBiases(science, decision).slice(0, 4);
   return (
     <section className="rail-card bias-card">
       <header className="rail-head">
@@ -589,10 +592,10 @@ function BiasCard({ science, decision, onOpen }: { science: Science; decision: D
             if (!mechanism) return null;
             return (
               <li key={m.mechanism_id}>
-                <button onClick={onOpen} title={mechanism.countermove.text}>
+                <button onClick={onOpen} title={mechanism.summary}>
                   <span className="rc-icon bias" />
                   <span>{mechanism.name}</span>
-                  <span className={`rc-tag ${mechanism.countermove.basis === "tested" ? "good" : ""}`}>{mechanism.countermove.basis === "tested" ? "Tested" : "Derived"}</span>
+                  {mechanism.countermove && <span className="rc-tag good">Remedy</span>}
                 </button>
               </li>
             );
@@ -614,7 +617,8 @@ function Workspace(props: WorkspaceProps) {
   const panel = decision.panel;
   const panelBusy = work?.kind === "panel" && work.id === decision.id;
   const analysed = decision.analysis === "done" || decision.anatomy.some((r) => r.level > 0);
-  const biases = decision.signature.mechanisms.filter((m) => m.level >= 2).length || decision.signature.mechanisms.length;
+  const known = engagedBiases(science, decision);
+  const biases = known.filter((m) => m.level >= 2).length || known.length;
   const title = dialogue?.exchanges.at(-1)?.turn.notes.decision || decision.frame?.decision || decision.problem.question;
   const usage = decision.usage;
   const model = decision.dialogue?.meta.model ?? decision.meta.model;
@@ -713,8 +717,6 @@ function Workspace(props: WorkspaceProps) {
                       busy={!!talk}
                       onSettle={props.onSettle}
                       onReopen={props.onReopen}
-                      onPanel={() => onTab("panel")}
-                      onReveal={props.onReveal}
                     />
                   )}
                   {dialogue ? (
@@ -793,15 +795,14 @@ function Workspace(props: WorkspaceProps) {
           {panelBusy ? (
             <PanelProgress progress={progress} members={panelRun?.members ?? []} replicates={panelRun?.replicates ?? 1} since={work!.since} />
           ) : panel ? (
-            <>
-              <PanelResult science={science} decision={decision} />
-              <details className="again no-print">
-                <summary>Ask a different table</summary>
-                <PanelSetup science={science} decision={decision} avatars={avatars} configured={configured} onConvene={props.onConvene} onConnect={onConnect} again />
-              </details>
-            </>
+            <PanelResult science={science} decision={decision} />
           ) : (
-            <PanelSetup science={science} decision={decision} avatars={avatars} configured={configured} onConvene={props.onConvene} onConnect={onConnect} />
+            <div className="empty-state">
+              <p>No minds have weighed in yet. Pick who sits at the table beside your dialogue, then ask them; their full reasoning appears here.</p>
+              <button className="button" onClick={() => onTab("dialogue")}>
+                Pick the minds
+              </button>
+            </div>
           )}
         </Sheet>
       )}

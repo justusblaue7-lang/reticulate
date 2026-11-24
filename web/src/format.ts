@@ -21,6 +21,8 @@ export const DESIGN_LABEL: Record<Design, string> = {
   stimulation: "Brain stimulation (causal)",
   meta_analysis: "Meta-analysis",
   theory: "Theoretical proposal",
+  replication: "Multi-site replication",
+  field: "Field data",
 };
 
 export const SOURCE_LABEL: Record<Source, string> = { neuroquery: "NeuroQuery", neurosynth: "Neurosynth" };
@@ -33,14 +35,12 @@ export const SOURCE_LINE: Record<Source | "both", string> = {
 
 /** Short dimension names for the profile glyph's axes. */
 export const SHORT: Record<string, string> = {
-  risk_tolerance: "Risk",
-  exploration: "Explore",
-  time_horizon: "Horizon",
-  analytical_style: "Analytic",
-  experimentation: "Novelty",
-  social_orientation: "Social",
-  uncertainty_tolerance: "Ambiguity",
-  cognitive_flexibility: "Flexible",
+  risk_taking: "Risk",
+  patience: "Patience",
+  altruism: "Giving",
+  trust: "Trust",
+  positive_reciprocity: "Returns",
+  negative_reciprocity: "Punishes",
 };
 
 export const HEMI_LABEL = { lh: "Left hemisphere", rh: "Right hemisphere" } as const;

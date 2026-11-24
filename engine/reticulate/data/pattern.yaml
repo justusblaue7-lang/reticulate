@@ -1,237 +1,85 @@
-# Your pattern: how the person describes their own decision-making, and how the dialogue
-# uses it.
+# The person's own pattern: the six questions of the Global Preferences Survey (falk2018),
+# in the wording of the validated survey module (falk2023), each answered from 0 to 10.
+# The answer is the value: 0 one end of the scale, 10 the other.
 #
-# The pattern scores the person on the eight dimensions of dimensions.yaml, from a short
-# self-rating: two statements per dimension, one written toward each pole, rated 1 (not like
-# me) to 5 (very like me). A dimension's score is the mean of the high-pole item and the
-# reversed low-pole item, mapped to 0–10, so 5 means no particular leaning and acquiescence
-# (agreeing with everything) cancels out. The person may adjust any score afterwards.
-#
-# The items are authored for Reticulate. They are not a validated instrument: their
-# reliability and validity are unknown, and two items per dimension are too few for a
-# trait estimate. Scores are `authored` (self-rated), never `measured` (docs/epistemics.md).
-# Licensed instruments with known reliability (DOSPERT, IUS-12, delay discounting) are on
-# the roadmap as `measured` inputs.
-#
-# `leanings` say, for each pole, what a pronounced leaning tends to leave out of view
-# (`watch`), the question that brings it into view (`counterweight`), how to put questions
-# to such a person (`style`, optional), and which mechanisms of mechanisms.yaml the leaning
-# makes more likely to pull. They are `derived`: they follow from the dimension definitions
-# and the mechanisms' summaries. Whether tailoring the dialogue this way improves decisions
-# has not been tested; the dialogue study on the roadmap compares dialogues with and
-# without a pattern.
+# `leanings` say what an answer toward one end has been found to go with in the cited
+# studies, and which documented bias the same measure was validated against. They describe;
+# they give no advice.
 #
 # Changes to this file are science changes: they need review (docs/epistemics.md).
 
-version: 0.6.0
+version: 1.0.0
 
 method:
   summary: >-
-    Sixteen statements, two per dimension, one toward each pole, rated from 1 (not like me)
-    to 5 (very like me). The low-pole statement is reversed, so agreeing with everything
-    cancels out. The score is a self-description in general, not a measurement, and a
-    particular decision may differ from it.
-  scale: [Not like me, Rarely, Sometimes, Often, Very like me]
-  basis: derived
+    Six questions from the Global Preferences Survey, asked of about 80,000 people in 76
+    countries. Each was validated against choices with real money: the answer predicts how a
+    person chooses between lotteries and safe amounts, between money now and more money
+    later, how much they give, trust, return and punish. Your answers describe your attitudes
+    in general; a particular decision can differ.
+  refs: [falk2018, falk2023, dohmen2011]
 
 items:
-  - id: risk_high
-    dimension: risk_tolerance
-    pole: high
-    text: I would accept a real chance of losing something for a chance at a much bigger gain.
-  - id: risk_low
-    dimension: risk_tolerance
-    pole: low
-    text: When a choice could cost me money, standing or security, I take the safer option even if it offers less.
-  - id: explore_high
-    dimension: exploration
-    pole: high
-    text: I try new options, tools or paths even when the ones I know work well.
-  - id: explore_low
-    dimension: exploration
-    pole: low
-    text: Once I have found something that works, I stick with it rather than keep looking.
-  - id: horizon_high
-    dimension: time_horizon
-    pole: high
-    text: I readily give up something I could have now for a better result years from now.
-  - id: horizon_low
-    dimension: time_horizon
-    pole: low
-    text: A good outcome soon matters more to me than a somewhat better one far in the future.
-  - id: analytic_high
-    dimension: analytical_style
-    pole: high
-    text: Before an important choice, I spell out the options and compare them point by point.
-  - id: analytic_low
-    dimension: analytical_style
-    pole: low
-    text: For important choices, I go with my gut feeling more than with a written comparison.
-  - id: novel_high
-    dimension: experimentation
-    pole: high
-    text: I am drawn to unconventional ways of doing things, even where a proven way exists.
-  - id: novel_low
-    dimension: experimentation
-    pole: low
-    text: I prefer the established, proven way of doing things over a new approach.
-  - id: social_high
-    dimension: social_orientation
-    pole: high
-    text: In big decisions, how the outcome affects the people around me weighs as much as how it affects me.
-  - id: social_low
-    dimension: social_orientation
-    pole: low
-    text: In big decisions, I judge mainly by what the outcome means for my own goals and freedom.
-  - id: ambiguity_high
-    dimension: uncertainty_tolerance
-    pole: high
-    text: I can commit to a course of action while important facts are still unknown.
-  - id: ambiguity_low
-    dimension: uncertainty_tolerance
-    pole: low
-    text: I find it hard to decide until the important unknowns are cleared up.
-  - id: flexible_high
-    dimension: cognitive_flexibility
-    pole: high
-    text: When new information comes in, I readily change my plan.
-  - id: flexible_low
-    dimension: cognitive_flexibility
-    pole: low
-    text: Once I have set a course, I keep to it unless the evidence against it is strong.
+  - id: gps_risk
+    dimension: risk_taking
+    text: In general, how willing or unwilling are you to take risks?
+    low: Completely unwilling to take risks
+    high: Very willing to take risks
+  - id: gps_patience
+    dimension: patience
+    text: How willing are you to give up something that is beneficial for you today in order to benefit more from that in the future?
+    low: Completely unwilling
+    high: Very willing
+  - id: gps_altruism
+    dimension: altruism
+    text: How willing are you to give to good causes without expecting anything in return?
+    low: Completely unwilling
+    high: Very willing
+  - id: gps_trust
+    dimension: trust
+    text: "How well does this describe you: I assume that people have only the best intentions."
+    low: Does not describe me at all
+    high: Describes me perfectly
+  - id: gps_pos_reciprocity
+    dimension: positive_reciprocity
+    text: "How well does this describe you: When someone does me a favour, I am willing to return it."
+    low: Does not describe me at all
+    high: Describes me perfectly
+  - id: gps_neg_reciprocity
+    dimension: negative_reciprocity
+    text: How willing are you to punish someone who treats you unfairly, even if there may be costs for you?
+    low: Completely unwilling
+    high: Very willing
 
 leanings:
-  - dimension: risk_tolerance
+  - dimension: risk_taking
     low:
-      watch: >-
-        What could be lost looms larger than an equal gain, and not acting can feel safe
-        even when it is not.
-      counterweight: >-
-        Make the cost of not acting as concrete as the cost of acting, and size the downside
-        realistically: how likely, how bad, how recoverable.
-      mechanisms: [loss_aversion, regret_aversion, status_quo_bias]
+      watch: Answering low goes with choosing a safe amount over a lottery when real money is at stake, and with holding fewer stocks.
     high:
-      watch: >-
-        The upside fills the picture; how likely the downside is, and whether it could be
-        absorbed, get less attention.
-      counterweight: >-
-        A pre-mortem: assume it went wrong a year from now and ask why; ask which loss they
-        could not absorb.
-      mechanisms: [probability_weighting, overconfidence]
-
-  - dimension: exploration
+      watch: Answering high goes with choosing lotteries over safe amounts when real money is at stake, and with self-employment, stock holding and smoking.
+  - dimension: patience
     low:
-      watch: The options on the table may be only the familiar ones.
-      counterweight: >-
-        Widen the set once: an option they have not considered, or what they would do if
-        the current options disappeared.
-      mechanisms: [status_quo_bias, explore_exploit]
+      watch: Answering low goes with taking smaller, sooner payments over larger, later ones when real money is at stake, and with saving less.
+      mechanisms: [present_bias]
     high:
-      watch: >-
-        Searching can stand in for deciding, and what already works may be underrated.
-      counterweight: >-
-        Ask what would be enough to stop searching, and what the known option offers that a
-        new one would have to beat.
-      mechanisms: [explore_exploit]
-
-  - dimension: time_horizon
+      watch: Answering high goes with waiting for larger, later payments when real money is at stake, and with saving more and longer education.
+  - dimension: altruism
     low:
-      watch: What arrives soon outweighs what matters later.
-      counterweight: >-
-        Make the future concrete: how the choice looks in one, five and ten years, to the
-        person they will be then.
-      style: Make the future near and specific, a particular day or a particular person, rather than abstract.
-      mechanisms: [present_bias, self_control]
+      watch: Answering low goes with giving less in a real donation choice.
     high:
-      watch: >-
-        What the choice costs now, in money, energy or wellbeing, can be underrated, and
-        distant payoffs are less certain than they look.
-      counterweight: >-
-        Ask what the choice costs them in the next year, and how sure the long-term payoff
-        really is.
-      mechanisms: []
-
-  - dimension: analytical_style
+      watch: Answering high goes with giving more in a real donation choice, and with donating, volunteering and helping strangers.
+  - dimension: trust
     low:
-      watch: >-
-        A strong first impression can settle the question before the options are compared,
-        and how an option is worded can shift it.
-      counterweight: >-
-        Ask what the feeling is responding to, turn it into one or two criteria they can
-        check, and restate an option the other way round (as a gain, then as a loss).
-      style: Start from concrete pictures and situations, then make the criteria explicit.
-      mechanisms: [cognitive_reflection, framing, moral_intuition]
+      watch: Answering low means not assuming that other people have the best intentions.
     high:
-      watch: >-
-        What can be counted can crowd out what matters but resists numbers: feelings,
-        values, relationships.
-      counterweight: >-
-        Ask how each option feels to live with, or what they would choose if the numbers
-        came out even.
-      style: Numbers and explicit criteria are welcome; still ask, at least once, how an option feels.
-      mechanisms: []
-
-  - dimension: experimentation
+      watch: Answering high means assuming that other people have the best intentions.
+  - dimension: positive_reciprocity
     low:
-      watch: >-
-        The proven way is the default, and a new approach has to clear a higher bar than the
-        old one ever did.
-      counterweight: >-
-        Ask whether they would choose the established way if they were starting fresh today,
-        and what a small trial of the alternative would cost.
-      mechanisms: [status_quo_bias, feedback_learning]
+      watch: Answering low means returning favours matters less to you than to most people, who answer near the top of this scale.
     high:
-      watch: Novelty can become a reason of its own, and the proven way can be dismissed too fast.
-      counterweight: >-
-        Ask what the conventional option gets right, and how they will know whether the new
-        approach works.
-      mechanisms: [overconfidence]
-
-  - dimension: social_orientation
+      watch: Answering high goes with returning a favour when real money is at stake.
+  - dimension: negative_reciprocity
     low:
-      watch: >-
-        Effects on other people, and their support or resistance, may only show up after the
-        decision.
-      counterweight: Ask who else is affected, and what each of them would need from the decision.
-      mechanisms: []
+      watch: Answering low goes with letting unfair treatment pass rather than paying to punish it.
     high:
-      watch: Other people's expectations can stand in for one's own preference.
-      counterweight: >-
-        Separate their own wish from what others expect: what would they choose if no one
-        else would ever know?
-      mechanisms: [social_conformity, inequity_aversion, trust_reciprocity]
-
-  - dimension: uncertainty_tolerance
-    low:
-      watch: >-
-        Unknowns can delay the decision indefinitely, or make the option with knowable
-        outcomes look better than it is.
-      counterweight: >-
-        Separate what can be found out before deciding from what cannot, and ask for the
-        smallest reversible step.
-      style: Make each unknown explicit and bounded; offer reversible steps rather than leaps.
-      mechanisms: [ambiguity_aversion, threat_and_anxiety]
-    high:
-      watch: Cheap information that would change the decision may go ungathered.
-      counterweight: >-
-        Ask which unknown, if answered, would change the choice, and whether it can be
-        checked cheaply first.
-      mechanisms: [overconfidence]
-
-  - dimension: cognitive_flexibility
-    low:
-      watch: >-
-        Commitment to the current plan, or to what has already gone into it, can outweigh new
-        evidence.
-      counterweight: >-
-        Ask what evidence would make them change course, and whether they would start this
-        plan today knowing what they know now.
-      mechanisms: [sunk_cost, status_quo_bias]
-    high:
-      watch: >-
-        Reframing can keep the decision open for good, and new but thin evidence can carry
-        too much weight.
-      counterweight: >-
-        Anchor on the criteria they named at the start, and ask what would have to stay true
-        for the decision to hold.
-      mechanisms: []
+      watch: Answering high goes with punishing unfair treatment even when it costs you, when real money is at stake.

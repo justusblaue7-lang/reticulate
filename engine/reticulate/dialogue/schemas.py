@@ -8,13 +8,27 @@ come from data/socratic.yaml, so the schema always matches the science layer.
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from reticulate.science import science
 from reticulate.simulation.schemas import Usage
 
 StageId = Literal[tuple(s.id for s in science().socratic.stages)]  # type: ignore[valid-type]
 MoveId = Literal[tuple(m.id for m in science().socratic.moves)]  # type: ignore[valid-type]
+
+# The moves of dialogues saved before science 1.0, mapped to the move that replaced them, so
+# that every saved decision still opens.
+LEGACY_MOVES = {
+    "goal": "values",
+    "alternative": "options",
+    "consequence": "outcomes",
+    "perspective": "perspectives",
+    "tradeoff": "values",
+    "assumption": "check",
+    "evidence": "check",
+    "opposite": "check",
+    "premortem": "check",
+}
 
 
 class Assumption(BaseModel):
@@ -46,15 +60,20 @@ class SocraticTurn(BaseModel):
         "between two things they said; empty on the first turn"
     )
     question: str = Field(description="Exactly one open question, at most 25 words")
-    move: MoveId = Field(description="The Socratic move this question makes")
-    stage: StageId = Field(description="The element of decision quality this question works on")
+    move: MoveId = Field(description="The move this question makes")
+    stage: StageId = Field(description="The part of the decision this question works on")
     mechanism_id: str = Field(
-        description="id of the mechanism whose countermove this question applies, or 'none'"
+        description="id of the bias this question asks about, or 'none'"
     )
     pattern: str = Field(
-        description="id of the dimension in <person> whose leaning this question counterweighs, or 'none'"
+        description="id of the attitude in <person> whose leaning this question asks about, or 'none'"
     )
     why: str = Field(description="Why this question now, in one short sentence addressed to the person")
+
+    @field_validator("move", mode="before")
+    @classmethod
+    def _legacy_move(cls, value: object) -> object:
+        return LEGACY_MOVES.get(value, value) if isinstance(value, str) else value
     scale: bool = Field(description="True when the question asks for a number from 0 to 10")
     notes: Notes
     ready: bool = Field(

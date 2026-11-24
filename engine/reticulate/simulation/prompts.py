@@ -50,8 +50,10 @@ Finally, write the watch-outs. For every mechanism in <mechanisms> that is linke
 feature you rated 2 or 3, write one watch-out:
 - "here": one sentence, addressed to the decision-maker, on how this mechanism could pull on \
 this particular decision. Point to its details; do not claim that it will happen.
-- "check": the mechanism's countermove turned into one concrete question or step for this \
-decision. Keep the substance of the countermove; do not invent facts or advice beyond it."""
+- "check": only for a mechanism that has a "remedy": the remedy turned into one concrete \
+question or step for this decision. Keep its substance; do not invent facts or advice beyond \
+it. For a mechanism without a remedy, leave "check" empty: no remedy has been shown to work, \
+and none may be invented."""
 )
 
 PERSPECTIVE_SYSTEM = """\
@@ -201,7 +203,7 @@ def analysis_prompt(problem: Problem) -> tuple[str, str]:
             "name": m.name,
             "summary": m.summary,
             "linked_features": [f.id for f in sci.features if m.id in f.mechanisms],
-            "countermove": m.countermove.text,
+            **({"remedy": m.countermove.text} if m.countermove else {}),
         }
         for m in sci.mechanisms
     ]

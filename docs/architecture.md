@@ -21,12 +21,12 @@ web/ (React, three.js)                          engine/ (Python, FastAPI)
 
 ## Your pattern (`reticulate/pattern.py`, `data/pattern.yaml`)
 
-The person rates sixteen statements (GET/PUT/DELETE `/api/pattern`); `pattern.score` maps
-each dimension's pair (the low-pole item reversed) to 0–10, `leanings` returns the
+The person answers the six questions of the Global Preferences Survey, 0–10 (GET/PUT/DELETE
+`/api/pattern`); `pattern.score` takes each answer as its attitude's value, `leanings` returns the
 dimensions at least 1.25 from 5 ("some") or 2.5 ("clear"). A new decision's dialogue takes a
 snapshot (`Dialogue.pattern`, `pattern_at`). `prompts.person_block` compiles the snapshot into
-a `<person>` block (each leaning's pole, behavioural anchor, what it leaves out of view, its
-counterweight, style and mechanisms), sent as a second cached system block after the frozen
+a `<person>` block (each leaning's pole and question, what such answers go with, and the bias
+the attitude was validated against), sent as a second cached system block after the frozen
 system prompt. Turns carry `pattern` (the leaning a question counterweighs, normalised to
 pronounced leanings only), the conclusion `pattern_notes`.
 
@@ -46,7 +46,7 @@ Problem ─▶ POST /api/decisions: the record, an empty dialogue, analysis "pen
 ```
 
 - **Prompt.** `dialogue/prompts.py` compiles one frozen system prompt from
-  `data/socratic.yaml` (stages, moves) and `data/mechanisms.yaml` (countermoves). The
+  `data/socratic.yaml` (stages, moves) and `data/mechanisms.yaml` (biases, evidence, proven remedies). The
   conversation is replayed as alternating messages: the decision, each turn as the JSON the
   model returned, each answer. Both the system prompt and the conversation carry cache
   breakpoints, so a turn pays full price only for what is new. App notes travel inside the
@@ -115,7 +115,7 @@ rendered into a prompt; the simulation sees the role (`name`) only.
 - One page. `views/Site.tsx` holds the nav, the ⌘K palette (`components/Palette.tsx`) and
   either the home or an open decision (`#decide/<id>[/<tab>]`). `views/Home.tsx` is the
   home: the command window (`Composer`: the decision, options, details, recent decisions,
-  examples), how it works, biases with countermoves, and `views/Patterns.tsx` (the cognitive
+  examples), how it works, the documented biases, your six questions, and `views/Patterns.tsx` (the
   patterns: a strip of minds, one dossier with all its attitudes, the builder). An open
   decision is a room in three columns: you (your leanings and whether each came up, the
   working notes), the dialogue in the command window (stage rail, thread, a pinned answer

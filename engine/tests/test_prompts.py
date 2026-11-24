@@ -2,21 +2,21 @@ from reticulate.simulation.prompts import PROMPT_VERSION, perspective_prompt, re
 
 
 def test_profile_rendering_reflects_leaning_strength_and_nuance(library):
-    text = render_profile(library.get("cooperative_bank_credit_officer"))
-    assert "risk_tolerance: 2/10" in text and "clear leaning toward cautious" in text
-    assert "Nuance:" in text and "other people" in text.lower() or "others" in text.lower()
+    text = render_profile(library.get("insurance_claims_clerk"))
+    assert "risk_taking: 1/10" in text and "strong leaning toward cautious" in text
+    assert "Nuance:" in text and "small print" in text
 
 
 def test_neutral_dimensions_get_no_anchor(library):
-    text = render_profile(library.get("impact_investor"))
-    line = next(line for line in text.splitlines() if line.startswith("- risk_tolerance"))
+    text = render_profile(library.get("software_developer"))
+    line = next(line for line in text.splitlines() if line.startswith("- risk_taking"))
     assert "no clear leaning" in line
 
 
 async def test_perspective_prompt_puts_profile_in_system_and_frame_in_user(library, engine, problem):
     frame = await engine.frame(problem)
-    system, user = perspective_prompt(problem, frame, library.get("creative_director"))
-    assert "<profile>" in system and "Creative director" in system
+    system, user = perspective_prompt(problem, frame, library.get("apprentice_carpenter"))
+    assert "<profile>" in system and "Apprentice carpenter" in system
     assert "<decision_frame>" in user and "Lübbecke" in user
 
 
@@ -25,7 +25,7 @@ def test_prompt_version_is_a_short_hash():
 
 
 def test_personality_is_rendered_and_appearance_never_is(library):
-    profile = library.get("venture_capitalist")
+    profile = library.get("software_founder")
     text = render_profile(profile)
     assert "Personality, Big Five" in text and "- neuroticism: 3/10" in text and "Achievement" in text
     for leak in ("coily", "skin", "phenotype", "glasses", "58"):

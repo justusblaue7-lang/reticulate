@@ -57,6 +57,13 @@
 - [x] "Download PDF" replaces printing: the whole decision as a document to keep, with a page for the review
 - [x] Free decisions on reticulate.space: three per visitor on the house key (`reticulate.trial`), then their own key
 
+**1.0 Only what large studies show** (docs/epistemics.md, "The evidence bar")
+- [x] Attitudes: the six preferences of the Global Preferences Survey replace the eight hypothetical tendencies; your pattern is the survey's six validated questions
+- [x] Biases: 13 with a meta-analysis, multi-lab replication or field data behind each; remedies only where trials prove them (2); no "derived" countermoves or moves
+- [x] The dialogue follows the structure of decision aids (Cochrane review); "decision quality" claims removed
+- [x] Sixteen minds from everyday life, 8 women and 8 men aged 19 to 72, answers spread like population surveys
+- [x] Home: the self section quotes the Apology ("to examine myself and others"), the close the Crito; one closing call; one place to pick the minds
+
 ## Next, for the thesis
 
 0. **Dialogue study.** Does the dialogue improve decisions, and does holding it with the

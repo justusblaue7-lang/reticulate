@@ -1,0 +1,42 @@
+# A Reticulate persona (1.0). `dimensions` are this character's answers to the six questions
+# of the Global Preferences Survey (0–10). Written, not measured: a character, not a real person.
+# `person` is shown in the interface only and never sent to Claude.
+id: retired_bookkeeper
+name: Retired bookkeeper
+kind: persona
+summary: 68, retired bookkeeper, manages the savings and the care of her husband, who has dementia.
+nuance: Careful with money and forgiving with people; thinks about the years ahead and about not burdening
+  her son.
+priorities:
+- her husband's care
+- her savings lasting
+- her independence
+voice: Orderly and kind; keeps lists.
+dimensions:
+  risk_taking: 2
+  patience: 7
+  altruism: 6
+  trust: 5
+  positive_reciprocity: 8
+  negative_reciprocity: 0
+personality:
+  traits:
+    openness: 4
+    conscientiousness: 9
+    extraversion: 4
+    agreeableness: 8
+    neuroticism: 5
+  values:
+  - security
+  - benevolence
+  - tradition
+context:
+  goals:
+  - Keep her husband at home as long as possible
+  - Not run out of money
+  constraints:
+  - Fixed pension
+  - Care needs that grow every year
+person:
+  name: Gisela Brandt
+  look: business_female_02

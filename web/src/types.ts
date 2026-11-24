@@ -2,7 +2,7 @@
 
 export type Provenance = "measured" | "inferred" | "meta-analytic" | "authored";
 export type Source = "neuroquery" | "neurosynth";
-export type Design = "within_subject" | "individual_differences" | "lesion" | "stimulation" | "meta_analysis" | "theory";
+export type Design = "within_subject" | "individual_differences" | "lesion" | "stimulation" | "meta_analysis" | "theory" | "replication" | "field";
 
 export interface Anchors {
   low: string;
@@ -19,7 +19,7 @@ export interface Dimension {
   instruments: { id: string; name: string; kind: string; ref: string | null }[];
   notes: string;
   refs: string[];
-  construct_map: { query: string; neurosynth: string[]; quality: "good" | "moderate" | "low"; note: string };
+  construct_map: { query: string; neurosynth: string[]; quality: "good" | "moderate" | "low"; note: string } | null;
   reasoning: Anchors;
 }
 
@@ -82,9 +82,9 @@ export interface DecisionFeature {
   note: string;
 }
 
+/** A remedy for a bias: listed only when a meta-analysis or field trials show that it works. */
 export interface Countermove {
   text: string;
-  basis: "tested" | "derived"; // tested: an intervention study shows that it reduces the effect
   finding: string;
   refs: string[];
 }
@@ -96,30 +96,31 @@ export interface Mechanism {
   evidence: { design: Design; finding: string; refs: string[] }[];
   dimensions: string[];
   refs: string[];
-  countermove: Countermove;
+  countermove: Countermove | null;
 }
 
+/** One question of the Global Preferences Survey, answered from 0 (`low`) to 10 (`high`). */
 export interface PatternItem {
   id: string;
   dimension: string;
-  pole: "low" | "high";
   text: string;
+  low: string;
+  high: string;
 }
 
+/** What an answer toward one end has been found to go with, and the bias it was validated against. */
 export interface PatternLeaning {
   watch: string;
-  counterweight: string;
-  style: string;
   mechanisms: string[];
 }
 
 export interface PatternScience {
-  method: { summary: string; scale: string[]; basis: "derived" };
+  method: { summary: string; refs: string[] };
   items: PatternItem[];
   leanings: { dimension: string; low: PatternLeaning; high: PatternLeaning }[];
 }
 
-/** The person's own pattern: self-rated, never measured. */
+/** The person's own pattern: their answers to the six survey questions. */
 export interface PersonalPattern {
   kind: "personal_pattern";
   provenance: "authored";
@@ -141,8 +142,7 @@ export interface SocraticMove {
   id: string;
   name: string;
   question: string;
-  basis: "tested" | "derived";
-  finding: string;
+  finding: string; // only where a meta-analysis or a systematic review of trials backs the move
   refs: string[];
 }
 
@@ -351,7 +351,7 @@ export interface NeuralSignature {
 export interface WatchOut {
   mechanism_id: string;
   here: string; // how the mechanism could pull on this decision (Claude)
-  check: string; // its countermove for this decision (Claude)
+  check: string; // its proven remedy for this decision (Claude); empty when it has none
 }
 
 // --- the Socratic dialogue ---------------------------------------------------------------
@@ -373,7 +373,7 @@ export interface SocraticTurn {
   move: string;
   stage: string;
   mechanism_id: string; // or "none"
-  pattern: string; // the dimension whose leaning this question counterweighs, or "none"
+  pattern: string; // the attitude whose leaning this question asks about, or "none"
   why: string;
   scale: boolean;
   notes: Notes;

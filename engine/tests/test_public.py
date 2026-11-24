@@ -117,6 +117,6 @@ def test_pattern_and_avatars():
     copy = c.post("/api/avatar", json={"profile": personas[0]}).json()
     assert copy["id"] != personas[0]["id"] and copy["origin"] == "user"
     science = c.get("/api/science").json()
-    answers = {i["id"]: 3 for i in science["pattern"]["items"]}
+    answers = {i["id"]: 5 for i in science["pattern"]["items"]}
     p = c.post("/api/pattern", json={"answers": answers}).json()
     assert all(v["value"] == 5 for v in p["dimensions"].values())

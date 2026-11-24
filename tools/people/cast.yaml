@@ -3,8 +3,8 @@
 # avatars (engine/reticulate/library/personas/*.yaml, `person.look`) and by the avatar builder.
 #
 # Build the assets with:  engine/.venv/bin/python tools/people/build.py
-# The first eleven are the personas; the rest are the cast the builder offers for your own
-# avatars. Occupational costumes (helmets, uniforms, masks) are left out on purpose.
+# The personas (engine/reticulate/library/personas) use sixteen of these looks; all of them are
+# offered by the builder for your own avatars. Occupational costumes (helmets, uniforms, masks) are left out on purpose.
 
 people:
   # personas

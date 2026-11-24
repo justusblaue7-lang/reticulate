@@ -1,5 +1,5 @@
-"""The science layer: dimensions, personality, brain structures, networks, findings, stimuli,
-decision features, mechanisms, the Socratic dialogue and references.
+"""The science layer: attitudes, personality, brain structures and networks (for the atlas),
+stimuli, decision features, biases, the dialogue and references.
 
 The content lives in YAML files under reticulate/data so that it can be reviewed and
 versioned as science, separately from code. This module loads it into typed models and
@@ -43,7 +43,7 @@ class Dimension(BaseModel):
     instruments: list[Instrument]
     notes: str = ""
     refs: list[str] = []
-    construct_map: ConstructMap
+    construct_map: ConstructMap | None = None  # a meta-analytic map in the atlas, if one fits
     reasoning: PoleAnchors
 
 
@@ -72,7 +72,10 @@ class Region(BaseModel):
     refs: list[str]
 
 
-Design = Literal["within_subject", "individual_differences", "lesion", "stimulation", "meta_analysis", "theory"]
+# replication: a multi-site or multi-country replication; field: field data or a field trial.
+Design = Literal[
+    "within_subject", "individual_differences", "lesion", "stimulation", "meta_analysis", "theory", "replication", "field"
+]
 
 
 class RegionLink(BaseModel):
@@ -132,18 +135,11 @@ class Evidence(BaseModel):
 
 
 class Countermove(BaseModel):
-    """What a decision-maker can do about a mechanism."""
+    """A remedy for a bias, listed only when a meta-analysis or field trials show that it works."""
 
     text: str
-    basis: Literal["tested", "derived"]  # tested: an intervention study shows it reduces the effect
-    finding: str = ""  # what the intervention study showed
-    refs: list[str] = []
-
-    @model_validator(mode="after")
-    def _tested_needs_evidence(self) -> "Countermove":
-        if self.basis == "tested" and not (self.finding and self.refs):
-            raise ValueError("a tested countermove needs its finding and references")
-        return self
+    finding: str  # what the trials showed
+    refs: list[str]
 
 
 class Mechanism(BaseModel):
@@ -153,7 +149,7 @@ class Mechanism(BaseModel):
     evidence: list[Evidence]
     dimensions: list[str]
     refs: list[str]
-    countermove: Countermove
+    countermove: Countermove | None = None  # none unless a remedy meets the bar
 
 
 class DecisionFeature(BaseModel):
@@ -169,7 +165,7 @@ class DecisionFeature(BaseModel):
 
 
 class SocraticStage(BaseModel):
-    """One element of decision quality; the dialogue moves through them in order."""
+    """One part of the decision aid; the dialogue moves through them in order."""
 
     id: str
     name: str
@@ -179,19 +175,18 @@ class SocraticStage(BaseModel):
 
 
 class SocraticMove(BaseModel):
-    """A kind of question the dialogue can ask, with the basis for asking it."""
+    """A kind of question the dialogue can ask; `finding` only where the evidence bar holds."""
 
     id: str
     name: str
     question: str  # the move's typical form
-    basis: Literal["tested", "derived"]
     finding: str = ""
-    refs: list[str]
+    refs: list[str] = []
 
     @model_validator(mode="after")
-    def _tested_needs_evidence(self) -> "SocraticMove":
-        if self.basis == "tested" and not (self.finding and self.refs):
-            raise ValueError("a tested move needs its finding and references")
+    def _finding_needs_refs(self) -> "SocraticMove":
+        if self.finding and not self.refs:
+            raise ValueError("a move's finding needs its references")
         return self
 
 
@@ -207,18 +202,19 @@ class Socratic(BaseModel):
 
 
 class PatternItem(BaseModel):
+    """One survey question, answered from 0 (`low`) to 10 (`high`)."""
+
     id: str
     dimension: str
-    pole: Literal["low", "high"]
     text: str
+    low: str
+    high: str
 
 
 class Leaning(BaseModel):
-    """What a pronounced leaning toward one pole tends to leave out, and how to ask about it."""
+    """What an answer toward one end has been found to go with, and the bias it was validated against."""
 
     watch: str
-    counterweight: str
-    style: str = ""
     mechanisms: list[str] = []
 
 
@@ -230,12 +226,11 @@ class DimensionLeanings(BaseModel):
 
 class PatternMethod(BaseModel):
     summary: str
-    scale: list[str]
-    basis: Literal["derived"]
+    refs: list[str]
 
 
 class PatternScience(BaseModel):
-    """The self-rating behind a person's own pattern, and how the dialogue uses it."""
+    """The survey questions behind a person's own pattern, and what their answers go with."""
 
     method: PatternMethod
     items: list[PatternItem]
@@ -255,7 +250,7 @@ class Science(BaseModel):
     networks: list[Network]
     region_groups: list[RegionGroup]
     regions: list[Region]
-    links: list[RegionLink]
+    links: list[RegionLink] = []  # brain-region findings per attitude: none since 1.0
     stimulus_categories: list[StimulusCategory]
     stimuli: list[Stimulus]
     features: list[DecisionFeature]
@@ -288,7 +283,7 @@ class Science(BaseModel):
             for e in m.evidence:
                 for ref in e.refs:
                     need("reference", ref, refs)
-            for ref in m.countermove.refs:
+            for ref in m.countermove.refs if m.countermove else []:
                 need("reference", ref, refs)
             for dim in m.dimensions:
                 need("dimension", dim, dims)
@@ -302,18 +297,17 @@ class Science(BaseModel):
                 need("reference", ref, refs)
         for item in self.pattern.items:
             need("dimension", item.dimension, dims)
+        for ref in self.pattern.method.refs:
+            need("reference", ref, refs)
         for entry in self.pattern.leanings:
             need("dimension", entry.dimension, dims)
             for mech in entry.low.mechanisms + entry.high.mechanisms:
                 need("mechanism", mech, mechanisms)
         for dim in dims:
-            poles = sorted(i.pole for i in self.pattern.items if i.dimension == dim)
-            if poles != ["high", "low"]:
-                problems.append(f"pattern items for '{dim}' need one low and one high statement")
+            if sum(i.dimension == dim for i in self.pattern.items) != 1:
+                problems.append(f"the pattern needs exactly one question for '{dim}'")
             if sum(e.dimension == dim for e in self.pattern.leanings) != 1:
                 problems.append(f"pattern leanings for '{dim}' need exactly one entry")
-        if len(self.pattern.method.scale) != 5:
-            problems.append("the pattern scale needs five labels")
         for r in self.regions:
             need("region group", r.group, {g.id for g in self.region_groups})
         for link in self.links:
@@ -386,13 +380,12 @@ def science() -> Science:
     socratic = _read("socratic.yaml")
     pattern = _read("pattern.yaml")
     return Science(
-        version="0.6.0",
+        version="1.0.0",
         dimensions=_read("dimensions.yaml")["dimensions"],
         personality={k: personality[k] for k in ("traits", "values", "refs", "value_refs")},
         networks=_read("networks.yaml")["networks"],
         region_groups=regions["groups"],
         regions=regions["regions"],
-        links=_read("region_links.yaml")["links"],
         stimulus_categories=stimuli["categories"],
         stimuli=stimuli["stimuli"],
         features=_read("decision_features.yaml")["features"],

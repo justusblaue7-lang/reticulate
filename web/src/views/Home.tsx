@@ -4,7 +4,8 @@ import { Art } from "../components/Art";
 import { Composer, type ComposerHandle } from "../components/decision/Composer";
 import { Kbd, MOD } from "../components/Mark";
 import { PatternCheck } from "../components/PatternCheck";
-import type { Avatar, DecisionSummary, PersonalPattern, Problem, Rating, Science } from "../types";
+import { DESIGN_LABEL } from "../format";
+import type { Avatar, DecisionSummary, Mechanism, PersonalPattern, Problem, Rating, Science } from "../types";
 import { Passage } from "./Passage";
 import { Patterns } from "./Patterns";
 
@@ -44,8 +45,8 @@ function Band({ slug, side = "right", className = "", children }: { slug: ArtSlu
 
 export const Home = forwardRef<ComposerHandle, Props>(function Home(props, composer) {
   const { science } = props;
-  const tested = science.mechanisms.filter((m) => m.countermove.basis === "tested");
-  const shown = [...tested, ...science.mechanisms.filter((m) => m.countermove.basis !== "tested")].slice(0, 4);
+  const featured = ["loss_aversion", "present_bias", "status_quo_bias", "confirmation_bias"];
+  const shown = featured.map((id) => science.mechanisms.find((m) => m.id === id)).filter((m): m is Mechanism => !!m);
 
   return (
     <main className="home">
@@ -96,11 +97,11 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
               <div className="mini-turn">
                 <p className="mini-reflect">You said security matters most, yet you lean toward the bolder offer.</p>
                 <p className="mini-q">What makes this case different for you?</p>
-                <span className="mini-tag">For your leaning · Cautious</span>
+                <span className="mini-tag">Your answers · Cautious</span>
               </div>
             </div>
             <h3>Question.</h3>
-            <p>One question at a time, aimed at what your way of deciding tends to leave out.</p>
+            <p>One question at a time, through the parts of a decision aid: options, outcomes and their chances, what matters to you.</p>
           </article>
           <article className="card bento-item">
             <div className="bento-visual">
@@ -125,16 +126,15 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
           <header className="block-head left rise">
             <h2>Know what pulls on you.</h2>
             <p>
-              {science.mechanisms.length} documented biases, each with a countermove, {tested.length} of them tested in intervention studies.
-              When one fits your decision, or your pattern makes it likelier, the dialogue asks its countermove as a question. It never
-              diagnoses you.
+              {science.mechanisms.length} biases, each confirmed by a meta-analysis, a replication across many labs or large field data. Where
+              trials have proven a remedy, the dialogue uses it; where none has been proven, it only asks. It never diagnoses you.
             </p>
           </header>
           <div className="biases-stage">
             <Art slug="battle" className="backdrop" decorative sizes="(max-width: 980px) 100vw, 60vw" />
             <div className="rc-window static rise">
               <div className="rc-search">
-                <span className="placeholder">Biases and countermoves</span>
+                <span className="placeholder">Documented biases</span>
               </div>
               <div className="rc-list">
                 {shown.map((m, i) => (
@@ -142,9 +142,9 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
                     <span className="rc-icon bias" />
                     <span className="rc-stack">
                       <span className="rc-title">{m.name}</span>
-                      <span className="rc-sub">{m.countermove.text}</span>
+                      <span className="rc-sub">{m.summary}</span>
                     </span>
-                    <span className={`rc-tag ${m.countermove.basis === "tested" ? "good" : ""}`}>{m.countermove.basis === "tested" ? "Tested" : "Derived"}</span>
+                    <span className="rc-tag good">{DESIGN_LABEL[m.evidence[0].design]}</span>
                   </div>
                 ))}
               </div>
@@ -154,13 +154,13 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
       </section>
 
       <section className="you" id="you">
-        <Band slug="statue-night" side="left" className="you-band">
+        <Band slug="death-of-socrates" side="left" className="you-band">
           <span className="block-kicker">Your pattern</span>
-          <h2 className="maxim">Know thyself.</h2>
-          <p className="byline">The Delphic inscription Socrates made his task · Plato, Phaedrus 229e</p>
+          <h2 className="maxim">“To examine myself and others.”</h2>
+          <p className="byline">Socrates on his task · Plato, Apology 28e</p>
           <p className="band-lede">
-            Everyone leans somewhere: toward caution or risk, the familiar or the new, the gut or the spreadsheet. Rate sixteen statements, and
-            the dialogue aims its questions at what your leanings tend to leave out. It never tells you who you are; it asks.
+            Six questions from the Global Preferences Survey, answered by 80,000 people in 76 countries and validated against choices with real
+            money. Your answers show the dialogue where to look. It never tells you who you are; it asks.
           </p>
         </Band>
         <div className="container you-check rise">
@@ -172,30 +172,24 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
         <header className="block-head rise">
           <h2>Minds that decide differently.</h2>
           <p>
-            Each mind is a whole set of attitudes: {science.dimensions.length} decision tendencies, a personality, values, goals and constraints.
-            They sit beside your dialogue; pick who should weigh in, and what they weigh differently comes back to you as a question.
+            Sixteen people from everyday life, each with their answers to the same six questions, a personality, values,
+            goals and constraints. They sit beside your dialogue: pick who should weigh in, and what they weigh differently comes back to you as a
+            question.
           </p>
         </header>
         <Patterns science={science} avatars={props.avatars} onAvatars={props.onAvatars} onAtlas={props.onAtlas} />
       </section>
 
       <section className="closing" aria-label="Socrates">
-        <Band slug="death-of-socrates" className="quote-band">
+        <Band slug="thinker" className="quote-band">
           <blockquote>
-            <p className="maxim">“The unexamined life is not worth living.”</p>
-            <footer className="byline">Socrates, at his trial · Plato, Apology 38a</footer>
+            <p className="maxim">“I am the kind of man who listens to nothing within me but the argument that on reflection seems best to me.”</p>
+            <footer className="byline">Socrates, deciding whether to flee his prison · Plato, Crito 46b</footer>
           </blockquote>
-        </Band>
-      </section>
-
-      <section className="final">
-        <div className="container final-inner">
-          <h2>Decide on purpose.</h2>
-          <p>Start with one sentence.</p>
-          <button className="button primary large" onClick={props.onFocus}>
+          <button className="button primary large closing-cta" onClick={props.onFocus}>
             Start a decision
           </button>
-        </div>
+        </Band>
       </section>
 
       <section className="colophon container" aria-label="Art credits">
@@ -212,7 +206,6 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
                 "bronze",
                 "ceiling",
                 "battle",
-                "statue-night",
                 "death-of-socrates",
                 "marble-head",
               ] as const

@@ -3,12 +3,14 @@
 A decision tool built on decision science. You bring a decision; Reticulate questions it in a
 **Socratic dialogue**, one question at a time, until you know what matters to you, what you
 choose and what you will do first. Beside the dialogue it shows the documented biases that
-could pull on the decision (each with a countermove) and the minds you can bring to the
-table: simulated decision-makers, each a whole set of attitudes, whose different weighing comes
-back to you as a question. Reticulate reads nothing from brain activity; a brain atlas of the
-research literature is there to look up, apart from the dialogue.
+could pull on the decision (a remedy only where trials have proven one) and sixteen minds you
+can bring to the table: simulated people from everyday life, each with their answers to the
+six questions of the Global Preferences Survey, whose different weighing comes back to you as a
+question. Everything stated as fact rests on large studies (meta-analyses, multi-lab
+replications, large samples or field trials). A brain atlas of the research literature is
+there to look up, apart from the dialogue.
 
-> Build 0.9. Read [docs/epistemics.md](docs/epistemics.md) before showing results to
+> Build 1.0. Read [docs/epistemics.md](docs/epistemics.md) before showing results to
 > anyone: it states what each part may and may not be taken to mean.
 
 ## Open it
@@ -24,21 +26,21 @@ keeps it in `engine/.env` on this computer. Without a key you can rate a decisio
 
 ## How a decision goes
 
-0. **Your pattern** (once, about two minutes). Rate sixteen statements about how you usually
-   decide. The dialogue then aims its questions at what your leanings tend to leave out
-   (the cost of not acting, for someone cautious; what you would choose if no one knew, for
-   someone who weighs others' expectations). It is a self-description, never shown back as a
-   label, and stays in `data/pattern.yaml`.
+0. **Your pattern** (once, about a minute). Answer the six questions of the Global
+   Preferences Survey (risk, patience, giving, trust, returning favours, punishing unfairness)
+   from 0 to 10. Where a clear answer bears on a decision, the dialogue asks how. It stays in
+   `data/pattern.yaml`.
 1. **Ask.** Type the decision ("Should I …"); options and details are optional.
 2. **Dialogue.** Reticulate asks one question at a time and reflects your answers back. The
-   questions walk through the six elements of decision quality (frame, what matters,
-   options, evidence, trade-offs, commitment); each says why it is asked, and where a bias
-   fits what you said, the question is its countermove. Your **working notes** (what
+   questions walk through the parts of a decision aid (the decision, options, outcomes and
+   their chances, what matters, weighing, commitment); each says why it is asked, and where
+   a documented bias fits what you said, the question asks about it. Your **working notes** (what
    matters, options, unknowns, assumptions, your leaning) build up beside the dialogue. You
    can skip a question, change an earlier answer, or decide whenever you are ready.
 3. **Your decision.** In your own words: the choice, why, what you give up, when to look
    again, the first step as an if–then plan, the open questions to settle (a checklist),
-   and how well the dialogue covered each element of decision quality.
+   how fully the dialogue covered each part, and a PDF of the whole record with a page for the
+   review.
 4. **Minds at the table** (optional), beside the dialogue. Each mind shows the attitudes it
    reasons from (its pronounced leanings; open it for priorities, values, goals and
    constraints). Pick who should weigh in and ask them; each one's take appears on its card,
@@ -46,8 +48,8 @@ keeps it in `engine/.env` on this computer. Without a key you can rate a decisio
    reasoning is under "Their reasoning". They are perspectives to question, not votes.
 5. **Biases** fill in by themselves: Claude's analysis runs in the background while you talk.
 
-Every step is saved at once. A dialogue costs about $0.04 a question (usually under $0.60 in
-total); the app states the cost before every paid step.
+Every step is saved at once. On Claude Haiku a question costs well under a cent; the app
+states the cost before every paid step.
 
 ## Where things are
 
@@ -87,8 +89,8 @@ cd engine && source .venv/bin/activate
 pytest                         # tests; literature tests run when the data are installed
 reticulate build-atlas         # regenerate the atlas assets (~30 s once data are downloaded)
 reticulate avatars
-reticulate simulate "…" -p venture_capitalist -p municipal_treasurer -r 3
-reticulate sensitivity "…" -p cooperative_bank_credit_officer -d risk_tolerance -r 3
+reticulate simulate "…" -p software_founder -p secondary_teacher -r 3
+reticulate sensitivity "…" -p insurance_claims_clerk -d risk_taking -r 3
 reticulate serve               # API on :8000
 cd ../web && npm run dev       # interface on :5173
 

@@ -54,7 +54,9 @@ class FeatureRating(BaseModel):
 class WatchOut(BaseModel):
     mechanism_id: str = Field(description="id of a mechanism from the list")
     here: str = Field(description="One sentence on how the mechanism could pull on this particular decision")
-    check: str = Field(description="The mechanism's countermove as one concrete question or step for this decision")
+    check: str = Field(
+        default="", description="The mechanism's remedy as one concrete question or step for this decision; empty when it has none"
+    )
 
 
 class DecisionAnalysis(DecisionFrame):

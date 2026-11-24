@@ -1,8 +1,9 @@
-"""The person's own pattern: a self-rating on the eight dimensions, and its leanings.
+"""The person's own pattern: their answers to the six questions of the Global Preferences
+Survey, and the leanings among them.
 
-The pattern is how the person describes their decision-making in general (data/pattern.yaml
-holds the statements and the leanings). It is `authored`, never `measured`. It lives in one
-file in the data folder, and a dialogue takes a snapshot of it when it starts, so a
+Each answer (0–10) is the value of its attitude (data/pattern.yaml holds the questions and
+what answers have been found to go with). It is `authored`: the person's own answers. It lives
+in one file in the data folder, and a dialogue takes a snapshot of it when it starts, so a
 dialogue always shows, and replays with, the pattern it was held with.
 """
 
@@ -19,8 +20,8 @@ from reticulate.science import science
 
 Pole = Literal["low", "high"]
 
-# A score this far from the midpoint (5) is a leaning the dialogue attends to. Item scores
-# move in steps of 1.25, so "clear" starts one full answer step from neutral on both items.
+# An answer this far from the middle of the scale (5) is a leaning the dialogue attends to:
+# 0–2 and 8–10 are clear, 3 and 7 some, 4–6 none.
 CLEAR = 2.5
 SOME = 1.25
 
@@ -33,7 +34,7 @@ class PatternScore(BaseModel):
 class PersonalPattern(BaseModel):
     kind: Literal["personal_pattern"] = "personal_pattern"
     provenance: Literal["authored"] = "authored"  # self-rated (docs/epistemics.md)
-    answers: dict[str, int] = {}  # item id -> 1…5
+    answers: dict[str, int] = {}  # question id -> 0…10
     dimensions: dict[str, PatternScore]
     updated_at: datetime
     science_version: str
@@ -54,24 +55,19 @@ class Leaning(BaseModel):
 
 
 def score(answers: dict[str, int]) -> dict[str, float]:
-    """0–10 per dimension: the mean of the high item and the reversed low item."""
+    """0–10 per attitude: the answer to its question."""
     sci = science()
     known = {i.id: i for i in sci.pattern.items}
     unknown = sorted(set(answers) - set(known))
     if unknown:
-        raise ValueError(f"unknown pattern items: {', '.join(unknown)}")
+        raise ValueError(f"unknown questions: {', '.join(unknown)}")
     missing = sorted(set(known) - set(answers))
     if missing:
-        raise ValueError(f"answer every statement; missing: {', '.join(missing)}")
+        raise ValueError(f"answer every question; missing: {', '.join(missing)}")
     for item_id, value in answers.items():
-        if value not in (1, 2, 3, 4, 5):
-            raise ValueError(f"'{item_id}' needs an answer from 1 to 5")
-    out: dict[str, float] = {}
-    for dim in sci.dimension_ids:
-        items = [i for i in sci.pattern.items if i.dimension == dim]
-        points = [answers[i.id] if i.pole == "high" else 6 - answers[i.id] for i in items]
-        out[dim] = round((sum(points) / len(points) - 1) * 2.5, 2)
-    return out
+        if value not in range(11):
+            raise ValueError(f"'{item_id}' needs an answer from 0 to 10")
+    return {known[item_id].dimension: float(value) for item_id, value in answers.items()}
 
 
 def build(request: PatternRequest) -> PersonalPattern:
@@ -114,15 +110,18 @@ def snapshot(pattern: PersonalPattern | None) -> dict[str, float] | None:
 
 
 def load(path: Path) -> PersonalPattern | None:
+    """The saved pattern; None if there is none, or if it answers the questions of an earlier
+    science version (before 1.0 the pattern rated other dimensions), so it is asked again."""
     if not path.exists():
         return None
-    return PersonalPattern.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
+    saved = PersonalPattern.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
+    return saved if set(saved.dimensions) == set(science().dimension_ids) else None
 
 
 def save(path: Path, pattern: PersonalPattern) -> PersonalPattern:
     path.parent.mkdir(parents=True, exist_ok=True)
     data = pattern.model_dump(mode="json")
-    header = "# Your pattern: how you described your own decision-making in Reticulate (self-rated).\n"
+    header = "# Your pattern: your answers to the six questions of the Global Preferences Survey.\n"
     path.write_text(header + yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
     return pattern
 

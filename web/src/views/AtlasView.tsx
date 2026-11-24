@@ -19,7 +19,7 @@ function open() {
 }
 
 /**
- * The brain atlas: published meta-analytic maps of the eight tendencies and of decision
+ * The brain atlas: published meta-analytic maps of decision-making constructs and of decision
  * features. A reference to the research literature, kept apart from the dialogue: nothing in a
  * decision is read from it.
  */
@@ -40,7 +40,7 @@ export default function AtlasView({ science, onClose }: { science: Science; onCl
   const entries = loaded?.atlas.catalogue.maps ?? [];
   const constructs = entries.filter((m) => m.kind === "construct");
   const features = entries.filter((m) => m.kind === "feature");
-  const entry = entries.find((m) => m.id === entryId);
+  const entry = entries.find((m) => m.id === entryId) ?? constructs[0] ?? entries[0];
   const available = { neuroquery: !!entry?.sources.neuroquery, neurosynth: !!entry?.sources.neurosynth };
   const shown: Source = entry?.sources[source] ? source : available.neuroquery ? "neuroquery" : "neurosynth";
 
@@ -65,11 +65,11 @@ export default function AtlasView({ science, onClose }: { science: Science; onCl
     };
   }, [loaded, entry, shown]);
 
-  const dimension = science.dimensions.find((d) => `construct.${d.id}` === entryId);
-  const feature = science.features.find((f) => `feature.${f.id}` === entryId);
+  const dimension = science.dimensions.find((d) => `construct.${d.id}` === entry?.id);
+  const feature = science.features.find((f) => `feature.${f.id}` === entry?.id);
 
   const chip = (m: MapEntry) => (
-    <button key={m.id} className={`chip ${m.id === entryId ? "on" : ""}`} onClick={() => setEntryId(m.id)}>
+    <button key={m.id} className={`chip ${m.id === entry?.id ? "on" : ""}`} onClick={() => setEntryId(m.id)}>
       {m.kind === "construct" ? (science.dimensions.find((d) => `construct.${d.id}` === m.id)?.name ?? m.name) : (science.features.find((f) => `feature.${f.id}` === m.id)?.name ?? m.name)}
     </button>
   );
@@ -82,7 +82,7 @@ export default function AtlasView({ science, onClose }: { science: Science; onCl
         </button>
         <h1>Brain atlas</h1>
         <p>
-          Where published brain-imaging studies report activity for each of the eight tendencies and for features of decisions, pooled across
+          Where published brain-imaging studies report activity for decision-making constructs and for features of decisions, pooled across
           thousands of studies and people. It shows the research literature on the average brain. It is not a reading of you, it does not explain
           a choice, and nothing in your dialogue is drawn from it.
         </p>
@@ -97,7 +97,7 @@ export default function AtlasView({ science, onClose }: { science: Science; onCl
       ) : (
         <div className="atlas-grid">
           <aside className="atlas-pick">
-            <h3 className="eyebrow">Tendencies</h3>
+            <h3 className="eyebrow">Constructs</h3>
             <div className="chips">{constructs.map(chip)}</div>
             {features.length > 0 && (
               <>
@@ -105,7 +105,7 @@ export default function AtlasView({ science, onClose }: { science: Science; onCl
                 <div className="chips">{features.map(chip)}</div>
               </>
             )}
-            {dimension && (
+            {dimension?.construct_map && (
               <p className="note">
                 <strong>{dimension.name}.</strong> {dimension.construct_map.note}{" "}
                 <span className={`rc-tag ${dimension.construct_map.quality === "good" ? "good" : ""}`}>Map quality: {dimension.construct_map.quality}</span>

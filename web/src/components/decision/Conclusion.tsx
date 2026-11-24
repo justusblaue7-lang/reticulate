@@ -1,4 +1,3 @@
-import { PUBLIC } from "../../api";
 import { PdfButton } from "../../record/PdfButton";
 import type { Decision, Science } from "../../types";
 
@@ -10,12 +9,10 @@ interface Props {
   busy: boolean;
   onSettle: (items: string[]) => void;
   onReopen: () => void;
-  onPanel: () => void;
-  onReveal: () => void;
 }
 
 /** The decision as the person reached it: the choice, why, the first step, and what to settle. */
-export function Conclusion({ science, decision, busy, onSettle, onReopen, onPanel, onReveal }: Props) {
+export function Conclusion({ science, decision, busy, onSettle, onReopen }: Props) {
   const c = decision.dialogue!.conclusion!;
   const settled = new Set(decision.settled);
   const stages = new Map(science.socratic.stages.map((s) => [s.id, s]));
@@ -112,11 +109,11 @@ export function Conclusion({ science, decision, busy, onSettle, onReopen, onPane
       {c.quality.length > 0 && (
         <details className="quality" open={weakest.length > 0}>
           <summary>
-            Decision quality{weakest.length ? ` · weakest: ${weakest.map((q) => stages.get(q.stage)?.name.toLowerCase()).join(", ")}` : ""}
+            Coverage{weakest.length ? ` · weakest: ${weakest.map((q) => stages.get(q.stage)?.name.toLowerCase()).join(", ")}` : ""}
           </summary>
           <p className="note">
-            How well the dialogue covered the six elements of decision quality; a decision is only as good as its weakest one (Spetzler, Winter &amp; Meyer,
-            2016). This is Claude's reading of the dialogue, not a measurement.
+            How fully the dialogue covered each part of the decision: the decision, the options, the outcomes and their chances, what matters to
+            you, the weighing, and the commitment. Claude's reading of the dialogue, not a measurement.
           </p>
           <ul>
             {c.quality.map((q) => (
@@ -137,13 +134,7 @@ export function Conclusion({ science, decision, busy, onSettle, onReopen, onPane
         <button className="button" onClick={onReopen} disabled={busy}>
           Keep talking
         </button>
-        <button className="button" onClick={onPanel}>
-          {decision.panel ? "See what the panel said" : "Hear other minds"}
-        </button>
         <PdfButton science={science} decision={decision} className="button primary" />
-        <button className="button quiet" onClick={onReveal} title={PUBLIC ? "The record as data (JSON), to keep or to open in another browser" : undefined}>
-          {PUBLIC ? "Export data" : "Show in folder"}
-        </button>
       </div>
     </section>
   );

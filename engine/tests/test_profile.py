@@ -23,8 +23,8 @@ def test_personas_are_complete_and_not_caricatures(library):
 
 def test_missing_dimension_is_rejected():
     dims = _dims()
-    dims.pop("risk_tolerance")
-    with pytest.raises(ValidationError, match="risk_tolerance"):
+    dims.pop("risk_taking")
+    with pytest.raises(ValidationError, match="risk_taking"):
         CognitiveProfile(id="x", name="X", dimensions=dims)
 
 
@@ -39,8 +39,8 @@ def test_figure_inspired_profiles_require_sources():
 
 
 def test_counterfactual_variant(library):
-    base = library.get("cooperative_bank_credit_officer")
-    variant = base.with_value("risk_tolerance", 8)
-    assert variant.id == "cooperative_bank_credit_officer~risk_tolerance=8"
-    assert variant.value("risk_tolerance") == 8 and base.value("risk_tolerance") == 2
-    assert variant.dimensions["risk_tolerance"].source == "counterfactual"
+    base = library.get("insurance_claims_clerk")
+    variant = base.with_value("risk_taking", 8)
+    assert variant.id == "insurance_claims_clerk~risk_taking=8"
+    assert variant.value("risk_taking") == 8 and base.value("risk_taking") == 1
+    assert variant.dimensions["risk_taking"].source == "counterfactual"

@@ -51,10 +51,9 @@ export function StageRail({ science, decision }: { science: Science; decision: D
   );
 }
 
-/** Why the guide asked this: the Socratic move, its basis, and the bias it counters. */
 type Values = Record<string, number> | null;
 
-/** The person's leaning a question counterweighs: the pole they lean to, and what it leaves out. */
+/** The person's leaning a question is aimed at: the end they answered toward, and what that goes with. */
 function aimedAt(science: Science, pattern: Values, dimension: string) {
   const dim = science.dimensions.find((d) => d.id === dimension);
   if (!dim || !pattern || pattern[dimension] === undefined) return null;
@@ -70,27 +69,26 @@ function Why({ science, exchange, pattern }: { science: Science; exchange: Excha
   return (
     <div className="why-panel">
       <p>{turn.why}</p>
-      {move && (
+      {move?.finding && (
         <p className="why-move">
-          <span className="kicker">The move · {move.name}</span>
-          {move.basis === "tested" ? move.finding : "A classic Socratic question; it follows from the method rather than from an intervention study."}{" "}
-          <span className={`basis ${move.basis}`}>{move.basis === "tested" ? "Tested" : "Derived"}</span>
+          <span className="kicker">The evidence · {move.name}</span>
+          {move.finding}
           <Cites refs={move.refs} science={science} />
         </p>
       )}
       {aimed && (
         <p className="why-move why-pattern">
-          <span className="kicker">For your pattern · {aimed.pole}</span>
-          You described yourself as leaning {aimed.pole.toLowerCase()} ({aimed.dim.name.toLowerCase()}). {aimed.lean?.watch} This question brings
-          in the other side; it does not say your leaning is wrong. <span className="basis derived">Derived</span>
+          <span className="kicker">Your answers · {aimed.pole}</span>
+          You answered toward “{aimed.pole.toLowerCase()}” ({aimed.dim.name.toLowerCase()}). {aimed.lean?.watch} This question asks how that bears
+          on this decision; it does not say your answer is wrong.
         </p>
       )}
       {mechanism && (
         <p className="why-move">
-          <span className="kicker">Against · {mechanism.name}</span>
-          {mechanism.summary} The countermove: {mechanism.countermove.text}{" "}
-          <span className={`basis ${mechanism.countermove.basis}`}>{mechanism.countermove.basis === "tested" ? "Tested" : "Derived"}</span>
-          <Cites refs={mechanism.countermove.refs.length ? mechanism.countermove.refs : mechanism.refs} science={science} />
+          <span className="kicker">A documented bias · {mechanism.name}</span>
+          {mechanism.summary} {mechanism.evidence[0]?.finding}
+          {mechanism.countermove && <> Proven remedy: {mechanism.countermove.text}</>}
+          <Cites refs={mechanism.countermove ? [...mechanism.refs, ...mechanism.countermove.refs] : mechanism.refs} science={science} />
         </p>
       )}
     </div>
@@ -114,8 +112,8 @@ function Turn({ science, exchange, index, latest, pattern }: { science: Science;
       </p>
       <div className="turn-meta">
         <span>{stage?.name ?? turn.stage}</span>
-        {aimed && <span className="for-pattern" title={aimed.lean?.watch}>for your leaning · {aimed.pole.toLowerCase()}</span>}
-        {mechanism && <span className="against">against {mechanism.name.toLowerCase()}</span>}
+        {aimed && <span className="for-pattern" title={aimed.lean?.watch}>your answers · {aimed.pole.toLowerCase()}</span>}
+        {mechanism && <span className="against">{mechanism.name.toLowerCase()}</span>}
         <button className="why-toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? "Close" : "Why this question?"}
         </button>

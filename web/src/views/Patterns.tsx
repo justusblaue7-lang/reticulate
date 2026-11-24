@@ -195,9 +195,9 @@ function Dossier({ science, avatar, onAtlas, onEdit, onDelete }: {
         ) : null}
 
         <p className="note">
-          Attitudes are set by hand, from the decision research behind each tendency; the mind is simulated by Claude and predicts no real person.{" "}
+          Attitudes are this character's answers to the six questions of the Global Preferences Survey, written by hand, not measured; the mind is simulated by Claude and predicts no real person.{" "}
           <button className="text-button" onClick={onAtlas}>
-            Where research studies these tendencies: the brain atlas
+            The imaging literature on decision-making: the brain atlas
           </button>
         </p>
       </div>

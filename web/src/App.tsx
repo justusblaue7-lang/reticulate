@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "./api";
 import { ClaudeDialog } from "./components/ClaudeDialog";
 import { Mark } from "./components/Mark";
+import { current } from "./pattern";
 import type { Avatar, PersonalPattern, Science, Status } from "./types";
 import { Site } from "./views/Site";
 
@@ -19,7 +20,8 @@ export function App() {
         setScience(s);
         setAvatars(a);
         setStatus(st);
-        setPattern(p);
+        // Answers to the questions of an earlier version are set aside; the six questions are asked again.
+        setPattern(p && current(s, p.dimensions) ? p : null);
       })
       .catch((e) => setError(`The Reticulate engine is not reachable (${e.message}). Start it with ./Reticulate.command.`));
   }, []);

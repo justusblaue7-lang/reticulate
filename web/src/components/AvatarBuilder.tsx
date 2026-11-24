@@ -1,5 +1,5 @@
 // Build or edit an avatar: who it is shown as (a 3D person and a name), its role and
-// situation, personality (Big Five and values) and the eight decision dimensions.
+// situation, personality (Big Five and values) and the six attitudes of the Global Preferences Survey.
 
 import { useEffect, useState } from "react";
 import { loadCatalogue, type PersonAsset } from "../people/model";
@@ -219,7 +219,7 @@ export function AvatarBuilder({ science, draft, onChange, onSave, onCancel, savi
 
         <fieldset className="control-group">
           <legend>Decision profile</legend>
-          <p className="note">Eight decision tendencies, 5 = no leaning. The outline beside the person follows them.</p>
+          <p className="note">Their answers to the six questions of the Global Preferences Survey, 0 to 10. The outline beside the person follows them.</p>
           <div className="controls-grid">
             {science.dimensions.map((d) => (
               <Slider key={d.id} label={d.name} value={draft.dimensions[d.id].value} low={d.low_pole} high={d.high_pole} onChange={(v) => setDim(d.id, v)} />

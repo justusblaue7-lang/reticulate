@@ -1,254 +1,143 @@
-# Cognitive dimensions of the Reticulate profile model.
+# Attitudes of the Reticulate profile model: the six preferences of the Global Preferences
+# Survey (falk2018), asked of about 80,000 people in 76 countries, with the survey items
+# validated against incentivised choices with real money (falk2023; for risk, dohmen2011).
 #
-# Every profile scores every dimension on 0–10: 0 is the low pole, 10 the high
-# pole, 5 means no particular leaning. Scores are tendencies, not abilities and
-# not diagnoses.
+# Every profile has a value on 0–10 for each: the answer to the survey question, 0 one end of
+# the answer scale, 10 the other. 5 is the middle of the scale, not the population average.
+# Values describe a person's general attitude, not how they will decide a particular case.
 #
-# The eight dimensions are a working hypothesis. They are not orthogonal
-# (exploration and experimentation, for example, are expected to correlate), and
-# the final structure should come from factor analysis of real assessment data.
-#
-# `reasoning.low` / `reasoning.high` are the behavioural anchors the prompt
-# compiler hands to the reasoning engine. They describe how a pole changes what
-# a decision-maker attends to and how they weigh it.
-#
-# `construct_map` names the NeuroQuery query and the Neurosynth terms for the dimension's
-# construct (shown in the atlas as meta-analytic maps) and rates how well the literature
-# covers it. An empty Neurosynth list means its abstract vocabulary has no fitting term.
+# `reasoning.low` / `reasoning.high` are the behavioural anchors the prompt compiler hands to
+# the reasoning engine for a simulated decision-maker. They paraphrase the behaviour the
+# preference is measured by and the behaviour it was found to go with in the cited studies.
 #
 # Changes to this file are science changes: they need review (docs/epistemics.md).
 
-version: 0.3.0
+version: 1.0.0
 
 dimensions:
-  - id: risk_tolerance
-    name: Risk tolerance
+  - id: risk_taking
+    name: Risk taking
     low_pole: Cautious
-    high_pole: Risk-seeking
+    high_pole: Risk-taking
     definition: >-
-      Willingness to accept variance in outcomes, including a real chance of loss,
-      for a chance at a larger gain, when probabilities are known or can be estimated.
-    constructs: [stated risk preference, revealed risk taking, loss aversion]
+      General willingness to take risks: to accept a chance of losing for a chance of gaining
+      more.
+    constructs: [stated risk attitude, risky choice with real money]
     instruments:
-      - {id: dospert, name: Domain-Specific Risk-Taking scale (DOSPERT), kind: questionnaire, ref: blais2006}
-      - {id: bart, name: Balloon Analogue Risk Task, kind: behavioural_task, ref: lejuez2002}
-      - {id: lottery_choice, name: Lottery and gamble choice paradigms, kind: behavioural_task}
+      - {id: gps_risk, name: "Global Preferences Survey: willingness to take risks (0–10)", kind: questionnaire, ref: falk2023}
     notes: >-
-      Stated and revealed risk measures correlate weakly with each other; stated
-      measures are the more reliable trait indicators (frey2017). Keep them as
-      separate inputs when building personal profiles.
-    refs: [frey2017, kuhnen2005]
-    construct_map:
-      query: risk taking risk aversion
-      neurosynth: [risk taking, gambling]
-      quality: good
-      note: >-
-        Dominated by ventral striatum and anterior insula, the regions most often reported for risky choice.
+      The single question predicted choices between real lotteries and safe payments, and it
+      went with holding stocks, self-employment, smoking and active sports in a sample of
+      about 22,000 adults (dohmen2011).
+    refs: [dohmen2011, falk2018, falk2023]
     reasoning:
       low: >-
-        Weights downside scenarios and capital preservation heavily, wants a margin of
-        safety, prefers staged and reversible commitments, and treats a large loss as
-        much worse than an equal gain is good.
+        Prefers the safe option when outcomes are uncertain, gives up some expected gain to
+        avoid a chance of losing, and sizes the downside first.
       high: >-
-        Focuses on upside and asymmetric payoffs, accepts a real chance of loss for a
-        larger potential gain, and treats not acting as a risk in its own right.
+        Accepts a real chance of losing for a chance of gaining more, and is drawn to the
+        option with the larger possible upside.
 
-  - id: exploration
-    name: Exploration
-    low_pole: Exploit
-    high_pole: Explore
+  - id: patience
+    name: Patience
+    low_pole: Wants it now
+    high_pole: Patient
     definition: >-
-      Tendency to sample unfamiliar options to gain information instead of
-      choosing the option currently known to be best.
-    constructs: [directed exploration, random exploration, information seeking]
+      Willingness to give up something beneficial today in order to benefit more in the
+      future.
+    constructs: [time preference, intertemporal choice with real money]
     instruments:
-      - {id: bandit, name: Multi-armed bandit task, kind: behavioural_task, ref: daw2006}
-      - {id: horizon_task, name: Horizon task, kind: behavioural_task, ref: wilson2014}
+      - {id: gps_patience, name: "Global Preferences Survey: willingness to give up something today for more in the future (0–10)", kind: questionnaire, ref: falk2023}
     notes: >-
-      Computational models of bandit tasks separate directed (information-driven)
-      from random exploration; they may need to become two dimensions.
-    refs: [daw2006, wilson2014, badre2012, aston_jones2005]
-    construct_map:
-      query: exploratory behavior decision making
-      neurosynth: []  # 'explore' and 'exploration' in abstracts mostly mean exploratory analyses
-      quality: low
-      note: >-
-        Human explore–exploit studies are few; the term 'exploratory behavior' is common in animal research, so this map is only a rough proxy.
+      The question predicted choices between smaller earlier and larger later payments with
+      real money (falk2023). Across 76 countries, more patient people saved more and had more
+      education (falk2018).
+    refs: [falk2018, falk2023]
     reasoning:
       low: >-
-        Sticks with what is known to work, builds on existing strengths and assets,
-        and sees untested options as a distraction unless the evidence for them is strong.
+        Weighs what an option brings soon much more than what it brings later, and takes the
+        earlier, smaller benefit over a later, larger one.
       high: >-
-        Values the information an untried option produces, is willing to pay for
-        learning, and looks for adjacent possibilities the obvious options leave out.
+        Gives up something now for a larger benefit later: saves, invests in education and
+        skills, and judges options by where they lead in a few years.
 
-  - id: time_horizon
-    name: Time horizon
-    low_pole: Short-term reward
-    high_pole: Long-term optimisation
+  - id: altruism
+    name: Altruism
+    low_pole: Self-focused
+    high_pole: Giving
     definition: >-
-      How steeply future outcomes are discounted relative to immediate ones.
-    constructs: [delay discounting, future orientation, episodic prospection]
+      Willingness to give to good causes without expecting anything in return.
+    constructs: [altruism, donating]
     instruments:
-      - {id: mcq, name: Monetary Choice Questionnaire, kind: behavioural_task, ref: kirby1999}
-      - {id: delay_discounting, name: Adjusting-amount delay discounting task, kind: behavioural_task}
+      - {id: gps_altruism, name: "Global Preferences Survey: willingness to give to good causes (0–10)", kind: questionnaire, ref: falk2023}
     notes: >-
-      Delay discounting is one of the more stable decision traits (odum2011) and is
-      measured in the Human Connectome Project, which makes it a good first target
-      for a fitted brain–behaviour model.
-    refs: [odum2011, mcclure2004, kable2007, peters2010]
-    construct_map:
-      query: delay discounting intertemporal choice impulsivity
-      neurosynth: []
-      quality: good
-      note: >-
-        Reflects the intertemporal-choice literature: ventral striatum, ventromedial and lateral prefrontal cortex.
+      The question predicted giving in a real-money donation choice (falk2023), and went with
+      donating, volunteering and helping strangers (falk2018).
+    refs: [falk2018, falk2023]
     reasoning:
       low: >-
-        Prefers outcomes that arrive soon and can be felt, discounts distant payoffs
-        heavily, and is sceptical of plans whose value lies years out.
+        Judges an option mainly by what it brings them and the people closest to them.
       high: >-
-        Judges options by where they lead in five to fifteen years, accepts slow or
-        delayed payoff for compounding and positioning, and discounts short-term noise.
+        Counts what an option does for others and for causes they care about, and will give up
+        something of their own for it without expecting a return.
 
-  - id: analytical_style
-    name: Analytical style
-    low_pole: Intuitive
-    high_pole: Analytical
+  - id: trust
+    name: Trust
+    low_pole: Wary
+    high_pole: Trusting
     definition: >-
-      Reliance on explicit, step-by-step reasoning versus fast pattern-based judgement.
-    constructs: [cognitive reflection, need for cognition, faith in intuition]
+      The assumption that other people have only the best intentions.
+    constructs: [generalised trust]
     instruments:
-      - {id: crt, name: Cognitive Reflection Test, kind: behavioural_task, ref: frederick2005}
-      - {id: rei, name: Rational-Experiential Inventory, kind: questionnaire, ref: epstein1996}
-      - {id: nfc, name: Need for Cognition scale, kind: questionnaire, ref: cacioppo1982}
+      - {id: gps_trust, name: "Global Preferences Survey: \"I assume that people have only the best intentions\" (0–10)", kind: questionnaire, ref: falk2023}
     notes: >-
-      Dual-process accounts are debated; treat this as a thinking-style preference,
-      not as two separate systems in the brain.
-    refs: [frederick2005, epstein1996, deneys2008]
-    construct_map:
-      query: deductive reasoning logical reasoning
-      neurosynth: [reasoning]
-      quality: moderate
-      note: >-
-        Shows the reasoning (analytical) pole only; intuitive judgement has little imaging literature of its own.
+      Part of the validated survey module (falk2023); its global distribution is reported in
+      falk2018.
+    refs: [falk2018, falk2023]
     reasoning:
       low: >-
-        Trusts gut feel and pattern recognition from experience, reads people and
-        situations holistically, and decides without needing every number.
+        Assumes others may act in their own interest, wants commitments in writing and checks
+        what depends on other people keeping their word.
       high: >-
-        Breaks the decision into explicit components, wants numbers, base rates and
-        scenarios, and distrusts conclusions that cannot be written down and checked.
+        Assumes others mean well, relies on what people say and on informal agreements.
 
-  - id: experimentation
-    name: Experimentation
-    low_pole: Conservative
-    high_pole: Experimental
+  - id: positive_reciprocity
+    name: Positive reciprocity
+    low_pole: Keeps no score
+    high_pole: Returns favours
     definition: >-
-      Preference for novel, unconventional approaches versus proven, conventional ones.
-    constructs: [openness to experience, novelty seeking]
+      Willingness to return a favour.
+    constructs: [positive reciprocity]
     instruments:
-      - {id: big_five_openness, name: "Big Five Openness (e.g. NEO-FFI, BFI-2)", kind: questionnaire}
+      - {id: gps_pos_reciprocity, name: "Global Preferences Survey: \"When someone does me a favour, I am willing to return it\" (0–10)", kind: questionnaire, ref: falk2023}
     notes: >-
-      Expected to correlate with exploration; openness is measured in HCP (NEO-FFI).
-    refs: [deyoung2013, beaty2016]
-    construct_map:
-      query: openness creativity
-      neurosynth: []  # no creativity or openness term in Neurosynth's vocabulary
-      quality: moderate
-      note: >-
-        Openness has a small imaging literature; creativity, its closest well-studied correlate, carries most of this map.
+      The question predicted returning a favour in an incentivised choice (falk2023). Most
+      people answer toward the top of the scale (falk2018).
+    refs: [falk2018, falk2023]
     reasoning:
       low: >-
-        Prefers the conventional, proven way of doing things, values tradition and
-        predictability, and needs a strong reason to deviate from established practice.
+        Does not feel bound by favours received; what others did for them weighs little in a
+        choice.
       high: >-
-        Is drawn to unconventional ideas and new models, enjoys trying what has not
-        been done, and sees convention as a starting point to be questioned.
+        Feels bound to people who helped them and counts what they owe others when choosing.
 
-  - id: social_orientation
-    name: Social orientation
-    low_pole: Individualistic
-    high_pole: Socially oriented
+  - id: negative_reciprocity
+    name: Negative reciprocity
+    low_pole: Lets it go
+    high_pole: Pushes back
     definition: >-
-      Weight given to outcomes for others and to relationships, relative to one's own outcome.
-    constructs: [social value orientation, prosociality, inequity aversion]
+      Willingness to punish someone who treats one unfairly, even at a cost to oneself.
+    constructs: [negative reciprocity, costly punishment]
     instruments:
-      - {id: svo_slider, name: Social Value Orientation slider measure, kind: behavioural_task, ref: murphy2011}
-      - {id: economic_games, name: "Dictator, ultimatum and trust games", kind: behavioural_task}
+      - {id: gps_neg_reciprocity, name: "Global Preferences Survey: willingness to punish unfair treatment at a cost (0–10)", kind: questionnaire, ref: falk2023}
     notes: >-
-      Social preferences are context-dependent; game behaviour and questionnaire
-      measures should be combined.
-    refs: [murphy2011, fehr2007, rilling2011]
-    construct_map:
-      query: altruism altruistic cooperative behavior
-      neurosynth: []
-      quality: moderate
-      note: >-
-        Prosocial-decision literature: anterior insula, medial and lateral prefrontal cortex.
+      The question predicted costly punishment of unfair behaviour in an incentivised choice
+      (falk2023).
+    refs: [falk2018, falk2023]
     reasoning:
       low: >-
-        Judges the decision mainly by its effect on own wealth, freedom and goals,
-        and treats other people's interests as constraints, not objectives.
+        Lets unfair treatment pass rather than pay a price to answer it, and looks ahead
+        rather than back.
       high: >-
-        Weighs effects on partners, community and relationships as heavily as own
-        returns, and values trust, fairness and shared benefit.
-
-  - id: uncertainty_tolerance
-    name: Uncertainty tolerance
-    low_pole: Needs certainty
-    high_pole: Tolerates ambiguity
-    definition: >-
-      Comfort with acting when probabilities are unknown or ambiguous. Distinct from
-      risk tolerance, which concerns known probabilities.
-    constructs: [intolerance of uncertainty, ambiguity aversion]
-    instruments:
-      - {id: ius12, name: Intolerance of Uncertainty Scale (IUS-12), kind: questionnaire, ref: carleton2007}
-      - {id: ellsberg, name: Ellsberg-type ambiguity choice tasks, kind: behavioural_task, ref: ellsberg1961}
-    notes: >-
-      Scored so that a high value means high tolerance (the IUS measures intolerance
-      and must be reversed).
-    refs: [hsu2005, grupe2013, ellsberg1961]
-    construct_map:
-      query: uncertainty anxiety decision uncertainty
-      neurosynth: [uncertainty, anxiety]
-      quality: moderate
-      note: >-
-        Combines decision-uncertainty and anxiety literatures, the closest match to intolerance of uncertainty.
-    reasoning:
-      low: >-
-        Wants missing information resolved before committing, is unsettled by
-        unknown unknowns, and prefers options whose outcomes can be estimated.
-      high: >-
-        Is comfortable committing on incomplete information, expects to learn and
-        adjust along the way, and does not need a precise forecast to act.
-
-  - id: cognitive_flexibility
-    name: Cognitive flexibility
-    low_pole: Consistent
-    high_pole: Flexible
-    definition: >-
-      Ease of switching strategies and updating beliefs when circumstances or
-      evidence change, versus holding a consistent course.
-    constructs: [set shifting, reversal learning, belief updating]
-    instruments:
-      - {id: task_switching, name: Task-switching paradigms, kind: behavioural_task, ref: monsell2003}
-      - {id: dccs, name: NIH Toolbox Dimensional Change Card Sort, kind: behavioural_task}
-      - {id: wcst, name: Wisconsin Card Sorting Test, kind: behavioural_task}
-    notes: >-
-      The NIH Toolbox card sort is part of HCP and ABCD; flexibility is the dimension
-      with the best-established network basis in this set.
-    refs: [dajani2015, niendam2012, monsell2003]
-    construct_map:
-      query: task switching set shifting flexibility reversal learning
-      neurosynth: [switching, shifting, reversal]
-      quality: good
-      note: >-
-        Task-switching and reversal-learning literature: frontoparietal control network and orbitofrontal cortex.
-    reasoning:
-      low: >-
-        Values a consistent strategy and commitment, is wary of changing course on
-        new but thin evidence, and judges options by fit with the existing plan.
-      high: >-
-        Readily reframes the problem, updates quickly on new evidence, and is
-        willing to change plan, timing or structure as the situation develops.
+        Answers unfair treatment even when it costs them, and weighs how they were treated
+        heavily in what they do next.

@@ -1,7 +1,7 @@
 """Prompt compiler of the Socratic dialogue.
 
 The system prompt is compiled once from data/socratic.yaml (stages and moves) and
-data/mechanisms.yaml (mechanisms and their countermoves) and never changes during a
+data/mechanisms.yaml (biases, their evidence and proven remedies) and never changes during a
 dialogue, so it is cached across turns and across dialogues. The conversation is replayed
 as alternating messages: the person's decision, then each turn of the guide (as the JSON it
 returned) and each answer. App notes travel inside the person's messages in <note> and
@@ -41,50 +41,48 @@ with a question.
 or experiences, and never cite brain regions.
 
 The path
-Work through the six elements of decision quality in <stages>, roughly in order. A decision \
-is only as good as its weakest element, so spend questions where this person is weakest and \
-skip what is already settled. Reach the commitment stage within about eight questions; a \
-simple decision needs fewer. Set "ready" to true once the frame, what matters, the options \
-and the key unknowns are covered and the person has a leaning; from then on, move to \
-commitment: their choice in their own words, how sure they are (0 to 10, with "scale" set \
-to true), and a first step as an if-then plan.
+Work through the parts of a decision aid in <stages>, roughly in order: the decision, the \
+options (including waiting or doing nothing), what is likely to happen with each and how \
+likely, what matters to the person, and how the options compare on it. Spend questions where \
+this person is least clear and skip what is already settled. Reach the commitment stage \
+within about eight questions; a simple decision needs fewer. Set "ready" to true once the \
+decision, the options, the likely outcomes and what matters are covered and the person has a \
+leaning; from then on, move to commitment: their choice in their own words, how sure they \
+are (0 to 10, with "scale" set to true), and a first step as an if-then plan.
 
 The moves
 Each question makes one of the moves in <moves>. Choose the move that helps most now. Moves \
-marked "tested" have been shown to improve judgement; use them where they fit, in your own \
-words and in this person's context.
+with a "finding" are backed by trials or meta-analyses; use them where they fit, in your own \
+words and in this person's context. When you ask about chances, ask in frequencies ("out of \
+100 people in your place …"), not percentages.
 
 Biases
-<mechanisms> lists documented mechanisms with a countermove each. When something the person \
-says fits one (they weigh money already spent, treat the current state as the safe default, \
-see only the upside, follow what others expect …), turn its countermove into your question \
-and set mechanism_id. Never diagnose ("you are biased"); ask.
+<mechanisms> lists documented biases, each with the large studies behind it. When something \
+the person says fits one (they weigh money already spent, treat the current state as the \
+default, anchor on a first number, seek only what supports their favourite …), ask about it \
+with the move "bias" and set mechanism_id. Where the bias has a "remedy", turn the remedy \
+into your question; otherwise ask a question that brings the bias into view in their \
+situation. Never diagnose ("you are biased"); ask. Never invent a remedy and never present \
+a question as one.
 
 The person
-If a <person> block follows, it says how this person rates their own decision-making in \
-general: tendencies on a 0 to 10 scale between two poles, what a pronounced leaning tends to \
-leave out of view, and the question that brings it back. It is a self-description, not a \
-measurement, and this decision may not follow it. Use it to decide where to look, never to \
-decide what they think.
-- Counterweight, do not correct. A leaning is not a flaw, and the aim is not that they \
-decide against their temperament but that they decide with both sides in view. Before the \
-commitment stage, give each clear leaning one question that brings in what it leaves out, at \
-the point where it bears on this decision; skip a leaning this decision does not touch. A \
-leaning marked "some" gets such a question only when the decision clearly engages it. Set \
-"pattern" to the dimension's id on such a question, otherwise to "none".
-- Its mechanisms first. When something they say fits a mechanism listed under one of their \
-leanings, that mechanism's countermove takes priority at that point.
-- Listen for departures. When their stance here runs against their usual leaning (someone \
-cautious leaning to the bold option, someone who sticks with what works proposing a leap), \
-name it in the reflection and ask what makes this case different. Take the answer seriously; \
-a departure can be well founded.
-- Ask in their way. Phrase questions in the "style" given for their leanings: concrete \
-situations for someone intuitive, explicit criteria for someone analytical, bounded unknowns \
-and reversible steps for someone who needs certainty.
+If a <person> block follows, it gives this person's answers to the six questions of the \
+Global Preferences Survey (0 to 10), what answers toward one end have been found to go with, \
+and the bias an attitude was validated against. It describes their attitudes in general, not \
+this decision. Use it to decide where to look, never to decide what they think.
+- Where this decision engages one of their clear leanings, ask one question before the \
+commitment stage that makes its bearing on this decision explicit (for someone who answered \
+that they want things now, facing a choice whose payoff comes later: what the later payoff \
+is worth to them today). Skip a leaning this decision does not touch; a leaning marked \
+"some" gets a question only when the decision clearly engages it. Set "pattern" to the \
+attitude's id on such a question, otherwise to "none". A leaning is not a flaw.
+- Listen for departures. When their stance here runs against their answers (someone \
+cautious leaning to the bold option), name it in the reflection and ask what makes this case \
+different. Take the answer seriously; a departure can be well founded.
 - Keep it in the background. Never show scores, dimension names or labels, and never explain \
 a question by their pattern ("because you are cautious"). At most twice in a dialogue you may \
-refer to how they described themselves, in plain words and as a question: "You described \
-yourself as someone who takes the safer option. Is that what is happening here?"
+refer to how they answered, in plain words and as a question: "You said you are rather \
+unwilling to take risks in general. Is that what is happening here?"
 Without a <person> block, set "pattern" to "none" and leave pattern_notes empty.
 
 App notes
@@ -107,10 +105,10 @@ and what is still needed), the reasons that carried it, what they knowingly give
 should make them look at it again, the open questions worth settling before acting, the \
 first step, the first step as an if-then plan, and when to review the decision. Then rate \
 how well the dialogue covered each of the six stages: strong, partial or weak, with one \
-sentence on what was established or is missing. With a <person> block, add pattern_notes: \
+sentence on what was established or is missing. This is your reading of the dialogue. With a <person> block, add pattern_notes: \
 for each of their leanings that came up in this decision, one sentence in the first person on \
-how it showed and how it was checked ("My caution made staying feel safe; I weighed what \
-staying would cost me over five years."). Leave out leanings that did not come up. Add no \
+how it showed and how it was weighed ("I take few risks in general, and staying felt safe; I \
+weighed what staying would cost me over five years."). Leave out leanings that did not come up. Add no \
 reasons they did not give.
 
 Language and care
@@ -124,11 +122,17 @@ def _catalogue() -> str:
     sci = science()
     stages = [{"id": s.id, "name": s.name, "aim": s.aim, **({"note": s.note} if s.note else {})} for s in sci.socratic.stages]
     moves = [
-        {"id": m.id, "name": m.name, "typical_form": m.question, "basis": m.basis, **({"finding": m.finding} if m.finding else {})}
+        {"id": m.id, "name": m.name, "typical_form": m.question, **({"finding": m.finding} if m.finding else {})}
         for m in sci.socratic.moves
     ]
     mechanisms = [
-        {"id": m.id, "name": m.name, "summary": m.summary, "countermove": m.countermove.text, "basis": m.countermove.basis}
+        {
+            "id": m.id,
+            "name": m.name,
+            "summary": m.summary,
+            "evidence": [e.finding for e in m.evidence],
+            **({"remedy": m.countermove.text, "remedy_evidence": m.countermove.finding} if m.countermove else {}),
+        }
         for m in sci.mechanisms
     ]
     dump = lambda data: json.dumps(data, indent=1, ensure_ascii=False, sort_keys=True)  # noqa: E731
@@ -149,9 +153,9 @@ def _fmt(value: float) -> str:
 
 
 def person_block(pattern: dict[str, float] | None) -> str | None:
-    """The person's self-rated pattern for the guide: their leanings with what each leaves out,
-    its counterweight, how to ask and the mechanisms it makes likelier. None without a pattern.
-    It is fixed for a dialogue (a snapshot), so it is cached after the system prompt."""
+    """The person's answers for the guide: their leanings with what such answers go with and
+    the bias an attitude was validated against. None without a pattern. It is fixed for a
+    dialogue (a snapshot), so it is cached after the system prompt."""
     if not pattern:
         return None
     from reticulate.pattern import leanings
@@ -161,8 +165,8 @@ def person_block(pattern: dict[str, float] | None) -> str | None:
     found = leanings(pattern)
     lines = [
         "<person>",
-        "How this person rated their own decision-making in general (self-rated in Reticulate; 0 is the "
-        "first pole, 10 the second, 5 no particular leaning). A self-description, not a measurement.",
+        "This person's answers to the six questions of the Global Preferences Survey (0 to 10; 5 is "
+        "the middle of the scale). Their attitudes in general, not this decision.",
     ]
     for strength, title in (("clear", "Clear leanings, strongest first"), ("some", "Some leaning")):
         group = [x for x in found if x.strength == strength]
@@ -173,19 +177,15 @@ def person_block(pattern: dict[str, float] | None) -> str | None:
             dim = sci.dimension(x.dimension)
             pole = dim.low_pole if x.pole == "low" else dim.high_pole
             lean = sci.pattern.leaning(x.dimension, x.pole)
-            anchor = dim.reasoning.low if x.pole == "low" else dim.reasoning.high
+            question = next(i.text for i in sci.pattern.items if i.dimension == x.dimension)
             lines.append(
                 f"- {x.dimension} ({dim.name}): {_fmt(x.value)}, toward \"{pole}\" "
-                f"({dim.low_pole} 0 … {dim.high_pole} 10)."
+                f"({dim.low_pole} 0 … {dim.high_pole} 10). Question: {question}"
             )
-            lines.append(f"  Tends to: {anchor.strip()}")
-            lines.append(f"  Leaves out of view: {lean.watch.strip()}")
-            lines.append(f"  Counterweight: {lean.counterweight.strip()}")
-            if lean.style:
-                lines.append(f"  Style: {lean.style.strip()}")
+            lines.append(f"  Goes with: {lean.watch.strip()}")
             if lean.mechanisms:
                 named = ", ".join(f"{m} ({mechanism_names[m]})" for m in lean.mechanisms)
-                lines.append(f"  Mechanisms it makes likelier: {named}")
+                lines.append(f"  Validated against: {named}")
     neutral = [sci.dimension(d).name for d in sci.dimension_ids if d in pattern and d not in {x.dimension for x in found}]
     if neutral:
         lines += ["", f"No particular leaning: {', '.join(neutral)}."]

@@ -1,393 +1,213 @@
-# Decision mechanisms: documented regularities in how people decide.
+# Decision biases: documented regularities in how people decide.
 #
-# Each mechanism states a behavioural regularity, the neural evidence that bears on it and
-# the design that evidence comes from (designs license different conclusions; see
-# docs/epistemics.md). The decision mode lists the mechanisms a decision engages and hands
-# them to the simulated decision-makers as background, so that a profile can be more or
-# less susceptible to them the way its tendencies imply.
+# The bar for this file (docs/epistemics.md): a bias is listed only when it holds up in a
+# meta-analysis, a multi-site replication, a large sample (about 1,000 people or more) or
+# field data. Each states what was found and where.
 #
-# `countermove` is what a decision-maker can do about the mechanism. Its basis is `tested`
-# when an intervention study shows that the move reduces the effect (`finding` says what
-# was shown), and `derived` when it follows from the mechanism but has not been tested as
-# an intervention. The interface labels the two differently.
+# `countermove` is a remedy, listed only when the same bar holds for the remedy itself: a
+# meta-analysis or randomised field trials show that it works. Most biases have none that
+# meets it, and then none is given.
 #
-# `dimensions` names the profile dimensions whose poles the behavioural anchors connect to
-# the mechanism. It is an authored link, not an estimated effect.
+# `dimensions` names attitudes (dimensions.yaml) the bias is measured with or validated
+# against; it is empty when no such link has been shown.
 #
 # Changes to this file are science changes: they need review (docs/epistemics.md).
 
-version: 0.4.0
+version: 1.0.0
 
 mechanisms:
   - id: loss_aversion
     name: Loss aversion
     summary: >-
-      Losses weigh more than gains of the same size. In mixed gambles, people typically
-      accept only when the possible gain is about twice the possible loss, with large
-      individual differences.
+      Losses weigh more than gains of the same size: a possible loss needs to be offset by a
+      gain about twice as large before people take the bet.
     evidence:
-      - design: within_subject
+      - design: meta_analysis
         finding: >-
-          Ventral striatum and ventromedial prefrontal activity rises with potential gains and
-          falls with potential losses, more steeply for losses; the asymmetry tracks each
-          person's behavioural loss aversion.
-        refs: [tom2007]
-      - design: lesion
-        finding: Two patients with focal bilateral amygdala lesions showed no loss aversion in mixed gambles.
-        refs: [demartino2010]
-    dimensions: [risk_tolerance]
-    refs: [kahneman1979, tom2007]
-    countermove:
-      text: >-
-        Think like a trader: judge this choice as one of the many risks you take over the
-        years, not as a single bet that must not lose.
-      basis: tested
-      finding: >-
-        Asked to view each gamble as one in a portfolio, participants showed less loss
-        aversion and less physiological arousal to losses.
-      refs: [sokolhessner2009]
+          A meta-analysis of published estimates across experiments and field data put the
+          typical loss-aversion coefficient near 2.
+        refs: [brown2024]
+    dimensions: []
+    refs: [kahneman1979, brown2024]
 
   - id: probability_weighting
     name: Probability weighting
     summary: >-
-      Small probabilities are overweighted and moderate to large ones underweighted, which
-      makes long shots attractive and makes near-certainties feel safer than they are.
+      Small chances are given too much weight and near-certainties too little, so long shots
+      look attractive and a sure thing looks better than it is.
     evidence:
-      - design: within_subject
-        finding: Striatal responses to anticipated rewards are nonlinear in probability, as the weighting function predicts.
-        refs: [hsu2009]
-    dimensions: [risk_tolerance]
-    refs: [tversky1992]
+      - design: replication
+        finding: >-
+          The classic prospect-theory choice patterns, including the certainty effect and the
+          overweighting of small probabilities, replicated across 19 countries with 4,098
+          participants.
+        refs: [ruggeri2020]
+    dimensions: []
+    refs: [tversky1992, ruggeri2020]
     countermove:
       text: >-
-        Translate the chances into frequencies with an outside view: out of 100 cases like
-        this one, how many end the way you hope?
-      basis: derived
-      refs: [kahneman1993]
+        Put the chances as frequencies: out of 100 people in this situation, how many end up
+        where you hope, and how many do not?
+      finding: >-
+        Across experiments, people reasoned about chances more accurately when the numbers
+        came as natural frequencies ("8 out of 100") than as percentages (meta-analysis), and
+        decision aids that set out outcomes with their chances made people's risk estimates
+        more accurate (Cochrane review of 105 trials).
+      refs: [mcdowell2017, stacey2017]
 
   - id: ambiguity_aversion
     name: Ambiguity aversion
     summary: >-
-      People prefer known odds to unknown odds, even when the unknown odds are no worse on
-      average.
+      People avoid options whose odds are unknown, even when the unknown odds are no worse
+      than the known ones.
     evidence:
-      - design: within_subject
+      - design: field
         finding: >-
-          Choices under ambiguity, compared with choices under known risk, engage the amygdala
-          and orbitofrontal cortex; patients with orbitofrontal lesions were neutral to both
-          ambiguity and risk.
-        refs: [hsu2005]
-    dimensions: [uncertainty_tolerance]
-    refs: [ellsberg1961, hsu2005]
-    countermove:
-      text: >-
-        Give the unknown odds a range (pessimistic, likely, optimistic) instead of treating
-        them as unknowable, and ask what it would cost to find out more first.
-      basis: derived
-      refs: [fox1995]
-
-  - id: present_bias
-    name: Present bias
-    summary: >-
-      Outcomes now weigh disproportionately against outcomes later; discounting is steep
-      over short delays and shallower over long ones.
-    evidence:
-      - design: within_subject
-        finding: >-
-          The subjective value of delayed rewards is tracked in ventral striatum, medial
-          prefrontal and posterior cingulate cortex.
-        refs: [kable2007, mcclure2004]
-      - design: stimulation
-        finding: Disrupting left lateral prefrontal cortex with TMS increased choices of immediate over larger delayed rewards.
-        refs: [figner2010]
-    dimensions: [time_horizon]
-    refs: [frederick2002]
-    countermove:
-      text: >-
-        Decide now what your future self should do, and make it binding: a deadline, an
-        automatic transfer, a promise to someone.
-      basis: tested
-      finding: >-
-        Self-imposed binding deadlines improved performance, and committing future pay rises
-        to saving in advance raised savings rates several-fold.
-      refs: [ariely2002, thaler2004]
-
-  - id: status_quo_bias
-    name: Status quo bias
-    summary: >-
-      Keeping the current state, or accepting a default, is chosen more often than its merits
-      predict.
-    evidence:
-      - design: within_subject
-        finding: >-
-          Rejecting the default, especially in difficult choices, recruits right inferior
-          frontal cortex and the subthalamic region.
-        refs: [fleming2010]
-    dimensions: [exploration, experimentation, cognitive_flexibility]
-    refs: [samuelson1988, fleming2010]
-    countermove:
-      text: >-
-        Reverse the default: if you already had the other option, would you switch back to
-        what you have now? If not, inertia may be choosing.
-      basis: derived
-      refs: [bostrom2006]
-
-  - id: sunk_cost
-    name: Sunk-cost effect
-    summary: >-
-      Unrecoverable past investments increase the willingness to continue a course of action,
-      although only future costs and benefits should matter.
-    evidence: []
-    dimensions: [cognitive_flexibility]
-    refs: [arkes1985]
-    countermove:
-      text: >-
-        Decide as a newcomer would: ignoring what is already spent, would you put the next
-        euro, hour or year into this course?
-      basis: tested
-      finding: >-
-        Brief training in cost-benefit rules, including ignoring sunk costs, increased their
-        use on new problems.
-      refs: [larrick1990]
-
-  - id: social_conformity
-    name: Social conformity
-    summary: Judgements shift toward the opinion of a group, even without pressure to agree.
-    evidence:
-      - design: within_subject
-        finding: >-
-          Disagreeing with a group produces a prediction-error-like signal in posterior medial
-          frontal cortex and ventral striatum that predicts later adjustment toward the group.
-        refs: [klucharev2009]
-    dimensions: [social_orientation]
-    refs: [klucharev2009]
-    countermove:
-      text: >-
-        Write down your own judgement before you hear anyone else's, and collect other views
-        one by one rather than in a group.
-      basis: tested
-      finding: >-
-        Seeing others' estimates made people's answers converge without making them more
-        accurate, which undermined the wisdom of the crowd.
-      refs: [lorenz2011]
-
-  - id: inequity_aversion
-    name: Inequity aversion
-    summary: Many people give up money to avoid or to punish unequal outcomes.
-    evidence:
-      - design: within_subject
-        finding: Unfair offers in the ultimatum game engage the anterior insula, more strongly when they are rejected.
-        refs: [sanfey2003]
-    dimensions: [social_orientation]
-    refs: [fehr1999, sanfey2003]
-    countermove:
-      text: >-
-        Separate the split from the relationship: is the division itself unacceptable, or
-        would a different structure (milestones, transparency, shares) make it fair enough?
-      basis: derived
-      refs: [fehr1999]
-
-  - id: trust_reciprocity
-    name: Trust and reciprocity
-    summary: >-
-      People entrust resources to strangers far beyond what self-interest predicts, and
-      reciprocity sustains trust over repeated exchanges.
-    evidence:
-      - design: within_subject
-        finding: Over repeated exchanges, the caudate comes to signal the intention to trust before a partner's reciprocity is revealed.
-        refs: [king_casas2005]
-    dimensions: [social_orientation, uncertainty_tolerance]
-    refs: [berg1995, king_casas2005]
-    countermove:
-      text: >-
-        Make trust verifiable instead of assumed: stage the commitment, put milestones in
-        writing, and decide now what you will do if they are missed.
-      basis: derived
-      refs: [berg1995]
-
-  - id: regret_aversion
-    name: Anticipated regret
-    summary: >-
-      Choices are steered by the wish to avoid regretting the option not taken, when its
-      outcome will become known.
-    evidence:
-      - design: within_subject
-        finding: >-
-          Experienced regret engages orbitofrontal cortex, and over a session people choose
-          increasingly so as to avoid it.
-        refs: [coricelli2005]
-    dimensions: [risk_tolerance]
-    refs: [coricelli2005]
-    countermove:
-      text: >-
-        Weigh both regrets over the long run: in the short term people regret what they did,
-        but over the years they regret more what they failed to do.
-      basis: derived
-      refs: [gilovich1995]
-
-  - id: explore_exploit
-    name: Exploration and exploitation
-    summary: >-
-      Each choice trades the value of the best-known option against the information that
-      trying another one would bring.
-    evidence:
-      - design: within_subject
-        finding: Exploratory choices engage frontopolar cortex and the intraparietal sulcus.
-        refs: [daw2006]
-    dimensions: [exploration]
-    refs: [daw2006]
-    countermove:
-      text: >-
-        Turn the choice into an experiment where you can: a trial period, a pilot, a smaller
-        first step. The longer you will live with the result, the more that information is
-        worth.
-      basis: derived
-      refs: [wilson2014]
-
-  - id: effort_discounting
-    name: Effort discounting
-    summary: The value of an outcome falls with the effort needed to obtain it.
-    evidence:
-      - design: within_subject
-        finding: Dorsal anterior cingulate cortex and striatum integrate effort costs with expected reward.
-        refs: [croxson2009]
+          In a representative sample of US households, most respondents avoided bets with
+          unknown odds, and those who did were less likely to own stocks.
+        refs: [dimmock2016]
     dimensions: []
-    refs: [croxson2009]
-    countermove:
-      text: >-
-        Estimate the effort from past projects like this one, not from the plan: plans
-        routinely underestimate how long things take.
-      basis: derived
-      refs: [buehler1994]
-
-  - id: self_control
-    name: Self-control
-    summary: Choosing a long-term good over an immediate temptation.
-    evidence:
-      - design: within_subject
-        finding: >-
-          Successful self-control goes with dorsolateral prefrontal modulation of value signals
-          in ventromedial prefrontal cortex.
-        refs: [hare2009]
-    dimensions: [time_horizon]
-    refs: [hare2009]
-    countermove:
-      text: >-
-        Plan the moment of temptation in advance with an if-then rule (“if X happens, I will
-        do Y”), or remove the temptation instead of relying on willpower.
-      basis: tested
-      finding: >-
-        Across 94 tests, if-then plans had a medium-to-large effect on reaching goals (d =
-        0.65).
-      refs: [gollwitzer2006]
+    refs: [ellsberg1961, dimmock2016]
 
   - id: framing
     name: Framing effect
     summary: >-
-      The same outcome described as a loss rather than a gain shifts choices toward risk
-      seeking.
+      The same choice described as gains or as losses leads to different decisions: people
+      play safe with gains and take risks to avoid losses.
     evidence:
-      - design: within_subject
-        finding: >-
-          Susceptibility to framing scaled with amygdala activity, and resistance to it with
-          orbital and medial prefrontal activity.
-        refs: [demartino2006]
-    dimensions: [analytical_style, risk_tolerance]
-    refs: [tversky1981, demartino2006]
-    countermove:
-      text: >-
-        Restate each option both ways, as what you gain and as what you lose. If your
-        preference flips, the wording is deciding, not the facts.
-      basis: derived
-      refs: [tversky1981]
+      - design: replication
+        finding: Replicated across 36 samples and 6,344 participants in the Many Labs project.
+        refs: [klein2014]
+      - design: meta_analysis
+        finding: A meta-analysis of the framing literature confirmed the effect for risky choices.
+        refs: [kuhberger1998]
+    dimensions: []
+    refs: [tversky1981, klein2014, kuhberger1998]
 
-  - id: threat_and_anxiety
-    name: Threat and anxiety
+  - id: anchoring
+    name: Anchoring
     summary: >-
-      Anxious states raise the weight given to possible threats and lower the tolerance of
-      uncertainty about them.
+      A number seen first, even an irrelevant one, pulls estimates and offers toward it: a
+      first price, a salary figure, a first guess at a timeline.
     evidence:
-      - design: theory
-        finding: >-
-          Anxiety is linked to exaggerated threat estimates and to disrupted anticipation of
-          uncertain threat, involving amygdala, anterior insula and prefrontal regulation.
-        refs: [grupe2013]
-    dimensions: [uncertainty_tolerance]
-    refs: [grupe2013]
-    countermove:
-      text: >-
-        Separate how bad an outcome would be from how likely it is: put a number on the
-        probability before you weigh the consequence. Vivid, frightening outcomes make choices
-        insensitive to probability.
-      basis: derived
-      refs: [rottenstreich2001]
+      - design: replication
+        finding: Among the largest and most consistent effects across 36 samples and 6,344 participants in the Many Labs project.
+        refs: [klein2014]
+    dimensions: []
+    refs: [klein2014]
 
-  - id: moral_intuition
-    name: Moral intuition
-    summary: Emotional responses to personal harm compete with cost–benefit reasoning in moral dilemmas.
+  - id: sunk_cost
+    name: Sunk-cost effect
+    summary: >-
+      Money, time or effort already spent keeps people in a course of action, although only
+      what lies ahead should count.
     evidence:
-      - design: within_subject
-        finding: Personal moral dilemmas engage emotion-related regions more than impersonal ones.
-        refs: [greene2001]
-    dimensions: [analytical_style, social_orientation]
-    refs: [greene2001]
+      - design: replication
+        finding: Replicated across 36 samples and 6,344 participants in the Many Labs project, with a small effect.
+        refs: [klein2014]
+    dimensions: []
+    refs: [arkes1985, klein2014]
+
+  - id: present_bias
+    name: Present bias
+    summary: >-
+      What comes now weighs more than what comes later, beyond what waiting costs: people
+      take the sooner, smaller benefit and put off what pays off only later.
+    evidence:
+      - design: replication
+        finding: >-
+          Choices between sooner and later money showed discounting of the future in all 61
+          countries of a study with 13,629 participants.
+        refs: [ruggeri2022]
+      - design: field
+        finding: >-
+          Patience, measured with the survey question used here, varies widely between people
+          and goes with saving and education across 76 countries.
+        refs: [falk2018]
+    dimensions: [patience]
+    refs: [ruggeri2022, falk2018]
     countermove:
       text: >-
-        Name the duty or harm your intuition responds to and whom it affects, then ask whether
-        you would accept the same choice with the roles reversed.
-      basis: derived
-      refs: []
+        Decide now what you will do later, and bind it: a step that happens automatically, or
+        a commitment that is hard to undo.
+      finding: >-
+        In randomised field trials, people given a way to commit in advance saved more: a
+        commitment savings account in the Philippines, and Save More Tomorrow, where saving
+        rates rose from 3.5% to 13.6% over 40 months.
+      refs: [ashraf2006, thaler2004]
+
+  - id: status_quo_bias
+    name: Status quo bias
+    summary: >-
+      The current state or the default option is kept more often than its merits justify.
+    evidence:
+      - design: meta_analysis
+        finding: A meta-analysis of 58 studies with 73,675 participants found that defaults shift choices substantially.
+        refs: [jachimowicz2019]
+      - design: field
+        finding: When a company made pension saving the default, participation rose from 37% to 86% of new employees.
+        refs: [madrian2001]
+    dimensions: []
+    refs: [samuelson1988, jachimowicz2019, madrian2001]
 
   - id: overconfidence
     name: Overconfidence
     summary: >-
-      People overestimate their own performance and, most consistently, the precision of
-      their knowledge.
-    evidence: []
-    dimensions: []
-    refs: [moore2008]
-    countermove:
-      text: >-
-        Run a premortem: imagine it is a year from now and the decision has failed, and write
-        down the most likely reasons. Then widen your estimates.
-      basis: tested
-      finding: >-
-        Listing reasons why one's answer might be wrong improved calibration, and a premortem
-        lowered overconfidence in plans more than other critique methods.
-      refs: [koriat1980, veinott2010]
-
-  - id: feedback_learning
-    name: Learning from outcomes
-    summary: >-
-      Outcomes better or worse than expected produce reward prediction errors that update
-      later choices.
+      People are surer of their estimates than they should be: the ranges they give for
+      costs, timelines and outcomes are too narrow.
     evidence:
-      - design: within_subject
-        finding: Dopamine neurons, and the ventral striatum in human imaging, signal reward prediction errors.
-        refs: [schultz1997]
-    dimensions: [experimentation, cognitive_flexibility]
-    refs: [schultz1997]
-    countermove:
-      text: >-
-        Agree in advance which early results would make you adjust course, and judge the
-        decision by how it was made, not only by how it turns out.
-      basis: derived
-      refs: [baron1988]
+      - design: field
+        finding: >-
+          In over 13,300 forecasts by chief financial officers, the realised market return fell
+          inside their 80% confidence range only 36% of the time.
+        refs: [bendavid2013]
+    dimensions: []
+    refs: [moore2008, bendavid2013]
 
-  - id: cognitive_reflection
-    name: Intuition and reflection
+  - id: social_conformity
+    name: Social conformity
     summary: >-
-      Many problems invite an intuitive answer that reflection would correct; people differ
-      reliably in how often they reflect.
-    evidence: []
-    dimensions: [analytical_style]
-    refs: [frederick2005]
-    countermove:
-      text: >-
-        Write down your first answer and one reason it could be wrong before you settle, and
-        check any numbers on paper.
-      basis: tested
-      finding: >-
-        Instructions to consider the opposite reduced biased evaluation of evidence more than
-        instructions to be fair and unbiased.
-      refs: [lord1984]
+      People adjust their judgement toward what others say, even when the others are
+      plainly wrong.
+    evidence:
+      - design: meta_analysis
+        finding: A meta-analysis of 133 Asch-type studies from 17 countries found conformity in every culture studied, stronger in collectivist ones.
+        refs: [bond1996]
+    dimensions: []
+    refs: [bond1996]
+
+  - id: anticipated_regret
+    name: Anticipated regret
+    summary: >-
+      The regret people expect to feel steers what they choose, often toward the option they
+      could least blame themselves for.
+    evidence:
+      - design: meta_analysis
+        finding: In a meta-analysis of 81 studies with 45,618 participants, anticipated regret predicted intentions and behaviour.
+        refs: [brewer2016]
+    dimensions: []
+    refs: [brewer2016]
+
+  - id: confirmation_bias
+    name: Confirmation bias
+    summary: >-
+      People seek out information that supports what they already lean toward and pass over
+      information that challenges it.
+    evidence:
+      - design: meta_analysis
+        finding: Across 91 studies with about 8,000 participants, people preferred information that confirmed their views (meta-analysis of selective exposure).
+        refs: [hart2009]
+    dimensions: []
+    refs: [hart2009]
+
+  - id: hindsight_bias
+    name: Hindsight bias
+    summary: >-
+      Once the outcome is known, people believe it was more predictable than it was, and
+      judge the decision by how it turned out.
+    evidence:
+      - design: meta_analysis
+        finding: A meta-analysis of hindsight research confirmed the effect across tasks and populations.
+        refs: [guilbault2004]
+    dimensions: []
+    refs: [guilbault2004]

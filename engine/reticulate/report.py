@@ -127,8 +127,8 @@ def markdown(decision: Decision) -> str:
             mechanism = mechanisms.get(note.mechanism_id)
             if not mechanism:
                 continue
-            basis = "tested" if mechanism.countermove.basis == "tested" else "derived, not tested as an intervention"
-            lines += [f"- **{mechanism.name}.** {note.here} *What to do:* {note.check} ({basis})"]
+            remedy = f" *Proven remedy:* {note.check}" if mechanism.countermove and note.check else ""
+            lines += [f"- **{mechanism.name}.** {note.here}{remedy}"]
         out += _section("Watch out for", lines)
 
     panel = decision.panel

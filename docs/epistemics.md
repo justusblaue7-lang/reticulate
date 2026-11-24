@@ -1,5 +1,43 @@
 # Epistemics: what Reticulate may claim
 
+## The evidence bar (1.0)
+
+Since science 1.0 Reticulate states as fact only what holds up in large studies. A claim about
+how people decide, and every remedy, needs at least one of:
+
+- a meta-analysis,
+- a replication across many labs or countries (Many Labs, Ruggeri et al.),
+- a large sample (about 1,000 people or more), or
+- field data or randomised field trials.
+
+What does not meet the bar was removed, not relabelled:
+
+- **The eight tendencies** (a working hypothesis, never validated) are replaced by the six
+  preferences of the Global Preferences Survey (Falk et al., 2018: about 80,000 people in 76
+  countries), measured with the survey's own questions, which were validated against choices
+  with real money (Falk et al., 2023; for risk, Dohmen et al., 2011).
+- **Your pattern** is your answers to those six questions, no longer sixteen statements
+  written for Reticulate. What an answer "goes with" is what the studies found, nothing more.
+- **Biases**: 13 remain, each with the large study behind it (`mechanisms.yaml`). Gone are
+  biases backed only by brain studies, small experiments or theory (exploration, effort,
+  threat, moral intuition, self-control, learning from feedback, trust games as biases,
+  cognitive reflection).
+- **Remedies**: only two meet the bar — frequencies instead of percentages (meta-analysis;
+  Cochrane review of decision aids) and commitment in advance (randomised field trials). All
+  "derived" countermoves are gone; a bias without a proven remedy is described, not treated.
+- **The dialogue's structure** is that of patient decision aids (Cochrane review: 105 trials,
+  31,043 people) and ends with an if-then plan (meta-analysis of 94 tests). Its other
+  questions are plain questions and claim nothing. The "six elements of decision quality"
+  and the claim that a decision is only as good as its weakest element are gone; the
+  conclusion rates coverage, as Claude's reading.
+- **The minds** are characters, written by hand: their attitudes are answers to the same six
+  questions, spread across the sixteen roughly as answers spread in population surveys (most
+  near the middle, few at the ends, returning favours high for most). They are not measured
+  and predict no real person; that they are simulations is said wherever they appear.
+
+Older records keep what they were made with; their questions and biases still open, mapped to
+what replaced them where needed.
+
 ## Provenance labels
 
 | Label | Meaning | Where it appears now |
@@ -60,20 +98,19 @@ counters, so dialogues can be analysed.
 
 ## The person's own pattern
 
-The pattern (data/pattern.yaml in the engine, data/pattern.yaml in the data folder) is a
-self-rating: sixteen statements authored for Reticulate, two per dimension, one reversed. It is
-`authored`, not `measured`: the items are not a validated instrument, their reliability is
-unknown, and two items per dimension are too few for a trait estimate. The interface says
-"self-rated" and "not a measurement" wherever the pattern appears, and shows positions and
-leanings, not decimals.
+The pattern (data/pattern.yaml in the engine, data/pattern.yaml in the data folder) is the
+person's answers to the six questions of the Global Preferences Survey, each from 0 to 10. The
+questions are validated; one answer per preference is what the survey itself uses, and it
+describes an attitude in general, not how the person will decide a particular case. 5 is the
+middle of the scale, not the population average.
 
-What each leaning leaves out of view, its counterweight question and the mechanisms it makes
-likelier are `derived` from the dimension definitions and the mechanisms' summaries. Whether
-tailoring the dialogue to a self-rated pattern improves decisions has not been tested; the
-dialogue study (roadmap) compares dialogues with and without a pattern. A dialogue keeps a
-snapshot of the pattern it started with, and every question records the leaning it
-counterweighs (`pattern`), so the comparison can be made. The conclusion's "your pattern in
-this decision" is Claude's reading of the dialogue, labelled as such.
+What an answer goes with is what the cited studies found (dohmen2011, falk2018, falk2023).
+The dialogue uses clear leanings to choose where to look: it asks how a leaning bears on this
+decision. That use is a design choice, not a tested intervention, and the interface claims no
+effect for it; the dialogue study (roadmap) compares dialogues with and without a pattern. A
+dialogue keeps a snapshot of the answers it started with, and every question records the
+leaning it asks about (`pattern`). The conclusion's "your pattern in this decision" is
+Claude's reading of the dialogue, labelled as such.
 
 ## What a decision report may say
 

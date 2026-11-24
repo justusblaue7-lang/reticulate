@@ -2,14 +2,14 @@ import { useState } from "react";
 import { DESIGN_LABEL } from "../../format";
 import type { Decision, Science } from "../../types";
 import { Cites } from "../Cites";
-import { PULL } from "./model";
+import { engagedBiases, PULL } from "./model";
 
-/** The documented mechanisms this decision engages, each with what to do about it. */
+/** The documented biases this decision engages, with the evidence, and a remedy where one is proven. */
 export function WatchOuts({ science, decision }: { science: Science; decision: Decision }) {
   const [all, setAll] = useState(false);
   const notes = new Map(decision.watch_outs.map((w) => [w.mechanism_id, w]));
   const features = new Map(science.features.map((f) => [f.id, f]));
-  const engaged = [...decision.signature.mechanisms].sort((a, b) => b.level - a.level || Number(notes.has(b.mechanism_id)) - Number(notes.has(a.mechanism_id)));
+  const engaged = [...engagedBiases(science, decision)].sort((a, b) => b.level - a.level || Number(notes.has(b.mechanism_id)) - Number(notes.has(a.mechanism_id)));
   const main = engaged.filter((m) => m.level >= 2);
   const shown = all || main.length === 0 ? engaged : main;
 
@@ -50,21 +50,15 @@ export function WatchOuts({ science, decision }: { science: Science; decision: D
                   Your decision involves {m.features.map((f) => features.get(f)?.name.toLowerCase()).join(" and ")}.
                 </p>
               )}
-              <div className="move">
-                <span className="kicker">What to do</span>
-                <p className="move-check">{note?.check || move.text}</p>
-                {note?.check && <p className="move-general">{move.text}</p>}
-                <span className={`basis ${move.basis}`}>{move.basis === "tested" ? "Tested in an intervention study" : "Follows from the research; not tested as an intervention"}</span>
-              </div>
+              {move && (
+                <div className="move">
+                  <span className="kicker">Proven remedy</span>
+                  <p className="move-check">{note?.check || move.text}</p>
+                  {note?.check && <p className="move-general">{move.text}</p>}
+                </div>
+              )}
               <details className="evidence">
                 <summary>Evidence</summary>
-                {move.basis === "tested" && (
-                  <div className="evidence-item">
-                    <span className="design">The countermove</span>
-                    <p>{move.finding}</p>
-                    <Cites refs={move.refs} science={science} />
-                  </div>
-                )}
                 {mech.evidence.map((e, i) => (
                   <div key={i} className="evidence-item">
                     <span className="design">{DESIGN_LABEL[e.design]}</span>
@@ -72,10 +66,14 @@ export function WatchOuts({ science, decision }: { science: Science; decision: D
                     <Cites refs={e.refs} science={science} />
                   </div>
                 ))}
-                <div className="evidence-item">
-                  <span className="design">The effect</span>
-                  <Cites refs={[...new Set([...mech.refs, ...(move.basis === "derived" ? move.refs : [])])]} science={science} />
-                </div>
+                {move && (
+                  <div className="evidence-item">
+                    <span className="design">The remedy</span>
+                    <p>{move.finding}</p>
+                    <Cites refs={move.refs} science={science} />
+                  </div>
+                )}
+                {!move && <p className="note">No remedy for this bias has met the evidence bar (a meta-analysis or field trials), so none is given.</p>}
               </details>
             </article>
           );

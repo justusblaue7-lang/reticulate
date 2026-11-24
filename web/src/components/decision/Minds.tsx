@@ -8,7 +8,7 @@ import { estimate, observedPerCall, panelCalls, suggestPanel } from "./model";
 
 const MAX = 6;
 
-/** An avatar's eight tendencies as plain values, for its leanings. */
+/** An avatar's six attitudes as plain values, for its leanings. */
 const values = (a: Avatar) => Object.fromEntries(Object.entries(a.dimensions).map(([k, v]) => [k, v.value]));
 
 /** The attitudes that set a mind apart: its pronounced leanings, strongest first. */

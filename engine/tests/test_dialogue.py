@@ -23,7 +23,7 @@ def _say(client, decision_id: str, answer: str | None = None, skip: bool = False
 def test_system_prompt_is_frozen_and_compiled_from_the_science():
     text = prompts.system_prompt()
     assert text == prompts.system_prompt() and len(PROMPT_VERSION) == 12
-    for needle in ('"id": "premortem"', '"id": "commitment"', '"id": "loss_aversion"', "Think like a trader"):
+    for needle in ('"id": "outcomes"', '"id": "commitment"', '"id": "loss_aversion"', "Save More Tomorrow", "Cochrane"):
         assert needle in text
     assert "<stages>" in text and "<moves>" in text and "<mechanisms>" in text
 
@@ -104,7 +104,7 @@ def test_the_panel_result_reaches_the_guide_with_the_next_answer(configured):
     engine = configured.app.dependency_overrides[get_engine]()  # the one FakeEngine of this client
     decision = _start(configured)
     analysed(configured, decision["id"])
-    configured.post(f"/api/decisions/{decision['id']}/panel", json={"profiles": ["venture_capitalist", "municipal_treasurer"], "replicates": 1})
+    configured.post(f"/api/decisions/{decision['id']}/panel", json={"profiles": ["software_founder", "secondary_teacher"], "replicates": 1})
     queued = configured.get(f"/api/decisions/{decision['id']}").json()
     assert queued["dialogue"]["pending"] and queued["dialogue"]["pending"][0].startswith("<panel>")
     answered = _say(configured, decision["id"], "Interesting.").json()
@@ -123,7 +123,7 @@ def test_a_decision_rated_by_hand_can_start_a_dialogue_later(configured):
 
 
 def test_people_are_shown_by_name_and_look_but_simulated_by_role(library):
-    profile = library.get("family_business_successor")
+    profile = library.get("master_electrician")
     assert profile.person and profile.person.name and profile.person.look
     text = render_profile(profile)
     assert profile.name in text

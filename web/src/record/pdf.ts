@@ -337,7 +337,7 @@ function review(science: Science, decision: Decision, c: Conclusion, number: num
       c.decided ? "Decided on " : "Dialogue concluded on ",
       { text: day(decision.dialogue?.concluded_at ?? decision.updated_at), color: INK },
       ...(c.review ? [". Come back to it ", { text: when(c.review), color: INK }] : []),
-      ". Read your reasons before you look at how things turned out, so the outcome does not rewrite them.",
+      ". Once an outcome is known, people judge it as more predictable than it was (hindsight bias, confirmed in a meta-analysis). This record keeps what you knew, expected and weighed at the time.",
     ],
     style: "body",
   });
@@ -365,7 +365,7 @@ function review(science: Science, decision: Decision, c: Conclusion, number: num
       },
     });
     out.push({
-      text: "The six elements of decision quality; a decision is only as good as its weakest one (Spetzler, Winter & Meyer, 2016). This is Claude's reading of the dialogue, not a measurement.",
+      text: "How fully the dialogue covered each part of the decision. Claude's reading of the dialogue, not a measurement.",
       style: "note",
     });
   }
@@ -432,16 +432,23 @@ function biases(science: Science, decision: Decision, number: number): Content[]
   const mechanisms = new Map(science.mechanisms.map((m) => [m.id, m]));
   const out: Content[] = [
     section(number, "Biases at play", "What may pull on this decision"),
-    { text: "Documented decision biases that match this decision, each with a check. How each could apply here is Claude's reading.", style: "note", margin: [0, -4, 0, 10] },
+    {
+      text: "Biases confirmed by a meta-analysis, a replication across many labs or large field data, matched to this decision. How each could apply here is Claude's reading. A remedy is given only where trials have proven one.",
+      style: "note",
+      margin: [0, -4, 0, 10],
+    },
   ];
   for (const w of decision.watch_outs) {
     const m = mechanisms.get(w.mechanism_id);
+    if (!m) continue; // a bias from an earlier version of the science
+    const stack: Content[] = [
+      { text: m.name, bold: true, color: INK, fontSize: 10 },
+      { text: w.here, margin: [0, 2, 0, 3] },
+      { text: m.evidence[0]?.finding ?? "", fontSize: 8, color: MUTED, margin: [0, 0, 0, 3] },
+    ];
+    if (m.countermove) stack.push({ text: [{ text: "Proven remedy  ", bold: true, fontSize: 7.5, color: ACCENT }, w.check || m.countermove.text] });
     out.push({
-      stack: [
-        { text: m?.name ?? w.mechanism_id.replace(/_/g, " "), bold: true, color: INK, fontSize: 10 },
-        { text: w.here, margin: [0, 2, 0, 3] },
-        { text: [{ text: "Check  ", bold: true, fontSize: 7.5, color: ACCENT }, w.check] },
-      ],
+      stack,
       margin: [0, 0, 0, 12],
       unbreakable: true,
     });
