@@ -158,10 +158,7 @@ export const Home = forwardRef<ComposerHandle, Props>(function Home(props, compo
           <span className="block-kicker">Your pattern</span>
           <h2 className="maxim">“To examine myself and others.”</h2>
           <p className="byline">Socrates on his task · Plato, Apology 28e</p>
-          <p className="band-lede">
-            Six questions from the Global Preferences Survey, answered by 80,000 people in 76 countries and validated against choices with real
-            money. Your answers show the dialogue where to look. It never tells you who you are; it asks.
-          </p>
+          <p className="band-lede">From the Global Preferences Survey (Falk et al., 2018).</p>
         </Band>
         <div className="container you-check rise">
           <PatternCheck science={science} pattern={props.pattern} onPattern={props.onPattern} />
