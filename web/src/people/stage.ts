@@ -5,6 +5,7 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import type { PersonStyle } from "../types";
+import { HEIGHT } from "./style";
 import { applyStyle, disposePerson, loadPerson, type Person, type PersonAsset } from "./model";
 
 /** 0 = the full figure, 1 = the face. */
@@ -212,8 +213,11 @@ export class PersonStage {
     const eyes = p?.eyes ?? height * 0.93;
     const z = this.zoomShown;
     const smooth = z * z * (3 - 2 * z);
-    const span = THREE.MathUtils.lerp(height * 1.12, 0.34, smooth); // what must fit, in metres
-    const centre = THREE.MathUtils.lerp(height * 0.52, eyes - 0.04, Math.pow(smooth, 0.8));
+    // The full figure is framed for the person as built at their tallest, not as shown, so that a
+    // change of height shows as a change of size.
+    const frameHeight = p ? p.base.height * HEIGHT.max : height;
+    const span = THREE.MathUtils.lerp(frameHeight * 1.12, 0.34, smooth); // what must fit, in metres
+    const centre = THREE.MathUtils.lerp(frameHeight * 0.52, eyes - 0.04, Math.pow(smooth, 0.8));
     const vertical = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
     const distance = Math.max(span / 2 / vertical, (span * 0.62) / 2 / (vertical * this.camera.aspect));
     this.camera.position.set(0, centre + 0.02 * (1 - smooth), distance);

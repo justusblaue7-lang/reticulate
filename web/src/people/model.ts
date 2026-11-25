@@ -118,13 +118,18 @@ const RECOLOUR = /* glsl */ `
   vec3 skinGain = rtSkinGain;
   float wide = 1.6;
 #endif
-  float eye = clamp(vRtRegion.w, 0.0, 1.0);
-  float skin = rtSkin(c, skinRef, wide) * (1.0 - shoe) * (1.0 - eye);
+  float eye = smoothstep(0.5, 0.8, vRtRegion.w);
+  float bare = 0.0;
+#ifdef RT_CLOTH
+  bare = smoothstep(0.2, 0.35, vRtRegion.z);
+#endif
+  wide = max(wide, bare * smoothstep(0.4, 0.6, vRtRegion.y)); // all of a bare foot, ankle too
+  float skin = rtSkin(c, skinRef, wide) * (1.0 - shoe * (1.0 - bare)) * (1.0 - eye);
 #ifdef RT_SKIN
-  // Hair painted on the scalp and the brows: nearer the hair cards' colour than the skin's.
-  float hairish = rtNear(c, rtHairTone, 0.25, 1.0) * rtHasHair * (1.0 - eye);
-  float painted = hairish * smoothstep(-0.1, 0.1, hairish - skin);
-  skin *= 1.0 - painted;
+  // The face texture is skin throughout, apart from the eyes and hair painted on the scalp and
+  // brows: all of it takes the tone, so no patches stay behind and lips darken with the skin.
+  float painted = rtNear(c, rtHairTone, 0.25, 1.0) * rtHasHair * (1.0 - eye);
+  skin = (1.0 - eye) * (1.0 - painted);
 #endif
   vec3 outc = c;
 #ifdef RT_CLOTH
@@ -135,7 +140,12 @@ const RECOLOUR = /* glsl */ `
   outc = mix(outc, rtAt(target, l * rtLum(target) / max(ref, 1e-3)), on);
 #endif
   vec3 toned = c * skinGain;
-  outc = mix(outc, rtAt(toned / max(rtLum(toned), 1e-3), rtLum(toned)), skin * rtSkinOn);
+  // Lightening dark skin would magnify every mark in the texture: contrast is softened as it brightens.
+  float from = max(rtLum(skinRef), 1e-4);
+  float to = max(rtLum(skinRef * skinGain), 1e-4);
+  float soft = 1.0 / (1.0 + 0.6 * max(log(to / from), 0.0));
+  float light = to * pow(max(l, 1e-5) / from, soft);
+  outc = mix(outc, rtAt(toned / max(rtLum(toned), 1e-3), light), skin * rtSkinOn);
 #ifdef RT_SKIN
   outc = mix(outc, rtAt(rtHair, l * rtLum(rtHair) / max(rtHairRef, 1e-3)), painted * rtHairOn);
 #endif
@@ -276,7 +286,7 @@ const LOWER = /Thigh|Calf/;
 const HIPS = /Pelvis/; // shared by trousers and the hem of a jacket: counts a third
 const FEET = /Foot|Toe/;
 const HANDS = /Hand|Finger/;
-const EYES = /Eye/;
+const EYES = /[LR]Eye$/; // the eyeballs only: lids and brows are skin
 
 /** Per vertex: how much it belongs to the lower body (trousers, skirt) and to the feet (shoes).
  * The hands are kept aside too: they are bare on everyone, so they show the body's own skin. */

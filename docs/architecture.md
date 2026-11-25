@@ -113,8 +113,9 @@ interface and never rendered into a prompt; the simulation sees the role (`name`
 **Your own look.** In the builder a look starts from one of the 32 people and is then changed:
 skin tone, hair colour, the colours of top and bottom, height and build (`person.style`;
 palettes in `people/style.ts`). `model.ts` applies a style in the shader, so changes show at
-once and the textures stay shared: skin is found by colour (near the face's skin, and on the
-body near the hands' skin, in chromaticity and lightness) and scaled to the chosen tone; hair
+once and the textures stay shared: the whole face takes the tone (eyeballs and painted hair
+aside); on the body, skin is found by colour (near the hands' skin, in chromaticity and
+lightness); contrast is softened when skin is lightened; hair
 cards and clothes keep their light and shade and take the chosen colour, rolled off and
 pulled to grey rather than clipped. Top and bottom are told apart by the bones each vertex
 follows, decided per garment piece (UV island), so a jacket's hem keeps the jacket's colour.
